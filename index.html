@@ -907,6 +907,7 @@ html, body {
       <button id="sidebar-save-btn" class="sidebar-btn">Save</button>
       <button id="sidebar-load-btn" class="sidebar-btn">Load</button>
       <button id="sidebar-config-btn" class="sidebar-btn">Config</button>
+      <button id="sidebar-fullscreen-btn" class="sidebar-btn">Fullscreen</button>
       <button id="sidebar-title-btn" class="sidebar-btn">Back to title</button>
     </div>
     <button id="sidebar-close-btn" class="sidebar-btn sidebar-close-btn">閉じる</button>
@@ -1301,7 +1302,7 @@ const autoMaxWait = 1800;      // 長文でも最大〇秒
       id: "c1_004",
       type: "dialogue",
       name: "{NAME}",
-      text: "杏也お兄ちゃんごめんなさい、寝坊しました！！"
+      text: "杏也お兄ちゃんごめんなさい、寝坊した！！"
     },
 
     {
@@ -1513,6 +1514,25 @@ const autoMaxWait = 1800;      // 長文でも最大〇秒
 
 
 // =========================================================
+// シーン情報
+// =========================================================
+
+const sceneInfo = {
+
+  prologue: {
+    name: "プロローグ",
+    scenario: scenario
+  },
+
+  chapter1: {
+    name: "第一章",
+    scenario: chapter1Scenario
+  }
+
+};
+
+
+// =========================================================
 // 背景変更
 // =========================================================
 
@@ -1535,18 +1555,93 @@ function changeBackground(imageName) {
     `url("backgrounds/${imageName}")`;
 }
 
+
+// =========================================================
+// 背景画像の先読み
+// =========================================================
+
+function preloadBackground(imageName) {
+
+  return new Promise(
+    resolve => {
+
+      const img =
+        new Image();
+
+
+      img.onload =
+        () => {
+          resolve();
+        };
+
+
+      img.onerror =
+        () => {
+
+          console.warn(
+            "背景画像の先読みに失敗しました:",
+            imageName
+          );
+
+          resolve();
+        };
+
+
+      img.src =
+        `backgrounds/${imageName}`;
+    }
+  );
+}
+
+
   // =========================================================
   // 現在のシナリオ取得
   // =========================================================
 
-  function getCurrentScenario() {
+function getCurrentScenario() {
 
-    if (currentScene === "chapter1") {
-      return chapter1Scenario;
-    }
+  return (
+    sceneInfo[currentScene]?.scenario
+    ?? scenario
+  );
+}
 
-    return scenario;
-  }
+
+// =========================================================
+// 現在の章名取得
+// =========================================================
+
+function getCurrentChapterName() {
+
+  return (
+    sceneInfo[currentScene]?.name
+    ?? "不明な章"
+  );
+}
+
+
+// =========================================================
+// 章名からシーンIDを取得
+// 旧セーブデータ互換用
+// =========================================================
+
+function getSceneIdFromChapterName(
+  chapterName
+) {
+
+  const entry =
+    Object.entries(
+      sceneInfo
+    ).find(
+      ([sceneId, info]) =>
+        info.name === chapterName
+    );
+
+
+  return entry
+    ? entry[0]
+    : "prologue";
+}
 
 
   // =========================================================
@@ -2640,11 +2735,11 @@ document
   }
 
 
-  // =========================================================
-  // 第一章開始
-  // =========================================================
+// =========================================================
+// 第一章開始
+// =========================================================
 
-function startChapter1() {
+async function startChapter1() {
 
   if (isChapterStarting) {
     return;
@@ -2658,29 +2753,69 @@ function startChapter1() {
   stopAutoMode();
 
 
-  currentScene = "chapter1";
-  currentStep = 0;
+  currentScene =
+    "chapter1";
+
+  currentStep =
+    0;
 
 
-  setTimeout(
-    () => {
+  // -------------------------------------------------------
+  // 第一章冒頭の背景を暗転中に先読み
+  // -------------------------------------------------------
 
-      renderDialogueScreen();
-
-      updateDialogue();
-
-
-      // 第一章を表示
-      gameContainer.classList.remove(
-        'fade-out'
-      );
+  const firstData =
+    chapter1Scenario[0];
 
 
-      isChapterStarting = false;
+  if (
+    firstData &&
+    firstData.type === "background"
+  ) {
 
-    },
-    2000
+    await preloadBackground(
+      firstData.image
+    );
+
+
+    // 暗転中に背景をセット
+    changeBackground(
+      firstData.image
+    );
+
+
+    // 背景命令はここで処理済みなので
+    // 次のシナリオ項目から開始
+    currentStep = 1;
+  }
+
+
+  // 第一章開始までの間
+  await new Promise(
+    resolve =>
+      setTimeout(
+        resolve,
+        1600
+      )
   );
+
+
+  // 会話画面を生成
+  renderDialogueScreen();
+
+
+  // 最初の台詞を表示
+  updateDialogue();
+
+
+  // 背景・UI・台詞がすべて揃ってからフェードイン
+  gameContainer.classList.remove(
+    'fade-out'
+  );
+
+
+  isChapterStarting =
+    false;
 }
 
   // =========================================================
@@ -3743,12 +3878,9 @@ function closeSlotModal() {
         playerFirstName,
 
 
-      chapterName:
-        currentScene === "prologue"
+  chapterName:
+  getCurrentChapterName(),
 
-          ? "プロローグ"
-
-          : "第一章",
 
       currentBackground:
       currentBackground,
@@ -3851,23 +3983,19 @@ function closeSlotModal() {
     // シーン復元
     // -------------------------------------------------------
 
-    if (saveData.scene) {
+if (saveData.scene) {
 
+  currentScene =
+    saveData.scene;
 
-      currentScene =
-        saveData.scene;
+} else {
 
-
-    } else {
-
-
-      currentScene =
-        saveData.chapterName === "第一章"
-
-          ? "chapter1"
-
-          : "prologue";
-    }
+  // 古いセーブデータとの互換用
+  currentScene =
+    getSceneIdFromChapterName(
+      saveData.chapterName
+    );
+}
 
 
     // -------------------------------------------------------
@@ -4177,6 +4305,28 @@ document
           openConfigModal();
         }
       );
+
+
+// -------------------------------------------------------
+// Fullscreen
+// -------------------------------------------------------
+
+document
+  .getElementById(
+    'sidebar-fullscreen-btn'
+  )
+  .addEventListener(
+    'click',
+    () => {
+
+      stopAutoMode();
+      stopSkipMode();
+
+      closeSidebar();
+
+      toggleFullscreen();
+    }
+  );
 
 
     // -------------------------------------------------------
