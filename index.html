@@ -1089,6 +1089,16 @@ function resizeGameScreen() {
   let playerFirstName = "七星";
 
 
+// =========================================================
+// 画面演出時間
+// =========================================================
+
+const FADE_TIME = 400;
+const NAME_SCENE_WAIT = 600;
+const GAME_START_WAIT = 900;
+const CHAPTER_START_WAIT = 1600;
+
+
   // =========================================================
   // セーブスロット数
   // =========================================================
@@ -1218,7 +1228,7 @@ const autoMaxWait = 1800;      // 長文でも最大〇秒
   // プロローグ
   // ---------------------------------------------------------
 
-  const scenario = [
+ const prologueScenario = [
 
     {
       id: "p001",
@@ -1372,25 +1382,32 @@ const autoMaxWait = 1800;      // 長文でも最大〇秒
       id: "c1_014",
       type: "dialogue",
       name: "  ",
-      text: "そう言いながら、杏也お兄ちゃんは私のスカートの裾についた泥を拭う。さっき土下座した時についたであろう汚れと、ついでに皺も伸ばしてくれた。\n見違えるように綺麗になってゆくスカートを見ながら思う。やっぱり私たちって幼馴染ってよりも、むしろ――"
+      text: "そう言いながら、杏也お兄ちゃんは私のスカートの裾についた泥を拭う。さっき土下座した時についたであろう汚れと、ついでに皺も伸ばしてくれた。"
     },
 
     {
       id: "c1_015",
+      type: "dialogue",
+      name: "  ",
+      text: "どんどん綺麗になってゆくスカートを見ながら思う。やっぱり私たちって幼馴染ってよりも、むしろ――"
+    },
+
+    {
+      id: "c1_016",
       type: "dialogue",
       name: "{NAME}",
       text: "杏也お兄ちゃんってほんと、お母さんみたいだよね。"
     },
 
     {
-      id: "c1_016",
+      id: "c1_017",
       type: "dialogue",
       name: "佐久間杏也",
       text: "......また言ってるの？"
     },
 
     {
-      id: "c1_017",
+      id: "c1_018",
       type: "dialogue",
       name: "{NAME}",
       text: "だっていつも私の面倒見てくれるし、あと細かいところにも気づくでしょ？あ、あと細かすぎてちょっと口うるさいところとかそっくりだもん！"
@@ -1398,113 +1415,113 @@ const autoMaxWait = 1800;      // 長文でも最大〇秒
 
 
     {
-      id: "c1_018",
-      type: "dialogue",
-      name: "佐久間杏也",
-      text: "口うるさい、ねえ。\n......へぇ、いつも寝坊する{FIRST_NAME}ちゃんのことを起こしてあげてる僕に対してそんなこと思ってたんだ？"
-    },
-
-    {
       id: "c1_019",
       type: "dialogue",
+      name: "佐久間杏也",
+      text: "口うるさい、ねえ。\n......ふーん、いつも寝坊する{FIRST_NAME}ちゃんのことを起こしてあげてる僕に対してそんなこと思ってたんだ？"
+    },
+
+    {
+      id: "c1_020",
+      type: "dialogue",
       name: "{NAME}",
-      text: "そ、それは本当に感謝してるって！"
+      text: "そ、それに関しては本当に感謝してるって！"
     },
 
    {
-      id: "c1_020",
+      id: "c1_021",
       type: "dialogue",
       name: "佐久間杏也",
-      text: "全く、調子のいいこと言って。大体、年齢差としてはどっちかっていうと兄妹でしょ。なんでお母さんなの？"
+      text: "それに関しては、かあ。\nそれよりも、年齢差としてはどっちかっていうと兄妹でしょ。なんでお母さんなの？"
     },
 
 
     {
-      id: "c1_021",
-      type: "dialogue",
-      name: "{NAME}",
-      text: "えー、だってお兄ちゃんにはもう本物の妹がいるじゃん。私、杏奈と家族とか絶対やだ。"
-    },
-
-   {
       id: "c1_022",
       type: "dialogue",
-      name: "佐久間杏也",
-      text: "こら、そんな嫌そうな顔しないの。"
+      name: "{NAME}",
+      text: "んー......なんとなく、だけど......\nあ、あとお兄ちゃんにはもう本物の妹がいるじゃん。私、杏奈と家族とか絶対やだもん。"
     },
 
    {
       id: "c1_023",
       type: "dialogue",
       name: "佐久間杏也",
-      text: "っていうか、僕が{FIRST_NAME}ちゃんのお母さんなら杏奈は君の叔母ってことになるんじゃない？"
+      text: "こら、そんな嫌そうな顔しないの。"
     },
 
    {
       id: "c1_024",
       type: "dialogue",
       name: "佐久間杏也",
+      text: "っていうか、僕が{FIRST_NAME}ちゃんのお母さんなら杏奈は君の叔母ってことになるんじゃない？"
+    },
+
+   {
+      id: "c1_025",
+      type: "dialogue",
+      name: "佐久間杏也",
       text: "結局、杏奈と家族になってるけど。"
     },
 
     {
-      id: "c1_025",
+      id: "c1_026",
       type: "dialogue",
       name: "{NAME}",
       text: "あ......あれ？"
     },
 
     {
-      id: "c1_026",
+      id: "c1_027",
       type: "dialogue",
       name: "佐久間杏也",
       text: "気づいてなかったの？"
     },
 
     {
-      id: "c1_027",
+      id: "c1_028",
       type: "dialogue",
       name: "{NAME}",
       text: "いっ、いやいや、そんな馬鹿な。お兄ちゃんはお母さんだけど杏奈とは家族じゃなくて、だからお母さんじゃなくて......あれ？"
     },
 
     {
-      id: "c1_028",
+      id: "c1_029",
       type: "dialogue",
       name: "佐久間杏也",
       text: "はいはい、そんなこと考えてないで早く行くよ。そろそろ行かないと遅刻しちゃうでしょ？"
     },
 
     {
-      id: "c1_029",
+      id: "c1_030",
       type: "dialogue",
       name: "   ",
       text: "いつの間にかお兄ちゃんはもう歩き出していて、代わりに私のスカートは見違えるように綺麗になっている。"
     },
 
     {
-      id: "c1_030",
+      id: "c1_031",
       type: "dialogue",
       name: "{NAME}",
       text: "え、めっちゃ綺麗！すごい、さすが杏也お兄ちゃん......って、ちょっと待ってよ！！"
     },
 
     {
-      id: "c1_031",
+      id: "c1_032",
       type: "dialogue",
       name: "佐久間杏也",
       text: "どういたしまして。ほら、早く来ないと置いてくよ？"
     },
 
     {
-      id: "c1_032",
+      id: "c1_033",
       type: "dialogue",
       name: "{NAME}",
       text: "だ、だから待ってってば！"
     },
 
     {
-      id: "c1_033",
+      id: "c1_034",
       type: "dialogue",
       name: "   ",
       text: "慌ただしいだけのいつも通りの月曜の朝。少し先を歩くお兄ちゃんの背中を追いかけて、私は大きく足を踏み出した。"
@@ -1521,7 +1538,7 @@ const sceneInfo = {
 
   prologue: {
     name: "プロローグ",
-    scenario: scenario
+scenario: prologueScenario
   },
 
   chapter1: {
@@ -1602,10 +1619,9 @@ function getCurrentScenario() {
 
   return (
     sceneInfo[currentScene]?.scenario
-    ?? scenario
+    ?? prologueScenario
   );
 }
-
 
 // =========================================================
 // 現在の章名取得
@@ -2444,7 +2460,7 @@ charName.style.display =
         );
 
       },
-      900      
+GAME_START_WAIT   
 
     );
   }
@@ -2678,14 +2694,14 @@ document
 
 
       // フェードアウト後に第一章へ
-      setTimeout(
-        () => {
 
-          startChapter1();
+setTimeout(
+  () => {
+    startChapter1();
+  },
+  FADE_TIME
+);
 
-        },
-        400
-      );
     }
   );
               // ---------------------------------------------
@@ -2730,7 +2746,7 @@ document
         );
 
       },
-      600
+     NAME_SCENE_WAIT
     );
   }
 
@@ -2795,7 +2811,8 @@ async function startChapter1() {
     resolve =>
       setTimeout(
         resolve,
-        1600
+
+CHAPTER_START_WAIT
       )
   );
 
@@ -3653,17 +3670,10 @@ function openSavePage(
         ?? "七星";
 
 
-      const saveChapterName =
-        saveData.chapterName
-
-        ?? (
-          saveData.scene ===
-          "chapter1"
-
-            ? "第一章"
-
-            : "プロローグ"
-        );
+const saveChapterName =
+  saveData.chapterName
+  ?? sceneInfo[saveData.scene]?.name
+  ?? "不明な章";
 
 
       slotItem.innerHTML = `
