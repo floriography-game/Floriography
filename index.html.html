@@ -12,6 +12,28 @@
 
   <style>
     html, body {
+
+/* =========================================================
+   ゲーム画面全体
+   ========================================================= */
+
+#game-stage {
+  width: 1280px;
+  height: 720px;
+
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  transform-origin: center center;
+
+  overflow: hidden;
+
+  background-color: #2b2b2b;
+}
+
+
       margin: 0;
       padding: 0;
       width: 100%;
@@ -23,31 +45,31 @@
       user-select: none;
     }
 
-    #game-container {
-      width: 100vw;
-      height: 100vh;
-      height: 100dvh;
+#game-container {
+  width: 100%;
+  height: 100%;
 
-      background-color: #2b2b2b;
+  background-color: #2b2b2b;
 
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 30px;
-      padding: 20px;
-      box-sizing: border-box;
-      transition: opacity 0.4s ease;
-      position: relative;
-    }
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 
-    .fade-out {
-      opacity: 0;
-    }
+  gap: 30px;
+  padding: 20px;
+
+  box-sizing: border-box;
+
+  transition: opacity 0.4s ease;
+
+  position: relative;
+}
+
 
     /* --- タイトル画面 --- */
     #title-text {
@@ -85,8 +107,8 @@
     }
 
     /* --- 右上MENUボタン --- */
-    .menu-trigger-container {
-      position: fixed;
+.menu-trigger-container {
+  position: absolute;
       top: 15px;
       right: 15px;
       z-index: 1000;
@@ -117,8 +139,8 @@
 
     /* --- サイドバー UI --- */
     .sidebar-overlay {
-      position: fixed;
-      top: 0;
+      position: absolute;     
+       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
@@ -135,7 +157,7 @@
     }
 
     .sidebar {
-      position: fixed;
+      position: absolute;
       top: 0;
       right: -280px;
       width: 200px;
@@ -204,7 +226,7 @@
 
     /* --- モーダル共通 --- */
     .slot-modal-overlay, .log-modal-overlay {
-      position: fixed;
+      position: absolute;
       top: 0;
       left: 0;
       width: 100%;
@@ -512,330 +534,48 @@
       100% { transform: translateY(-5px); }
     }
 
-
 /* =========================================================
-   スマートフォン縦画面
+   SKIPボタン
    ========================================================= */
 
-@media (max-width: 700px) and (orientation: portrait) {
+.skip-btn {
+  position: absolute;
+  top: 8px;
+  right: 45px;
 
-  html,
-  body {
-    width: 100%;
-    height: 100%;
-    background-color: #111111;
-  }
+  background: transparent;
+  border: 1px solid #888;
+  border-radius: 4px;
 
+  font-size: 14px;
+  color: #888;
 
-  body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+  padding: 2px 8px;
 
+  cursor: pointer;
+  transition: all 0.2s ease;
 
-  #game-container {
-    width: 100vw;
-    aspect-ratio: 16 / 9;
+  z-index: 20;
+}
 
-    height: auto;
+.skip-btn:hover {
+  color: #d4af37;
+  border-color: #d4af37;
+}
 
-    max-height: 100vh;
-    max-height: 100dvh;
-
-    padding: 8px;
-
-    box-sizing: border-box;
-  }
-
-
-  #title-text {
-    font-size: 34px;
-  }
-
-
-  .btn {
-    padding: 7px 18px;
-    font-size: 12px;
-  }
-
-
-  .game-screen {
-    padding-bottom: 6px;
-  }
-
-
-  .dialogue-box {
-    width: 94%;
-
-    height: 95px;
-    min-height: 0;
-
-    padding: 8px 12px;
-
-    font-size: 11px;
-    line-height: 1.45;
-  }
-
-
-  .character-name {
-    font-size: 11px;
-    margin-bottom: 3px;
-  }
-
-
-  #dialogue-text {
-    font-size: 11px;
-    line-height: 1.45;
-  }
-
-
-  .menu-trigger-container {
-    top: 5px;
-    right: 5px;
-  }
-
-
-  .sys-btn {
-    padding: 4px 8px;
-    font-size: 10px;
-    min-height: 28px;
-  }
-
-
-  .auto-btn {
-    top: 5px;
-    right: 82px;
-
-    font-size: 9px;
-    padding: 2px 5px;
-  }
-
-
-  .skip-btn {
-    top: 5px;
-    right: 41px;
-
-    font-size: 9px;
-    padding: 2px 5px;
-  }
-
-
-  .close-btn {
-    top: 5px;
-    right: 8px;
-
-    font-size: 15px;
-  }
-
-
-  .next-mark {
-    right: 6px;
-    bottom: 3px;
-
-    font-size: 13px;
-    padding: 4px 6px;
-  }
+/* SKIP実行中 */
+.skip-btn.active-skip {
+  color: #000;
+  background-color: #d4af37;
+  border-color: #d4af37;
+  font-weight: bold;
 }
 
 
 /* =========================================================
-   スマートフォン横画面
+   AUTOボタン
    ========================================================= */
 
-@media (max-width: 950px) and (orientation: landscape) {
-
-  #game-container {
-    padding: 8px;
-  }
-
-
-  #title-text {
-    font-size: 42px;
-  }
-
-
-  .game-screen {
-    padding-bottom: 8px;
-  }
-
-
-  .dialogue-box {
-    width: 92%;
-
-    min-height: 125px;
-    max-height: 42dvh;
-
-    padding: 13px 18px;
-
-    font-size: 14px;
-    line-height: 1.55;
-  }
-
-
-  #dialogue-text {
-    font-size: 14px;
-    line-height: 1.55;
-  }
-
-
-  .character-name {
-    font-size: 14px;
-    margin-bottom: 4px;
-  }
-
-
-  .menu-trigger-container {
-    top: 6px;
-    right: 6px;
-  }
-
-
-  .sys-btn {
-    min-height: 36px;
-
-    padding: 5px 12px;
-  }
-
-
-  .slot-modal,
-  .config-modal {
-    max-height: 90dvh;
-  }
-
-
-  .log-modal {
-    height: 90dvh;
-  }
-}
-
-
-  /* サイドメニュー */
-  .sidebar {
-    width: min(82vw, 260px);
-
-    padding: 24px 16px;
-  }
-
-
-  /* セーブ・ロード画面 */
-  .slot-modal {
-    width: 94%;
-
-    max-height: 88vh;
-    max-height: 88dvh;
-
-    padding: 18px;
-
-    gap: 14px;
-  }
-
-
-  .slot-modal-header {
-    font-size: 18px;
-  }
-
-
-  .slot-list {
-    max-height: 62vh;
-    max-height: 62dvh;
-  }
-
-
-  .slot-item {
-    padding: 12px 14px;
-
-    flex-direction: column;
-    align-items: flex-start;
-
-    gap: 5px;
-  }
-
-
-  /* バックログ */
-  .log-modal {
-    width: 94%;
-    height: 86vh;
-    height: 86dvh;
-
-    padding: 16px;
-  }
-
-
-  .log-modal-header {
-    font-size: 18px;
-  }
-
-
-  .log-text {
-    font-size: 14px;
-  }
-
-
-  /* Config */
-  .config-modal {
-    width: 94%;
-
-    padding: 18px;
-  }
-
-
-  /* 名前確認 */
-  .name-confirm-box {
-    width: 90%;
-
-    padding: 22px 18px;
-  }
-
-
-  .name-confirm-text {
-    font-size: 17px;
-  }
-
-
-  .name-confirm-player-name {
-    font-size: 21px;
-  }
-
-
-  .name-confirm-btn {
-    min-width: 90px;
-
-    padding: 10px 18px;
-  }
-}
-
-    /* SKIPボタン */
-    .skip-btn {
-      position: absolute;
-      top: 8px;
-      right: 45px;
-      background: transparent;
-      border: 1px solid #888;
-      border-radius: 4px;
-      font-size: 14px;
-      color: #888;
-      padding: 2px 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      z-index: 20;
-    }
-
-    .skip-btn:hover {
-      color: #d4af37;
-      border-color: #d4af37;
-    }
-
-    /* スキップ実行中のボタン点灯スタイル */
-    .skip-btn.active-skip {
-      color: #000;
-      background-color: #d4af37;
-      border-color: #d4af37;
-      font-weight: bold;
-    }
-
-
-    /* AUTOボタン */
 .auto-btn {
   position: absolute;
   top: 8px;
@@ -851,7 +591,6 @@
   padding: 2px 8px;
 
   cursor: pointer;
-
   transition: all 0.2s ease;
 
   z-index: 20;
@@ -870,113 +609,6 @@
   font-weight: bold;
 }
 
-     /* --- 名前確認ウィンドウ --- */
-
-.name-confirm-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  width: 100%;
-  height: 100%;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  z-index: 100;
-
-  /* 最初は背景をほぼ透明に */
-  background-color: rgba(0, 0, 0, 0);
-
-  backdrop-filter: blur(0px);
-
-  transition:
-    background-color 0.45s ease,
-    backdrop-filter 0.45s ease;
-}
-
-.name-confirm-overlay.show {
-  background-color: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(2px);
-}
-
-.name-confirm-box {
-  width: 90%;
-  max-width: 420px;
-
-  background-color: rgba(25, 25, 25, 0.97);
-
-  border: 1px solid #d4af37;
-  border-radius: 8px;
-
-  padding: 30px;
-
-  box-sizing: border-box;
-
-  text-align: center;
-
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
-}
-
-  opacity: 0;
-  transform: translateY(8px) scale(0.98);
-
-  transition:
-  opacity 0.28s ease 1.2 s ;
-  transform 0.28s ease;
-
-.name-confirm-overlay.show .name-confirm-box {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
-
-.name-confirm-text {
-  font-size: 19px;
-  line-height: 1.8;
-
-  margin-bottom: 25px;
-
-  color: #ffffff;
-}
-
-.name-confirm-player-name {
-  color: #d4af37;
-  font-size: 23px;
-  font-weight: bold;
-
-  margin: 8px 0;
-}
-
-.name-confirm-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-}
-
-.name-confirm-btn {
-  min-width: 100px;
-
-  padding: 10px 25px;
-
-  font-size: 16px;
-  font-family: 'Shippori Mincho', serif;
-
-  background-color: transparent;
-  color: #ffffff;
-
-  border: 1px solid #d4af37;
-  border-radius: 4px;
-
-  cursor: pointer;
-
-  transition: all 0.2s ease;
-}
-
-.name-confirm-btn:hover {
-  background-color: #d4af37;
-  color: #000000;
-}
 
 /* =========================================================
    名前確認ウィンドウ
@@ -1093,6 +725,9 @@
 
 <body>
 
+  <div id="game-stage">
+
+
   <!-- ゲーム画面本体 -->
   <div id="game-container"></div>
 
@@ -1148,18 +783,58 @@
     </div>
   </div>
 
+  </div>
+
 <script>
 
   // =========================================================
   // DOM取得
   // =========================================================
 
-  const gameContainer =
-    document.getElementById('game-container');
+const gameStage =
+  document.getElementById('game-stage');
 
-  const menuContainer =
-    document.getElementById('menu-trigger-container');
+const gameContainer =
+  document.getElementById('game-container');
 
+const menuContainer =
+  document.getElementById('menu-trigger-container');
+
+
+// =========================================================
+// ゲーム画面全体のサイズ調整
+// =========================================================
+
+const GAME_WIDTH = 1280;
+const GAME_HEIGHT = 720;
+
+function resizeGameScreen() {
+
+  const viewportWidth =
+    window.innerWidth;
+
+  const viewportHeight =
+    window.innerHeight;
+
+
+  const scaleX =
+    viewportWidth / GAME_WIDTH;
+
+  const scaleY =
+    viewportHeight / GAME_HEIGHT;
+
+
+  // 縦横とも画面内に収まる最大倍率
+  const scale =
+    Math.min(
+      scaleX,
+      scaleY
+    );
+
+
+  gameStage.style.transform =
+    `translate(-50%, -50%) scale(${scale})`;
+}
 
   // =========================================================
   // プレイヤーデータ
@@ -4313,6 +3988,8 @@ document.addEventListener(
   'DOMContentLoaded',
   () => {
 
+    resizeGameScreen();
+
     initUIEvents();
 
 
@@ -4336,6 +4013,12 @@ document.addEventListener(
     showTitleScreen();
 
   }
+);
+
+
+   window.addEventListener(
+  'resize',
+  resizeGameScreen
 );
 
 </script>
