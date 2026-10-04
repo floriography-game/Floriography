@@ -1,0 +1,4091 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Floriography</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet">
+
+  <style>
+    html, body {
+
+/* =========================================================
+   ゲーム画面全体
+   ========================================================= */
+
+#game-stage {
+  width: 1280px;
+  height: 720px;
+
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  transform-origin: center center;
+
+  overflow: hidden;
+
+  background-color: #2b2b2b;
+}
+
+
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #1a1a1a;
+      color: #ffffff;
+      font-family: 'Shippori Mincho', serif;
+      user-select: none;
+    }
+
+#game-container {
+  width: 100%;
+  height: 100%;
+
+  background-color: #2b2b2b;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  gap: 30px;
+  padding: 20px;
+
+  box-sizing: border-box;
+
+  transition: opacity 0.4s ease;
+
+  position: relative;
+}
+
+
+    /* --- タイトル画面 --- */
+    #title-text {
+      font-family: 'Dancing Script', cursive;
+      font-size: 68px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: #ffffff;
+      text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+      margin: 0;
+      text-align: center;
+    }
+
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .btn {
+      padding: 12px 40px;
+      font-size: 20px;
+      font-family: 'Shippori Mincho', serif;
+      background-color: transparent;
+      color: #ffffff;
+      border: 1px solid #ffffff;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #ffffff;
+      color: #2b2b2b;
+    }
+
+    /* --- 右上MENUボタン --- */
+.menu-trigger-container {
+  position: absolute;
+      top: 15px;
+      right: 15px;
+      z-index: 1000;
+      display: none;
+    }
+
+    .menu-trigger-container.active {
+      display: block;
+    }
+
+    .sys-btn {
+      padding: 8px 20px;
+      font-size: 15px;
+      font-family: 'Shippori Mincho', serif;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: #d4af37;
+      border: 1px solid #d4af37;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      letter-spacing: 1px;
+    }
+
+    .sys-btn:hover {
+      background-color: #d4af37;
+      color: #000000;
+    }
+
+    /* --- サイドバー UI --- */
+    .sidebar-overlay {
+      position: absolute;     
+       top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 2000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .sidebar-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .sidebar {
+      position: absolute;
+      top: 0;
+      right: -280px;
+      width: 200px;
+      height: 100%;
+      background-color: rgba(20, 20, 20, 0.95);
+      border-left: 1px solid #d4af37;
+      box-shadow: -5px 0 15px rgba(0, 0, 0, 0.4);
+      z-index: 2001;
+      display: flex;
+      flex-direction: column;
+      padding: 30px 20px;
+      box-sizing: border-box;
+      transition: right 0.3s ease;
+    }
+
+    .sidebar.open {
+      right: 0;
+    }
+
+    .sidebar-title {
+      font-size: 20px;
+      color: #d4af37;
+      border-bottom: 1px solid #d4af37;
+      padding-bottom: 10px;
+      margin-bottom: 30px;
+      text-align: center;
+      letter-spacing: 2px;
+    }
+
+    .sidebar-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .sidebar-btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      font-family: 'Shippori Mincho', serif;
+      background-color: transparent;
+      color: #ffffff;
+      border: 1px solid rgba(212, 175, 55, 0.5);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .sidebar-btn:hover {
+      background-color: #d4af37;
+      color: #000000;
+      border-color: #d4af37;
+    }
+
+    .sidebar-close-btn {
+      margin-top: auto;
+      border-color: rgba(255, 255, 255, 0.3);
+      color: #888888;
+    }
+
+    .sidebar-close-btn:hover {
+      background-color: #ffffff;
+      color: #000000;
+    }
+
+    /* --- モーダル共通 --- */
+    .slot-modal-overlay, .log-modal-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.85);
+      z-index: 3000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .slot-modal-overlay.active, .log-modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .slot-modal {
+      width: 90%;
+      max-width: 600px;
+      background-color: rgba(25, 25, 25, 0.95);
+      border: 1px solid #d4af37;
+      border-radius: 8px;
+      padding: 25px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .slot-modal-header {
+      font-size: 22px;
+      color: #d4af37;
+      text-align: center;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+      padding-bottom: 10px;
+      letter-spacing: 2px;
+    }
+
+   .slot-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+    .slot-item {
+      padding: 15px 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      background-color: rgba(0, 0, 0, 0.5);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+
+    .slot-item:hover {
+      border-color: #d4af37;
+      background-color: rgba(212, 175, 55, 0.15);
+    }
+
+    .slot-info {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .slot-number {
+      font-size: 16px;
+      color: #d4af37;
+      font-weight: bold;
+    }
+
+    .slot-detail {
+      font-size: 14px;
+      color: #cccccc;
+    }
+
+    .slot-date {
+      font-size: 12px;
+      color: #888888;
+    }
+
+    /* --- バックログモーダル --- */
+    .log-modal {
+      width: 90%;
+      max-width: 700px;
+      height: 80vh;
+      background-color: rgba(25, 25, 25, 0.8);
+      border: 1px solid #d4af37;
+      border-radius: 8px;
+      padding: 25px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .log-modal-header {
+      font-size: 22px;
+      color: #d4af37;
+      text-align: center;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+      padding-bottom: 10px;
+      letter-spacing: 2px;
+      flex-shrink: 0;
+    }
+
+    .log-container {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      user-select: text;
+    }
+
+    .log-container::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .log-container::-webkit-scrollbar-thumb {
+      background: #d4af37;
+      border-radius: 3px;
+    }
+
+    .log-container::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .log-entry {
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+      padding-bottom: 12px;
+    }
+
+    .log-speaker {
+      color: #d4af37;
+      font-size: 15px;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .log-text {
+      color: #e0e0e0;
+      font-size: 16px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    /* --- ゲーム本編画面 --- */
+    .game-screen {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      padding-bottom: 30px;
+      box-sizing: border-box;
+    }
+
+    /* 会話枠 */
+    .dialogue-box {
+  width: calc(100% - 90px);
+  max-width: none;
+
+  height: 180px;
+
+  background-color: rgba(0, 0, 0, 0.8);
+  border: 1px solid #d4af37;
+  border-radius: 8px;
+
+  padding: 20px 25px;
+
+  box-sizing: border-box;
+
+  font-size: 18px;
+  line-height: 1.8;
+
+  position: relative;
+
+  transform: translateY(30px);
+}
+
+ .character-name {
+  position: absolute;
+
+  /* 会話ボックス左端に揃える */
+  left: 0;
+
+  /* 会話ボックスの外側へ持ち上げる */
+  top: -48px;
+
+  min-width: 190px;
+  height: 42px;
+
+  padding: 0 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  background-color: rgba(0, 0, 0, 0.82);
+
+  border: 1px solid #d4af37;
+  border-radius: 6px;
+
+  color: #d4af37;
+
+  font-size: 18px;
+  font-weight: bold;
+
+  margin: 0;
+
+  z-index: 25;
+
+  white-space: nowrap;
+}
+
+
+/* 会話本文の改行を反映 */
+#dialogue-text {
+  white-space: pre-wrap;
+  font-size: 22px;
+  line-height: 1.7;
+
+  margin-top: 6px;
+}
+
+    .next-mark {
+      position: absolute;
+      right: 15px;
+      bottom: 10px;
+      color: #d4af37;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 10px 15px;
+      animation: bounce 1s infinite alternate;
+      z-index: 10;
+    }
+
+    .next-mark:hover {
+      color: #ffffff;
+    }
+
+    /* 「×」非表示用ボタン */
+    .close-btn {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      background: transparent;
+      border: none;
+      font-size: 27px;
+      cursor: pointer;
+      color: #888;
+      padding: 0;
+      line-height: 1;
+      transition: color 0.2s ease;
+      z-index: 20;
+    }
+
+    .close-btn:hover {
+      color: #d4af37;
+    }
+
+    /* 非表示用クラス */
+    .hidden {
+      display: none !important;
+    }
+
+    /* --- 名前入力画面 --- */
+    .input-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      text-align: center;
+    }
+
+    .input-prompt {
+      font-size: 20px;
+      letter-spacing: 2px;
+      color: #d4af37;
+    }
+
+    .name-input {
+      padding: 10px 15px;
+      font-size: 20px;
+      font-family: 'Shippori Mincho', serif;
+      background-color: rgba(0, 0, 0, 0.5);
+      color: #ffffff;
+      border: 1px solid #d4af37;
+      border-radius: 4px;
+      text-align: center;
+      outline: none;
+      user-select: auto;
+    }
+
+    .name-input:focus {
+      border-color: #ffffff;
+      box-shadow: 0 0 8px rgba(212, 175, 55, 0.6);
+    }
+
+    /* --- CONFIGモーダル --- */
+    .config-modal {
+      width: 90%;
+      max-width: 500px;
+      background-color: rgba(25, 25, 25, 0.95);
+      border: 1px solid #d4af37;
+      border-radius: 8px;
+      padding: 25px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .config-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .config-label {
+      color: #d4af37;
+      font-size: 16px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .config-slider {
+      width: 100%;
+      accent-color: #d4af37;
+      cursor: pointer;
+    }
+
+    @keyframes bounce {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-5px); }
+    }
+
+/* AUTOボタン */
+.auto-btn {
+  position: absolute;
+
+  top: -18px;
+  right: 112px;
+
+  width: 64px;
+  height: 38px;
+
+  padding: 0;
+
+  border-radius: 6px;
+
+  background-color: rgba(0, 0, 0, 0.82);
+  border: 1px solid #888;
+
+  color: #888;
+
+  font-size: 13px;
+  font-family: 'Shippori Mincho', serif;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  z-index: 20;
+}
+
+
+/* SKIPボタン */
+.skip-btn {
+  position: absolute;
+
+  top: -18px;
+  right: 40px;
+
+  width: 64px;
+  height: 38px;
+
+  padding: 0;
+
+  border-radius: 6px;
+
+  background-color: rgba(0, 0, 0, 0.82);
+  border: 1px solid #888;
+
+  color: #888;
+
+  font-size: 13px;
+  font-family: 'Shippori Mincho', serif;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  z-index: 20;
+}
+
+/* カーソルを載せたとき */
+.auto-btn:hover,
+.skip-btn:hover {
+  color: #d4af37;
+  border-color: #d4af37;
+  background-color: rgba(80, 80, 80, 0.9);
+}
+
+/* AUTO実行中 */
+.auto-btn.active-auto {
+  color: #000;
+  background-color: #d4af37;
+  border-color: #d4af37;
+  font-weight: bold;
+}
+
+
+/* =========================================================
+   名前確認ウィンドウ
+   ========================================================= */
+
+.name-confirm-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 100;
+
+  /* 最初は背景を透明に */
+  background-color: rgba(0, 0, 0, 0);
+  backdrop-filter: blur(0px);
+
+  transition:
+    background-color 0.45s ease,
+    backdrop-filter 0.45s ease;
+}
+
+.name-confirm-overlay.show {
+  background-color: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(2px);
+}
+
+.name-confirm-box {
+  width: 90%;
+  max-width: 420px;
+
+  background-color: rgba(25, 25, 25, 0.97);
+
+  border: 1px solid #d4af37;
+  border-radius: 8px;
+
+  padding: 30px;
+
+  box-sizing: border-box;
+
+  text-align: center;
+
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+
+  /* 最初は透明 */
+  opacity: 0;
+
+  /* 0.12秒遅れてフェード開始 */
+  transition:
+    opacity 0.4s ease 0.5s;
+}
+
+.name-confirm-overlay.show .name-confirm-box {
+  opacity: 1;
+}
+
+.name-confirm-text {
+  font-size: 19px;
+  line-height: 1.8;
+
+  margin-bottom: 25px;
+
+  color: #ffffff;
+}
+
+.name-confirm-player-name {
+  color: #d4af37;
+
+  font-size: 23px;
+  font-weight: bold;
+
+  margin: 8px 0;
+}
+
+.name-confirm-buttons {
+  display: flex;
+  justify-content: center;
+
+  gap: 20px;
+}
+
+.name-confirm-btn {
+  min-width: 100px;
+
+  padding: 10px 25px;
+
+  font-size: 16px;
+  font-family: 'Shippori Mincho', serif;
+
+  background-color: transparent;
+  color: #ffffff;
+
+  border: 1px solid #d4af37;
+  border-radius: 4px;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.name-confirm-btn:hover {
+  background-color: #d4af37;
+  color: #000000;
+}
+
+  </style>
+</head>
+
+<body>
+
+  <div id="game-stage">
+
+
+  <!-- ゲーム画面本体 -->
+  <div id="game-container"></div>
+
+  <!-- 常駐UI：右上MENUボタン -->
+  <div id="menu-trigger-container" class="menu-trigger-container">
+    <button id="menu-toggle-btn" class="sys-btn">MENU</button>
+  </div>
+
+  <!-- 常駐UI：サイドバー -->
+  <div id="sidebar-overlay" class="sidebar-overlay"></div>
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-title">MENU</div>
+    <div class="sidebar-menu">
+      <button id="sidebar-log-btn" class="sidebar-btn">Backlog</button>
+      <button id="sidebar-save-btn" class="sidebar-btn">Save</button>
+      <button id="sidebar-load-btn" class="sidebar-btn">Load</button>
+      <button id="sidebar-config-btn" class="sidebar-btn">Config</button>
+      <button id="sidebar-title-btn" class="sidebar-btn">Back to title</button>
+    </div>
+    <button id="sidebar-close-btn" class="sidebar-btn sidebar-close-btn">閉じる</button>
+  </div>
+
+  <!-- 常駐UI：セーブ/ロード スロットモーダル画面 -->
+  <div id="slot-modal-overlay" class="slot-modal-overlay">
+    <div class="slot-modal">
+      <div id="slot-modal-header" class="slot-modal-header">セーブデータの選択</div>
+      <div id="slot-list" class="slot-list"></div>
+      <button id="slot-close-btn" class="sidebar-btn sidebar-close-btn">閉じる</button>
+    </div>
+  </div>
+
+  <!-- 常駐UI：バックログ モーダル画面 -->
+  <div id="log-modal-overlay" class="log-modal-overlay">
+    <div class="log-modal">
+      <div class="log-modal-header">Backlog</div>
+      <div id="log-container" class="log-container"></div>
+      <button id="log-close-btn" class="sidebar-btn sidebar-close-btn" style="flex-shrink: 0;">閉じる</button>
+    </div>
+  </div>
+
+  <!-- 常駐UI：CONFIG（設定）モーダル画面 -->
+  <div id="config-modal-overlay" class="slot-modal-overlay">
+    <div class="config-modal">
+      <div class="slot-modal-header">設定</div>
+      <div class="config-item">
+        <div class="config-label">
+          <span>テキスト表示速度</span>
+          <span id="speed-value-display">普通</span>
+        </div>
+        <input type="range" id="text-speed-slider" class="config-slider" min="10" max="90" value="50" step="10">
+      </div>
+      <button id="config-close-btn" class="sidebar-btn sidebar-close-btn">閉じる</button>
+    </div>
+  </div>
+
+  </div>
+
+<script>
+
+  // =========================================================
+  // DOM取得
+  // =========================================================
+
+const gameStage =
+  document.getElementById('game-stage');
+
+const gameContainer =
+  document.getElementById('game-container');
+
+const menuContainer =
+  document.getElementById('menu-trigger-container');
+
+
+// =========================================================
+// ゲーム画面全体のサイズ調整
+// =========================================================
+
+const GAME_WIDTH = 1280;
+const GAME_HEIGHT = 720;
+
+function resizeGameScreen() {
+
+  const viewportWidth =
+    window.innerWidth;
+
+  const viewportHeight =
+    window.innerHeight;
+
+
+  const scaleX =
+    viewportWidth / GAME_WIDTH;
+
+  const scaleY =
+    viewportHeight / GAME_HEIGHT;
+
+
+  // 縦横とも画面内に収まる最大倍率
+  const scale =
+    Math.min(
+      scaleX,
+      scaleY
+    );
+
+
+  gameStage.style.transform =
+    `translate(-50%, -50%) scale(${scale})`;
+}
+
+  // =========================================================
+  // プレイヤーデータ
+  // =========================================================
+
+  let playerLastName = "七條";
+  let playerFirstName = "七星";
+
+
+  // =========================================================
+  // セーブスロット数
+  // =========================================================
+
+  const SAVE_PAGE_COUNT = 5;   // SLOT 1～5
+  const SLOTS_PER_PAGE = 6;    // 各SLOT内の保存枠数
+
+
+  // =========================================================
+  // 会話履歴
+  // =========================================================
+
+  let dialogueHistory = [];
+
+
+  // =========================================================
+  // 既読データ
+  // =========================================================
+
+  let readFlags = [];
+
+  try {
+
+    const savedReadFlags =
+      localStorage.getItem(
+        'floriography_read_flags'
+      );
+
+    readFlags =
+      savedReadFlags
+        ? JSON.parse(savedReadFlags)
+        : [];
+
+
+    if (!Array.isArray(readFlags)) {
+      readFlags = [];
+    }
+
+  } catch (e) {
+
+    console.error(
+      "既読データの読み込みに失敗しました。",
+      e
+    );
+
+    readFlags = [];
+  }
+
+
+  // =========================================================
+  // SKIP
+  // =========================================================
+
+  let isSkipMode = false;
+  let skipTimerId = null;
+
+
+   // AUTOモード
+let isAutoMode = false;
+let autoTimerId = null;
+
+// AUTOで文章表示後に待つ時間
+// AUTO待機時間の設定
+const autoBaseWait = 350;      // 最低待機時間
+const autoPerCharWait = 25;    // 1文字あたりの追加時間
+const autoMaxWait = 1800;      // 長文でも最大〇秒
+
+  // =========================================================
+  // テキスト表示速度
+  // =========================================================
+
+  let textSpeed = 50;
+
+  try {
+  const savedTextSpeed =
+    localStorage.getItem(
+      'floriography_text_speed'
+    );
+
+  if (savedTextSpeed !== null) {
+
+    const parsedSpeed =
+      parseInt(
+        savedTextSpeed,
+        10
+      );
+
+    if (!Number.isNaN(parsedSpeed)) {
+      textSpeed = parsedSpeed;
+    }
+  }
+
+} catch (e) {
+
+  console.error(
+    "テキスト速度設定の読み込みに失敗しました。",
+    e
+  );
+}
+
+  // =========================================================
+  // 現在位置
+  // =========================================================
+
+  let currentScene = "prologue";
+  let currentStep = 0;
+
+  let currentBackground = null;
+
+  // =========================================================
+  // タイプライター
+  // =========================================================
+
+  let timerId = null;
+  let isTyping = false;
+  let currentText = "";
+
+
+  // =========================================================
+  // シナリオ
+  // =========================================================
+
+
+  // ---------------------------------------------------------
+  // プロローグ
+  // ---------------------------------------------------------
+
+  const scenario = [
+
+    {
+      id: "p001",
+      type: "dialogue",
+      name: "    ",
+      text: "ジ、ジジ......ジ....."
+    },
+
+    {
+      id: "p002",
+      type: "dialogue",
+      name: "？？？",
+      text: "おや......？"
+    },
+
+    {
+      id: "p003",
+      type: "dialogue",
+      name: "？？？",
+      text: "また新しい■■■でしょうか？"
+    },
+
+    {
+      id: "p004",
+      type: "dialogue",
+      name: "？？？",
+      text: "全く、断ったはずなのですが......まあ、来てしまったものは仕方がないですね。"
+    },
+
+    {
+      id: "p005",
+      type: "dialogue",
+      name: "？？？",
+      text: "やはり、まずは名前でしょうか？"
+    },
+
+    {
+      id: "p006",
+      type: "dialogue",
+      name: "？？？",
+      text: "そうですねえ、貴方の名前は――"
+    }
+
+  ];
+
+
+  // ---------------------------------------------------------
+  // 第一章
+  // ---------------------------------------------------------
+
+  const chapter1Scenario = [
+
+{
+  id: "c1_bg001",
+  type: "background",
+  image: "residential_morning.jpg"
+},
+
+    {
+      id: "c1_001",
+      type: "dialogue",
+      name: "女性の声",
+      text: "{FIRST_NAME}ー！もう杏也くん来てるわよー！"
+    },
+
+    {
+      id: "c1_002",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "お母さんうるさい、分かってるって！ごめん待って、今行くー！！"
+    },
+
+    {
+      id: "c1_003",
+      type: "dialogue",
+      name: "  ",
+      text: "休日明けの月曜日。一週間で一番憂鬱な朝だけど、いつも決まって来る「お兄ちゃん」のお陰でなんとかギリギリ、寝過ごさずに済んでいる。"
+    },
+
+    {
+      id: "c1_004",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "杏也お兄ちゃんごめんなさい、寝坊しました！！"
+    },
+
+    {
+      id: "c1_005",
+      type: "dialogue",
+      name: "  ",
+      text: "流れるようなスライディング土下座を決めた私。その頭上から苦笑が降ってくる。"
+    },
+
+    {
+      id: "c1_006",
+      type: "dialogue",
+      name: "佐久間杏也",
+      text: "全く、そんなに全力で謝るなら少しでも早く起きてくれればいいのに。"
+    },
+
+    {
+      id: "c1_007",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "うっ......そ、それは......その、善処します。"
+    },
+
+    {
+      id: "c1_008",
+      type: "dialogue",
+      name: "佐久間杏也",
+      text: "って、同じことを前も言ってたよね？"
+    },
+
+    {
+      id: "c1_009",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "あーあー。き、聞こえないなー！"
+    },
+
+    {
+      id: "c1_010",
+      type: "dialogue",
+      name: "  ",
+      text: "杏也お兄ちゃんは私より2つ上の幼馴染。家がすぐ隣なのと保育園のころから一緒の仲ということで、高校生になった今でも朝は迎えに来てくれる。"
+    },
+
+    {
+      id: "c1_011",
+      type: "dialogue",
+      name: "  ",
+      text: "血のつながりがあるわけじゃないけど......うんと小さいころから、頼りになるお兄ちゃんみたいな存在だったから「杏也お兄ちゃん」と呼んでいる。"
+    },
+
+    {
+      id: "c1_012",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "ほらお兄ちゃん、早く行かないと遅刻し、ちゃ......"
+    },
+
+    {
+      id: "c1_013",
+      type: "dialogue",
+      name: "佐久間杏也",
+      text: "こーら。スカート汚れちゃってるでしょ。まだ間に合うし、ちゃんと整えておきなさい。"
+    },
+
+    {
+      id: "c1_014",
+      type: "dialogue",
+      name: "  ",
+      text: "そう言いながら、杏也お兄ちゃんは私のスカートの裾についた泥を拭う。さっき土下座した時についたであろう汚れと、ついでに皺も伸ばしてくれた。\n見違えるように綺麗になってゆくスカートを見ながら思う。やっぱり私たちって幼馴染ってよりも、むしろ――"
+    },
+
+    {
+      id: "c1_015",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "杏也お兄ちゃんってほんと、お母さんみたいだよね。"
+    },
+
+    {
+      id: "c1_016",
+      type: "dialogue",
+      name: "佐久間杏也",
+      text: "......また言ってるの？"
+    },
+
+    {
+      id: "c1_017",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "だっていつも私の面倒見てくれるし、あと細かいところにも気づくでしょ？あ、あと細かすぎてちょっと口うるさいところとかそっくりだもん！"
+    },
+
+
+    {
+      id: "c1_018",
+      type: "dialogue",
+      name: "佐久間杏也",
+      text: "口うるさい、ねえ。\n......へぇ、いつも寝坊する{FIRST_NAME}ちゃんのことを起こしてあげてる僕に対してそんなこと思ってたんだ？"
+    },
+
+    {
+      id: "c1_019",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "そ、それは本当に感謝してるって！"
+    },
+
+   {
+      id: "c1_020",
+      type: "dialogue",
+      name: "佐久間杏也",
+      text: "全く、調子のいいこと言って。大体、年齢差としてはどっちかっていうと兄妹でしょ。なんでお母さんなの？"
+    },
+
+
+    {
+      id: "c1_021",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "えー、だってお兄ちゃんにはもう本物の妹がいるじゃん。私、杏奈と家族とか絶対やだ。"
+    },
+
+   {
+      id: "c1_022",
+      type: "dialogue",
+      name: "佐久間杏也",
+      text: "もう、そんな嫌そうな顔しなくても。"
+    },
+
+   {
+      id: "c1_023",
+      type: "dialogue",
+      name: "佐久間杏也",
+      text: "っていうか、僕が{FIRST_NAME}ちゃんのお母さんなら杏奈は君の叔母ってことになるんじゃない？"
+    },
+
+   {
+      id: "c1_024",
+      type: "dialogue",
+      name: "佐久間杏也",
+      text: "結局、杏奈と家族になってるけど。"
+    },
+
+    {
+      id: "c1_025",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "あ......あれ？"
+    },
+
+    {
+      id: "c1_026",
+      type: "dialogue",
+      name: "佐久間杏也",
+      text: "気づいてなかったの？"
+    },
+
+    {
+      id: "c1_027",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "いっ、いやいや、そんな馬鹿な。お兄ちゃんはお母さんだけど杏奈とは家族じゃなくて、だからお母さんじゃなくて......あれ？"
+    },
+
+    {
+      id: "c1_028",
+      type: "dialogue",
+      name: "佐久間杏也",
+      text: "はいはい、そんなこと考えてないで早く行くよ。そろそろ行かないと遅刻しちゃうでしょ？"
+    },
+
+    {
+      id: "c1_029",
+      type: "dialogue",
+      name: "   ",
+      text: "いつの間にかお兄ちゃんはもう歩き出していて、代わりに私のスカートは見違えるように綺麗になっている。"
+    },
+
+    {
+      id: "c1_030",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "え、めっちゃ綺麗！すごい、さすが杏也お兄ちゃん......って、ちょっと待ってよ！！"
+    },
+
+    {
+      id: "c1_031",
+      type: "dialogue",
+      name: "佐久間杏也",
+      text: "どういたしまして。ほら、早く来ないと置いてくよ？"
+    },
+
+    {
+      id: "c1_032",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "だ、だから待ってってば！"
+    },
+
+    {
+      id: "c1_033",
+      type: "dialogue",
+      name: "   ",
+      text: "慌ただしいだけのいつも通りの月曜の朝。少し先を歩くお兄ちゃんの背中を追いかけて、私は大きく足を踏み出した。"
+    }
+
+  ];
+
+
+// =========================================================
+// 背景変更
+// =========================================================
+
+function changeBackground(imageName) {
+
+  // 現在の背景を記憶
+  currentBackground = imageName;
+
+
+  if (!imageName) {
+
+    gameContainer.style.backgroundImage =
+      'none';
+
+    return;
+  }
+
+
+  gameContainer.style.backgroundImage =
+    `url("backgrounds/${imageName}")`;
+}
+
+  // =========================================================
+  // 現在のシナリオ取得
+  // =========================================================
+
+  function getCurrentScenario() {
+
+    if (currentScene === "chapter1") {
+      return chapter1Scenario;
+    }
+
+    return scenario;
+  }
+
+
+  // =========================================================
+  // 現在のシナリオID取得
+  // =========================================================
+
+  function getCurrentEntryId() {
+
+    const currentScenario =
+      getCurrentScenario();
+
+    const data =
+      currentScenario[currentStep];
+
+
+    if (!data) {
+      return null;
+    }
+
+
+    // 新方式
+    if (data.id) {
+      return data.id;
+    }
+
+
+    // 万一旧形式のデータが残っていた場合
+    return `${currentScene}_${currentStep}`;
+  }
+
+
+  // =========================================================
+  // 既読判定
+  // =========================================================
+
+  function isCurrentStepRead() {
+
+    const id =
+      getCurrentEntryId();
+
+
+    if (!id) {
+      return false;
+    }
+
+
+    return readFlags.includes(id);
+  }
+
+
+  // =========================================================
+  // 既読登録
+  // =========================================================
+
+  function markCurrentStepAsRead() {
+
+    const id =
+      getCurrentEntryId();
+
+
+    if (!id) {
+      return;
+    }
+
+
+    if (!readFlags.includes(id)) {
+
+      readFlags.push(id);
+
+
+      try {
+
+        localStorage.setItem(
+          'floriography_read_flags',
+          JSON.stringify(readFlags)
+        );
+
+      } catch (e) {
+
+        console.error(
+          "既読データの保存に失敗しました。",
+          e
+        );
+      }
+    }
+  }
+
+
+  // =========================================================
+  // タイマー停止
+  // =========================================================
+
+  function stopTextTimer() {
+
+    if (timerId) {
+
+      clearInterval(timerId);
+
+      timerId = null;
+    }
+
+
+    isTyping = false;
+  }
+
+// =========================================================
+// AUTO停止
+// =========================================================
+
+function stopAutoMode() {
+
+  isAutoMode = false;
+
+  if (autoTimerId) {
+
+    clearTimeout(autoTimerId);
+
+    autoTimerId = null;
+  }
+
+
+  const autoBtn =
+    document.getElementById(
+      'auto-btn'
+    );
+
+
+  if (autoBtn) {
+
+    autoBtn.classList.remove(
+      'active-auto'
+    );
+  }
+}
+
+
+// =========================================================
+// AUTO待機時間を文章の長さから計算
+// =========================================================
+
+function getAutoWaitTime(text) {
+
+  const length = text.length;
+
+  const calculated =
+    autoBaseWait +
+    length * autoPerCharWait;
+
+  return Math.min(
+    calculated,
+    autoMaxWait
+  );
+}
+
+  // =========================================================
+  // SKIP停止
+  // =========================================================
+
+  function stopSkipMode() {
+
+    isSkipMode = false;
+
+
+    if (skipTimerId) {
+
+      clearTimeout(skipTimerId);
+
+      skipTimerId = null;
+    }
+
+
+    const skipBtn =
+      document.getElementById(
+        'skip-btn'
+      );
+
+
+    if (skipBtn) {
+
+      skipBtn.classList.remove(
+        'active-skip'
+      );
+    }
+  }
+
+
+  // =========================================================
+  // 会話画面生成
+  // =========================================================
+
+function renderDialogueScreen() {
+
+  // プロローグを含め、会話画面では常にMENUを表示
+  menuContainer.classList.add('active');
+  menuContainer.classList.remove('hidden');
+
+
+  gameContainer.innerHTML = `
+
+    <div
+      class="game-screen"
+      id="game-screen"
+    >
+
+      <div
+        class="dialogue-box"
+        id="dialogue-box"
+      >
+
+        <button
+          type="button"
+          class="close-btn"
+          id="close-btn"
+        >
+          ×
+        </button>
+
+
+        <button
+          type="button"
+          class="auto-btn"
+          id="auto-btn"
+        >
+          AUTO
+        </button>
+
+
+        <button
+          type="button"
+          class="skip-btn"
+          id="skip-btn"
+        >
+          SKIP
+        </button>
+
+
+        <div
+          class="character-name"
+          id="char-name"
+        ></div>
+
+
+        <div
+          id="dialogue-text"
+        ></div>
+
+
+        <div
+          class="next-mark"
+          id="next-btn"
+        >
+          ▽
+        </div>
+
+      </div>
+
+    </div>
+  `;
+
+
+  // =========================================================
+  // 会話ボックス全体クリックで次へ
+  // =========================================================
+
+  const dialogueBox =
+    document.getElementById('dialogue-box');
+
+
+  dialogueBox.addEventListener(
+    'click',
+    (e) => {
+
+      // SKIP・AUTO・×を押した場合は会話送りしない
+      if (
+        e.target.closest('#skip-btn') ||
+        e.target.closest('#auto-btn') ||
+        e.target.closest('#close-btn')
+      ) {
+        return;
+      }
+
+
+      // SKIP中なら解除
+      if (isSkipMode) {
+        stopSkipMode();
+      }
+
+
+      // AUTO中なら解除
+      if (isAutoMode) {
+        stopAutoMode();
+      }
+
+
+      nextDialogue();
+    }
+  );
+
+
+  // =========================================================
+  // SKIPボタン
+  // =========================================================
+
+  document
+    .getElementById('skip-btn')
+    .addEventListener(
+      'click',
+      (e) => {
+
+        e.stopPropagation();
+
+
+        if (!isSkipMode) {
+
+          // 現在の行が未読ならSKIP不可
+          if (!isCurrentStepRead()) {
+
+            alert(
+              "ここから先は未読のため、スキップできません。"
+            );
+
+            return;
+          }
+
+
+          // AUTO中なら解除
+          if (isAutoMode) {
+            stopAutoMode();
+          }
+
+
+          isSkipMode = true;
+
+
+          const skipBtn =
+            document.getElementById('skip-btn');
+
+
+          if (skipBtn) {
+            skipBtn.classList.add('active-skip');
+          }
+
+
+          nextDialogue();
+
+
+        } else {
+
+          stopSkipMode();
+        }
+      }
+    );
+
+
+  // =========================================================
+  // AUTOボタン
+  // =========================================================
+
+  document
+    .getElementById('auto-btn')
+    .addEventListener(
+      'click',
+      (e) => {
+
+        e.stopPropagation();
+
+
+        // AUTO開始
+        if (!isAutoMode) {
+
+          // SKIP中なら解除
+          if (isSkipMode) {
+            stopSkipMode();
+          }
+
+
+          isAutoMode = true;
+
+
+          const autoBtn =
+            document.getElementById('auto-btn');
+
+
+          if (autoBtn) {
+            autoBtn.classList.add('active-auto');
+          }
+
+
+          // すでに文章全文が表示済みなら、
+          // 少し待って次へ進む
+
+    if (!isTyping) {
+
+  const waitTime =
+    getAutoWaitTime(currentText);
+
+  autoTimerId =
+    setTimeout(
+      () => {
+
+        nextDialogue();
+
+      },
+      waitTime
+    );
+}
+
+        } else {
+
+          // 再度押したらAUTO停止
+          stopAutoMode();
+        }
+      }
+    );
+
+
+  bindCloseButton();
+}
+
+
+
+  // =========================================================
+  // シナリオ内容を判定して表示
+  // =========================================================
+
+  function updateDialogue() {
+
+    const currentScenario =
+      getCurrentScenario();
+
+
+    const data =
+      currentScenario[currentStep];
+
+
+    if (!data) {
+      return;
+    }
+
+
+    // -------------------------------------------------------
+    // 通常会話
+    // -------------------------------------------------------
+
+    if (data.type === "dialogue") {
+
+      showDialogueEntry(data);
+
+      return;
+    }
+
+if (data.type === "background") {
+
+  changeBackground(
+    data.image
+  );
+
+  currentStep++;
+
+  updateDialogue();
+
+  return;
+}
+
+
+    // 将来的に
+    //
+    // type: "choice"
+    // type: "background"
+    // type: "music"
+    //
+    // などをここへ追加可能
+
+    console.warn(
+      "未対応のシナリオタイプです:",
+      data.type
+    );
+  }
+
+
+  // =========================================================
+  // 通常会話表示
+  // =========================================================
+
+  function showDialogueEntry(data) {
+
+    const charName =
+      document.getElementById(
+        'char-name'
+      );
+
+
+    const dialogueText =
+      document.getElementById(
+        'dialogue-text'
+      );
+
+
+    if (!charName || !dialogueText) {
+      return;
+    }
+
+
+const displayName =
+  replaceNameTags(
+    data.name
+  ).trim();
+
+charName.textContent =
+  displayName;
+
+charName.style.display =
+  displayName
+    ? 'flex'
+    : 'none';
+
+    // -------------------------------------------------------
+    // バックログ追加
+    // -------------------------------------------------------
+
+    addDialogueToHistory(
+      data.name,
+      data.text
+    );
+
+
+    // -------------------------------------------------------
+    // SKIP中
+    // -------------------------------------------------------
+
+    if (isSkipMode) {
+
+      stopTextTimer();
+
+
+      dialogueText.textContent =
+        replaceNameTags(
+          data.text
+        );
+
+
+      skipTimerId =
+        setTimeout(
+          () => {
+
+            nextDialogue();
+
+          },
+          30
+        );
+
+
+      return;
+    }
+
+
+    // -------------------------------------------------------
+    // 通常表示
+    // -------------------------------------------------------
+
+    typeWriter(
+      replaceNameTags(
+        data.text
+      )
+    );
+  }
+
+
+  // =========================================================
+  // 次の文章へ
+  // =========================================================
+
+ function nextDialogue() {
+
+  const currentScenario =
+    getCurrentScenario();
+
+
+  // =========================================================
+  // タイプライター途中なら全文表示
+  // =========================================================
+
+  if (
+    isTyping &&
+    !isSkipMode &&
+    !isAutoMode
+  ) {
+
+    stopTextTimer();
+
+
+    const dialogueText =
+      document.getElementById(
+        'dialogue-text'
+      );
+
+
+    if (dialogueText) {
+
+      dialogueText.textContent =
+        currentText;
+    }
+
+
+    return;
+  }
+
+
+  // =========================================================
+  // 今読んだ文章を既読にする
+  // =========================================================
+
+  markCurrentStepAsRead();
+
+
+  // =========================================================
+  // 次へ
+  // =========================================================
+
+  currentStep++;
+
+
+  // =========================================================
+  // シーン終了
+  // =========================================================
+
+  if (
+    currentStep >=
+    currentScenario.length
+  ) {
+
+    stopSkipMode();
+    stopAutoMode();
+
+
+    if (
+      currentScene === "prologue"
+    ) {
+
+      showNameScene();
+
+    } else {
+
+      alert(
+        "現在のシナリオはここまでです！"
+      );
+    }
+
+
+    return;
+  }
+
+
+  // =========================================================
+  // 未読に到達したらSKIP終了
+  // =========================================================
+
+  if (
+    isSkipMode &&
+    !isCurrentStepRead()
+  ) {
+
+    stopSkipMode();
+  }
+
+
+  updateDialogue();
+}
+
+  // =========================================================
+  // タイプライター
+  // =========================================================
+
+  function typeWriter(text) {
+
+  const textElement =
+    document.getElementById(
+      'dialogue-text'
+    );
+
+
+  if (!textElement) {
+    return;
+  }
+
+
+  stopTextTimer();
+
+
+  textElement.textContent = "";
+
+
+  let index = 0;
+
+
+  isTyping = true;
+  currentText = text;
+
+
+  timerId =
+    setInterval(
+      () => {
+
+
+        // 画面がすでに切り替わっていたら終了
+        if (
+          !document.body.contains(
+            textElement
+          )
+        ) {
+
+          stopTextTimer();
+
+          return;
+        }
+
+
+        textElement.textContent +=
+          text[index];
+
+
+        index++;
+
+
+        // =====================================================
+        // 全文表示完了
+        // =====================================================
+
+        if (
+          index >=
+          text.length
+        ) {
+
+          stopTextTimer();
+
+
+          // AUTO中なら少し待って次へ
+
+     if (isAutoMode) {
+
+  const waitTime =
+    getAutoWaitTime(text);
+
+  autoTimerId =
+    setTimeout(
+      () => {
+
+        nextDialogue();
+
+      },
+      waitTime
+    );
+}
+        }
+
+      },
+      textSpeed
+    );
+}
+
+  // =========================================================
+  // ゲーム開始
+  // =========================================================
+
+  function startGame() {
+
+    stopSkipMode();
+    stopTextTimer();
+    stopAutoMode();
+
+    changeBackground(null);
+
+    currentScene = "prologue";
+    currentStep = 0;
+
+
+    dialogueHistory = [];
+
+
+    menuContainer.classList.remove(
+      'active'
+    );
+
+
+    gameContainer.classList.add(
+      'fade-out'
+    );
+
+
+    setTimeout(
+      () => {
+
+        renderDialogueScreen();
+
+        updateDialogue();
+
+
+        gameContainer.classList.remove(
+          'fade-out'
+        );
+
+      },
+      900      
+
+    );
+  }
+
+
+  // =========================================================
+  // 名前入力
+  // =========================================================
+
+  function showNameScene() {
+
+    stopSkipMode();
+    stopTextTimer();
+    stopAutoMode();
+
+
+    menuContainer.classList.remove(
+      'active'
+    );
+
+
+    gameContainer.classList.add(
+      'fade-out'
+    );
+
+
+    setTimeout(
+      () => {
+
+
+        gameContainer.innerHTML = `
+
+          <div class="input-screen">
+
+            <div class="input-prompt">
+              名前を入力してください
+            </div>
+
+
+            <div
+              style="
+                display: flex;
+                gap: 10px;
+              "
+            >
+
+              <input
+                type="text"
+                id="player-last-input"
+                class="name-input"
+                value="${playerLastName}"
+                placeholder="姓"
+                style="width: 110px;"
+              >
+
+
+              <input
+                type="text"
+                id="player-first-input"
+                class="name-input"
+                value="${playerFirstName}"
+                placeholder="名"
+                style="width: 110px;"
+              >
+
+            </div>
+
+
+            <button
+              id="confirm-name-btn"
+              class="btn"
+            >
+              決定
+            </button>
+
+          </div>
+        `;
+
+
+        // ---------------------------------------------------
+        // 「決定」
+        // ---------------------------------------------------
+
+        document
+          .getElementById(
+            'confirm-name-btn'
+          )
+          .addEventListener(
+            'click',
+            () => {
+
+
+              const lastVal =
+                document
+                  .getElementById(
+                    'player-last-input'
+                  )
+                  .value
+                  .trim();
+
+
+              const firstVal =
+                document
+                  .getElementById(
+                    'player-first-input'
+                  )
+                  .value
+                  .trim();
+
+
+              // 空欄なら初期名
+              const newLastName =
+                lastVal !== ""
+                  ? lastVal
+                  : "七條";
+
+
+              const newFirstName =
+                firstVal !== ""
+                  ? firstVal
+                  : "七星";
+
+
+              // ---------------------------------------------
+              // 確認画面
+              // ---------------------------------------------
+
+              const overlay =
+                document.createElement(
+                  'div'
+                );
+
+
+              overlay.className =
+                'name-confirm-overlay';
+
+
+              overlay.innerHTML = `
+
+                <div
+                  class="name-confirm-box"
+                >
+
+                  <div
+                    class="name-confirm-text"
+                  >
+
+                    名前は
+
+                    <div
+                      class="name-confirm-player-name"
+                    >
+                      ${newLastName}${newFirstName}
+                    </div>
+
+                    でよろしいですか？
+
+                  </div>
+
+
+                  <div
+                    class="name-confirm-buttons"
+                  >
+
+                    <button
+                      type="button"
+                      id="name-confirm-yes"
+                      class="name-confirm-btn"
+                    >
+                      はい
+                    </button>
+
+
+                    <button
+                      type="button"
+                      id="name-confirm-no"
+                      class="name-confirm-btn"
+                    >
+                      いいえ
+                    </button>
+
+                  </div>
+
+                </div>
+              `;
+
+
+              gameContainer.appendChild(
+                overlay
+              );
+
+              requestAnimationFrame(() => {
+  overlay.classList.add('show');
+});
+
+
+              // ---------------------------------------------
+              // はい
+              // ---------------------------------------------
+
+              document
+                .getElementById(
+                  'name-confirm-yes'
+                )
+                .addEventListener(
+                  'click',
+                  () => {
+
+
+                    playerLastName =
+                      newLastName;
+
+
+                    playerFirstName =
+                      newFirstName;
+
+
+                    startChapter1();
+                  }
+                );
+
+
+              // ---------------------------------------------
+              // いいえ
+              // ---------------------------------------------
+
+              document
+                .getElementById(
+                  'name-confirm-no'
+                )
+                .addEventListener(
+                  'click',
+                  () => {
+
+
+                    overlay.remove();
+
+
+                    document
+                      .getElementById(
+                        'player-last-input'
+                      )
+                      .focus();
+                  }
+                );
+
+            }
+          );
+
+
+        gameContainer.classList.remove(
+          'fade-out'
+        );
+
+      },
+      600
+    );
+  }
+
+
+  // =========================================================
+  // 第一章開始
+  // =========================================================
+
+  function startChapter1() {
+
+    stopSkipMode();
+    stopTextTimer();
+    stopAutoMode();
+
+
+    currentScene = "chapter1";
+
+    currentStep = 0;
+
+
+    gameContainer.classList.add(
+      'fade-out'
+    );
+
+
+    setTimeout(
+      () => {
+
+
+        renderDialogueScreen();
+
+        updateDialogue();
+
+
+        gameContainer.classList.remove(
+          'fade-out'
+        );
+
+      },
+      2000
+    );
+  }
+
+
+  // =========================================================
+  // 名前タグ置換
+  // =========================================================
+
+  function replaceNameTags(text) {
+
+    if (!text) {
+      return "";
+    }
+
+
+    const fullName =
+      playerLastName +
+      playerFirstName;
+
+
+    return text
+
+      .replace(
+        /[{｛](LAST_NAME|姓)[}｝]/g,
+        playerLastName
+      )
+
+      .replace(
+        /[{｛](FIRST_NAME|名)[}｝]/g,
+        playerFirstName
+      )
+
+      .replace(
+        /[{｛](NAME|フルネーム)[}｝]/g,
+        fullName
+      );
+  }
+
+
+  // =========================================================
+  // バックログ追加
+  // =========================================================
+
+  function addDialogueToHistory(
+    rawName,
+    rawText
+  ) {
+
+    const name =
+      replaceNameTags(
+        rawName
+      ).trim();
+
+
+    const text =
+      replaceNameTags(
+        rawText
+      );
+
+
+    const last =
+      dialogueHistory[
+        dialogueHistory.length - 1
+      ];
+
+
+    // 同じ文章の二重登録防止
+    if (
+      last &&
+      last.name === name &&
+      last.text === text
+    ) {
+
+      return;
+    }
+
+
+    dialogueHistory.push({
+      name,
+      text
+    });
+  }
+
+
+  // =========================================================
+  // バックログ
+  // =========================================================
+
+  function openLogModal() {
+
+    const overlay =
+      document.getElementById(
+        'log-modal-overlay'
+      );
+
+
+    const container =
+      document.getElementById(
+        'log-container'
+      );
+
+
+    container.innerHTML = '';
+
+
+    if (
+      dialogueHistory.length === 0
+    ) {
+
+      container.innerHTML =
+        '<div style="color: #888; text-align: center; padding-top: 20px;">まだ履歴がありません。</div>';
+
+
+    } else {
+
+
+      dialogueHistory.forEach(
+        item => {
+
+
+          const entry =
+            document.createElement(
+              'div'
+            );
+
+
+          entry.className =
+            'log-entry';
+
+
+          if (item.name) {
+
+
+            const speaker =
+              document.createElement(
+                'div'
+              );
+
+
+            speaker.className =
+              'log-speaker';
+
+
+            speaker.textContent =
+              item.name;
+
+
+            entry.appendChild(
+              speaker
+            );
+          }
+
+
+          const text =
+            document.createElement(
+              'div'
+            );
+
+
+          text.className =
+            'log-text';
+
+
+          text.textContent =
+            item.text;
+
+
+          entry.appendChild(
+            text
+          );
+
+
+          container.appendChild(
+            entry
+          );
+        }
+      );
+    }
+
+
+    overlay.classList.add(
+      'active'
+    );
+
+
+    container.scrollTop =
+      container.scrollHeight;
+  }
+
+
+  function closeLogModal() {
+
+    document
+      .getElementById(
+        'log-modal-overlay'
+      )
+      .classList
+      .remove('active');
+  }
+
+
+  // =========================================================
+  // CONFIG
+  // =========================================================
+
+  function openConfigModal() {
+
+    document
+      .getElementById(
+        'config-modal-overlay'
+      )
+      .classList
+      .add('active');
+  }
+
+
+  function closeConfigModal() {
+
+    document
+      .getElementById(
+        'config-modal-overlay'
+      )
+      .classList
+      .remove('active');
+  }
+
+
+  function updateSpeedDisplay(val) {
+
+    const display =
+      document.getElementById(
+        'speed-value-display'
+      );
+
+
+    if (val <= 20) {
+
+      display.textContent =
+        "高速";
+
+    } else if (val <= 50) {
+
+      display.textContent =
+        "普通";
+
+    } else {
+
+      display.textContent =
+        "低速";
+    }
+  }
+
+
+  // =========================================================
+  // セーブデータ存在確認
+  // =========================================================
+
+ function hasAnySaveData() {
+
+  const totalSlots =
+    SAVE_PAGE_COUNT * SLOTS_PER_PAGE;
+
+  for (
+    let i = 1;
+    i <= totalSlots;
+    i++
+  ) {
+
+    if (
+      localStorage.getItem(
+        `floriography_save_${i}`
+      ) !== null
+    ) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+  // =========================================================
+  // 全画面
+  // =========================================================
+
+  function toggleFullscreen() {
+
+    if (!document.fullscreenElement) {
+
+
+      document
+        .documentElement
+        .requestFullscreen()
+        .catch(
+          err => {
+
+            alert(
+              `全画面表示エラー: ${err.message}`
+            );
+          }
+        );
+
+
+    } else {
+
+
+      if (document.exitFullscreen) {
+
+        document.exitFullscreen();
+      }
+    }
+  }
+
+
+  // =========================================================
+  // タイトル画面
+  // =========================================================
+
+  function showTitleScreen() {
+
+    stopSkipMode();
+    stopTextTimer();
+    stopAutoMode();
+
+    changeBackground(null);
+
+    currentScene =
+      "prologue";
+
+
+    currentStep =
+      0;
+
+
+    dialogueHistory =
+      [];
+
+
+    menuContainer.classList.remove(
+      'active'
+    );
+
+
+    menuContainer.classList.remove(
+      'hidden'
+    );
+
+
+    gameContainer.innerHTML = `
+
+      <h1 id="title-text">
+        Floriography
+      </h1>
+
+
+      <div class="button-group">
+
+
+        <button
+          id="start-btn"
+          class="btn"
+        >
+          はじめから
+        </button>
+
+
+        ${
+          hasAnySaveData()
+
+            ? `
+              <button
+                id="title-load-btn"
+                class="btn"
+              >
+                つづきから
+              </button>
+            `
+
+            : ''
+        }
+
+
+        <button
+          id="fullscreen-btn"
+          class="btn"
+        >
+          全画面モードで遊ぶ
+        </button>
+
+
+      </div>
+    `;
+
+
+    document
+      .getElementById(
+        'start-btn'
+      )
+      .addEventListener(
+        'click',
+        startGame
+      );
+
+
+    document
+      .getElementById(
+        'fullscreen-btn'
+      )
+      .addEventListener(
+        'click',
+        toggleFullscreen
+      );
+
+
+    if (hasAnySaveData()) {
+
+      document
+        .getElementById(
+          'title-load-btn'
+        )
+        .addEventListener(
+          'click',
+          () => {
+
+            openSlotModal(
+              'load'
+            );
+          }
+        );
+    }
+  }
+
+
+  // =========================================================
+  // 会話枠非表示
+  // =========================================================
+
+  function bindCloseButton() {
+
+    const closeBtn =
+      document.getElementById(
+        'close-btn'
+      );
+
+
+    const dialogueBox =
+      document.getElementById(
+        'dialogue-box'
+      );
+
+
+    if (
+      closeBtn &&
+      dialogueBox
+    ) {
+
+
+      closeBtn.addEventListener(
+        'click',
+        (e) => {
+
+
+          e.stopPropagation();
+
+
+          dialogueBox
+            .classList
+            .add('hidden');
+
+
+          menuContainer
+            .classList
+            .add('hidden');
+
+        }
+      );
+    }
+  }
+
+
+  // =========================================================
+  // セーブ／ロード画面
+  // =========================================================
+
+ function openSlotModal(mode) {
+
+  const modalOverlay =
+    document.getElementById(
+      'slot-modal-overlay'
+    );
+
+  const modalHeader =
+    document.getElementById(
+      'slot-modal-header'
+    );
+
+  const slotList =
+    document.getElementById(
+      'slot-list'
+    );
+
+
+  modalHeader.textContent =
+    mode === 'save'
+      ? 'セーブするSLOTを選択'
+      : 'ロードするSLOTを選択';
+
+
+  slotList.innerHTML = '';
+
+
+  // =====================================================
+  // 第一段階：SLOTページを表示
+  // =====================================================
+
+  for (
+    let page = 1;
+    page <= SAVE_PAGE_COUNT;
+    page++
+  ) {
+
+    const pageItem =
+      document.createElement('div');
+
+    pageItem.className =
+      'slot-item';
+
+
+    // このページにセーブデータがあるか確認
+    let savedCount = 0;
+
+    for (
+      let sub = 1;
+      sub <= SLOTS_PER_PAGE;
+      sub++
+    ) {
+
+      const actualSlot =
+        (page - 1) *
+        SLOTS_PER_PAGE +
+        sub;
+
+      if (
+        localStorage.getItem(
+          `floriography_save_${actualSlot}`
+        ) !== null
+      ) {
+        savedCount++;
+      }
+    }
+
+
+    pageItem.innerHTML = `
+      <div class="slot-info">
+
+        <div class="slot-number">
+          SLOT ${page}
+        </div>
+
+        <div class="slot-detail">
+          ${savedCount} / ${SLOTS_PER_PAGE} 保存済み
+        </div>
+
+      </div>
+    `;
+
+
+    pageItem.addEventListener(
+      'click',
+      () => {
+
+        openSavePage(
+          mode,
+          page
+        );
+      }
+    );
+
+
+    slotList.appendChild(
+      pageItem
+    );
+  }
+
+
+  modalOverlay
+    .classList
+    .add('active');
+}
+
+function openSavePage(
+  mode,
+  page
+) {
+
+  const modalHeader =
+    document.getElementById(
+      'slot-modal-header'
+    );
+
+  const slotList =
+    document.getElementById(
+      'slot-list'
+    );
+
+
+  modalHeader.textContent =
+    mode === 'save'
+      ? `SLOT ${page}：セーブ先を選択`
+      : `SLOT ${page}：ロードするデータを選択`;
+
+
+  slotList.innerHTML = '';
+
+
+  // =====================================================
+  // 第二段階：ページ内のセーブ枠
+  // =====================================================
+
+  for (
+    let subSlot = 1;
+    subSlot <= SLOTS_PER_PAGE;
+    subSlot++
+  ) {
+
+    const actualSlot =
+      (page - 1) *
+      SLOTS_PER_PAGE +
+      subSlot;
+
+
+    const rawData =
+      localStorage.getItem(
+        `floriography_save_${actualSlot}`
+      );
+
+
+    let saveData = null;
+
+
+    if (rawData) {
+
+      try {
+
+        saveData =
+          JSON.parse(rawData);
+
+      } catch (e) {
+
+        console.error(
+          `セーブデータ ${actualSlot} が壊れています。`,
+          e
+        );
+      }
+    }
+
+
+    const slotItem =
+      document.createElement(
+        'div'
+      );
+
+    slotItem.className =
+      'slot-item';
+
+
+    if (saveData) {
+
+      const saveLastName =
+        saveData.playerLastName
+        ?? "七條";
+
+
+      const saveFirstName =
+        saveData.playerFirstName
+        ?? "七星";
+
+
+      const saveChapterName =
+        saveData.chapterName
+
+        ?? (
+          saveData.scene ===
+          "chapter1"
+
+            ? "第一章"
+
+            : "プロローグ"
+        );
+
+
+      slotItem.innerHTML = `
+
+        <div class="slot-info">
+
+          <div class="slot-number">
+            SAVE ${subSlot}
+          </div>
+
+          <div class="slot-detail">
+            ${saveChapterName}
+            （${saveLastName}${saveFirstName}）
+          </div>
+
+        </div>
+
+        <div class="slot-date">
+          ${saveData.timestamp ?? ""}
+        </div>
+      `;
+
+
+    } else {
+
+      slotItem.innerHTML = `
+
+        <div class="slot-info">
+
+          <div class="slot-number">
+            SAVE ${subSlot}
+          </div>
+
+          <div
+            class="slot-detail"
+            style="color: #666;"
+          >
+            データなし
+          </div>
+
+        </div>
+      `;
+    }
+
+
+    slotItem.addEventListener(
+      'click',
+      () => {
+
+        if (mode === 'save') {
+
+          saveGame(
+            actualSlot
+          );
+
+          closeSlotModal();
+
+
+        } else {
+
+          if (saveData) {
+
+            loadGame(
+              actualSlot
+            );
+
+            closeSlotModal();
+
+
+          } else {
+
+            alert(
+              'データが存在しません。'
+            );
+          }
+        }
+      }
+    );
+
+
+    slotList.appendChild(
+      slotItem
+    );
+  }
+
+
+  // =====================================================
+  // SLOT一覧へ戻るボタン
+  // =====================================================
+
+  const backButton =
+    document.createElement(
+      'button'
+    );
+
+  backButton.className =
+    'sidebar-btn';
+
+  backButton.textContent =
+    '← SLOT一覧に戻る';
+
+
+  backButton.addEventListener(
+    'click',
+    () => {
+
+      openSlotModal(
+        mode
+      );
+    }
+  );
+
+
+  slotList.appendChild(
+    backButton
+  );
+}
+
+
+// =========================================================
+// セーブ／ロードモーダルを閉じる
+// =========================================================
+
+function closeSlotModal() {
+
+  document
+    .getElementById(
+      'slot-modal-overlay'
+    )
+    .classList
+    .remove('active');
+}
+
+
+  // =========================================================
+  // セーブ
+  // =========================================================
+
+  function saveGame(slotIndex) {
+
+    const now =
+      new Date();
+
+
+    const timeStr =
+
+      `${now.getFullYear()}/` +
+
+      `${now.getMonth() + 1}/` +
+
+      `${now.getDate()} ` +
+
+      `${now.getHours()}:` +
+
+      `${String(
+        now.getMinutes()
+      ).padStart(
+        2,
+        '0'
+      )}`;
+
+
+    const currentEntryId =
+      getCurrentEntryId();
+
+
+    const saveData = {
+
+
+      // セーブデータ形式
+      version: 3,
+
+
+      scene:
+        currentScene,
+
+
+      step:
+        currentStep,
+
+
+      // 将来的なシナリオ変更に備えIDも保存
+      entryId:
+        currentEntryId,
+
+
+      playerLastName:
+        playerLastName,
+
+
+      playerFirstName:
+        playerFirstName,
+
+
+      chapterName:
+        currentScene === "prologue"
+
+          ? "プロローグ"
+
+          : "第一章",
+
+      currentBackground:
+      currentBackground,
+
+      timestamp:
+        timeStr,
+
+
+      dialogueHistory:
+        dialogueHistory
+
+    };
+
+
+    try {
+
+
+      localStorage.setItem(
+        `floriography_save_${slotIndex}`,
+        JSON.stringify(
+          saveData
+        )
+      );
+
+
+      alert(
+        `スロット ${slotIndex} にセーブしました。`
+      );
+
+
+    } catch (e) {
+
+
+      console.error(
+        "セーブに失敗しました。",
+        e
+      );
+
+
+      alert(
+        "セーブに失敗しました。"
+      );
+    }
+  }
+
+
+  // =========================================================
+  // ロード
+  // =========================================================
+
+  function loadGame(slotIndex) {
+
+    const rawData =
+      localStorage.getItem(
+        `floriography_save_${slotIndex}`
+      );
+
+
+    if (!rawData) {
+      return;
+    }
+
+
+    let saveData;
+
+
+    try {
+
+
+      saveData =
+        JSON.parse(
+          rawData
+        );
+
+
+    } catch (e) {
+
+
+      console.error(
+        "セーブデータの読み込みに失敗しました。",
+        e
+      );
+
+
+      alert(
+        "セーブデータを読み込めませんでした。"
+      );
+
+
+      return;
+    }
+
+
+    stopSkipMode();
+    stopTextTimer();
+    stopAutoMode();
+
+
+    // -------------------------------------------------------
+    // シーン復元
+    // -------------------------------------------------------
+
+    if (saveData.scene) {
+
+
+      currentScene =
+        saveData.scene;
+
+
+    } else {
+
+
+      currentScene =
+        saveData.chapterName === "第一章"
+
+          ? "chapter1"
+
+          : "prologue";
+    }
+
+
+    // -------------------------------------------------------
+    // 名前復元
+    // -------------------------------------------------------
+
+    playerLastName =
+      saveData.playerLastName
+      ?? "七條";
+
+
+    playerFirstName =
+      saveData.playerFirstName
+      ?? "七星";
+
+
+    // -------------------------------------------------------
+    // バックログ復元
+    // -------------------------------------------------------
+
+    dialogueHistory =
+      Array.isArray(
+        saveData.dialogueHistory
+      )
+
+        ? saveData.dialogueHistory
+
+        : [];
+
+
+    const currentScenario =
+      getCurrentScenario();
+
+
+    // -------------------------------------------------------
+    // 新方式：entryIdから位置を探す
+    // -------------------------------------------------------
+
+    if (saveData.entryId) {
+
+
+      const foundIndex =
+        currentScenario.findIndex(
+          item =>
+            item.id ===
+            saveData.entryId
+        );
+
+
+      if (foundIndex !== -1) {
+
+
+        currentStep =
+          foundIndex;
+
+
+      } else {
+
+
+        currentStep =
+          Number.isInteger(
+            saveData.step
+          )
+
+            ? saveData.step
+
+            : 0;
+      }
+
+
+    } else {
+
+
+      // 旧セーブデータ
+      currentStep =
+        Number.isInteger(
+          saveData.step
+        )
+
+          ? saveData.step
+
+          : 0;
+    }
+
+
+    // -------------------------------------------------------
+    // 範囲外防止
+    // -------------------------------------------------------
+
+    if (currentStep < 0) {
+
+      currentStep = 0;
+    }
+
+
+    if (
+      currentStep >=
+      currentScenario.length
+    ) {
+
+      currentStep =
+        currentScenario.length - 1;
+    }
+
+
+    // -------------------------------------------------------
+    // 画面生成
+    // -------------------------------------------------------
+
+    changeBackground(
+  saveData.currentBackground ?? null
+);
+   
+    renderDialogueScreen();
+
+    updateDialogue();
+
+
+    gameContainer.classList.remove(
+      'fade-out'
+    );
+  }
+
+
+  // =========================================================
+  // UIイベント
+  // =========================================================
+
+  function initUIEvents() {
+
+    const menuToggleBtn =
+      document.getElementById(
+        'menu-toggle-btn'
+      );
+
+
+    const sidebarOverlay =
+      document.getElementById(
+        'sidebar-overlay'
+      );
+
+
+    const sidebar =
+      document.getElementById(
+        'sidebar'
+      );
+
+
+    const sidebarCloseBtn =
+      document.getElementById(
+        'sidebar-close-btn'
+      );
+
+
+    // -------------------------------------------------------
+    // MENUを閉じる
+    // -------------------------------------------------------
+
+    const closeSidebar =
+      () => {
+
+
+        sidebarOverlay
+          .classList
+          .remove('active');
+
+
+        sidebar
+          .classList
+          .remove('open');
+      };
+
+
+    // -------------------------------------------------------
+    // MENU
+    // -------------------------------------------------------
+
+menuToggleBtn
+  .addEventListener(
+    'click',
+    () => {
+
+      // AUTO中なら解除
+      if (isAutoMode) {
+        stopAutoMode();
+      }
+
+      // SKIP中なら解除
+      if (isSkipMode) {
+        stopSkipMode();
+      }
+
+      sidebarOverlay
+        .classList
+        .add('active');
+
+      sidebar
+        .classList
+        .add('open');
+    }
+  );
+
+    sidebarCloseBtn
+      .addEventListener(
+        'click',
+        closeSidebar
+      );
+
+
+    sidebarOverlay
+      .addEventListener(
+        'click',
+        closeSidebar
+      );
+
+
+    // -------------------------------------------------------
+    // Backlog
+    // -------------------------------------------------------
+
+document
+  .getElementById(
+    'sidebar-log-btn'
+  )
+  .addEventListener(
+    'click',
+    () => {
+
+      stopAutoMode();
+      stopSkipMode();
+
+      closeSidebar();
+
+      openLogModal();
+    }
+  );
+
+
+    // -------------------------------------------------------
+    // Save
+    // -------------------------------------------------------
+
+    document
+      .getElementById(
+        'sidebar-save-btn'
+      )
+      .addEventListener(
+        'click',
+        () => {
+
+          stopAutoMode();
+          stopSkipMode();
+      
+
+          closeSidebar();
+
+          openSlotModal(
+            'save'
+          );
+        }
+      );
+
+
+    // -------------------------------------------------------
+    // Load
+    // -------------------------------------------------------
+
+    document
+      .getElementById(
+        'sidebar-load-btn'
+      )
+      .addEventListener(
+        'click',
+        () => {
+
+          stopAutoMode();
+          stopSkipMode();
+
+
+          closeSidebar();
+
+          openSlotModal(
+            'load'
+          );
+        }
+      );
+
+
+    // -------------------------------------------------------
+    // Config
+    // -------------------------------------------------------
+
+    document
+      .getElementById(
+        'sidebar-config-btn'
+      )
+      .addEventListener(
+        'click',
+        () => {
+
+          stopAutoMode();
+          stopSkipMode();
+
+
+          closeSidebar();
+
+          openConfigModal();
+        }
+      );
+
+
+    // -------------------------------------------------------
+    // Back to title
+    // -------------------------------------------------------
+
+    document
+      .getElementById(
+        'sidebar-title-btn'
+      )
+      .addEventListener(
+        'click',
+        () => {
+
+          stopAutoMode();
+          stopSkipMode();
+
+
+
+          closeSidebar();
+
+
+          stopSkipMode();
+
+          stopTextTimer();
+
+
+          gameContainer.classList.add(
+            'fade-out'
+          );
+
+
+          setTimeout(
+            () => {
+
+
+              showTitleScreen();
+
+
+              gameContainer
+                .classList
+                .remove(
+                  'fade-out'
+                );
+
+            },
+            400
+          );
+        }
+      );
+
+
+    // -------------------------------------------------------
+    // モーダル閉じる
+    // -------------------------------------------------------
+
+    document
+      .getElementById(
+        'slot-close-btn'
+      )
+      .addEventListener(
+        'click',
+        closeSlotModal
+      );
+
+
+    document
+      .getElementById(
+        'log-close-btn'
+      )
+      .addEventListener(
+        'click',
+        closeLogModal
+      );
+
+
+    document
+      .getElementById(
+        'config-close-btn'
+      )
+      .addEventListener(
+        'click',
+        closeConfigModal
+      );
+
+
+    // -------------------------------------------------------
+    // テキスト速度
+    // -------------------------------------------------------
+
+    const speedSlider =
+      document.getElementById(
+        'text-speed-slider'
+      );
+
+
+   speedSlider.addEventListener(
+  'input',
+  (e) => {
+
+    textSpeed =
+      parseInt(
+        e.target.value,
+        10
+      );
+
+    updateSpeedDisplay(
+      textSpeed
+    );
+
+
+    // 設定を保存
+    try {
+
+      localStorage.setItem(
+        'floriography_text_speed',
+        String(textSpeed)
+      );
+
+    } catch (err) {
+
+      console.error(
+        "テキスト速度設定の保存に失敗しました。",
+        err
+      );
+    }
+  }
+);
+
+    // -------------------------------------------------------
+    // 会話枠を再表示
+    // -------------------------------------------------------
+
+    document.body.addEventListener(
+      'click',
+      (e) => {
+
+
+        const dialogueBox =
+          document.getElementById(
+            'dialogue-box'
+          );
+
+
+        if (
+          dialogueBox &&
+          dialogueBox
+            .classList
+            .contains(
+              'hidden'
+            )
+        ) {
+
+
+          dialogueBox
+            .classList
+            .remove(
+              'hidden'
+            );
+
+
+          menuContainer
+            .classList
+            .remove(
+              'hidden'
+            );
+
+
+          e.stopPropagation();
+        }
+
+      },
+      true
+    );
+
+// -------------------------------------------------------
+// Enterキーで会話を進める
+// -------------------------------------------------------
+
+document.addEventListener(
+  'keydown',
+  (e) => {
+
+    // Enterキー以外は無視
+    if (e.key !== 'Enter') {
+      return;
+    }
+
+    // 名前入力欄など、入力中なら反応させない
+    const activeElement = document.activeElement;
+
+    if (
+      activeElement &&
+      (
+        activeElement.tagName === 'INPUT' ||
+        activeElement.tagName === 'TEXTAREA'
+      )
+    ) {
+      return;
+    }
+
+    // MENUが開いている場合は反応させない
+    const sidebar =
+      document.getElementById('sidebar');
+
+    if (
+      sidebar &&
+      sidebar.classList.contains('open')
+    ) {
+      return;
+    }
+
+    // セーブ/ロード画面が開いている場合は反応させない
+    const slotModal =
+      document.getElementById('slot-modal-overlay');
+
+    if (
+      slotModal &&
+      slotModal.classList.contains('active')
+    ) {
+      return;
+    }
+
+    // バックログが開いている場合は反応させない
+    const logModal =
+      document.getElementById('log-modal-overlay');
+
+    if (
+      logModal &&
+      logModal.classList.contains('active')
+    ) {
+      return;
+    }
+
+    // CONFIGが開いている場合は反応させない
+    const configModal =
+      document.getElementById('config-modal-overlay');
+
+    if (
+      configModal &&
+      configModal.classList.contains('active')
+    ) {
+      return;
+    }
+
+    // 会話画面が存在しない場合は反応させない
+    const dialogueBox =
+      document.getElementById('dialogue-box');
+
+    if (!dialogueBox) {
+      return;
+    }
+
+    // 会話枠が非表示なら反応させない
+    if (
+      dialogueBox.classList.contains('hidden')
+    ) {
+      return;
+    }
+
+    // AUTO中なら解除
+    if (isAutoMode) {
+      stopAutoMode();
+    }
+
+    // SKIP中なら解除
+    if (isSkipMode) {
+      stopSkipMode();
+    }
+
+    nextDialogue();
+  }
+);
+
+
+  }
+
+
+  // =========================================================
+  // 起動
+  // =========================================================
+
+  window.addEventListener(
+  'DOMContentLoaded',
+  () => {
+
+    resizeGameScreen();
+
+    initUIEvents();
+
+
+    // 保存された速度をスライダーにも反映
+    const speedSlider =
+      document.getElementById(
+        'text-speed-slider'
+      );
+
+    if (speedSlider) {
+      speedSlider.value =
+        String(textSpeed);
+    }
+
+
+    updateSpeedDisplay(
+      textSpeed
+    );
+
+
+    showTitleScreen();
+
+  }
+);
+
+
+   window.addEventListener(
+  'resize',
+  resizeGameScreen
+);
+
+</script>
+
+
+ </body>
+</html>
