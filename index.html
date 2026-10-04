@@ -76,6 +76,10 @@
   position: relative;
 }
 
+/* 画面切り替え用フェードアウト */
+.fade-out {
+  opacity: 0;
+}
 
     /* --- タイトル画面 --- */
     #title-text {
@@ -1188,6 +1192,8 @@ const autoMaxWait = 1800;      // 長文でも最大〇秒
   let currentStep = 0;
 
   let currentBackground = null;
+
+  let isChapterStarting = false;
 
   // =========================================================
   // タイプライター
@@ -2431,6 +2437,13 @@ charName.style.display =
             'click',
             () => {
 
+const confirmNameBtn =
+  document.getElementById(
+    'confirm-name-btn'
+  );
+
+confirmNameBtn.disabled = true;
+
 
               const lastVal =
                 document
@@ -2540,51 +2553,74 @@ charName.style.display =
               // はい
               // ---------------------------------------------
 
-              document
-                .getElementById(
-                  'name-confirm-yes'
-                )
-                .addEventListener(
-                  'click',
-                  () => {
+document
+  .getElementById(
+    'name-confirm-yes'
+  )
+  .addEventListener(
+    'click',
+    () => {
+
+      playerLastName =
+        newLastName;
+
+      playerFirstName =
+        newFirstName;
 
 
-                    playerLastName =
-                      newLastName;
+      // 確認画面はすぐ消す
+      overlay.remove();
 
 
-                    playerFirstName =
-                      newFirstName;
+      // 名前入力画面全体をフェードアウト
+      gameContainer.classList.add(
+        'fade-out'
+      );
 
 
-                    startChapter1();
-                  }
-                );
+      // フェードアウト後に第一章へ
+      setTimeout(
+        () => {
 
+          startChapter1();
 
+        },
+        400
+      );
+    }
+  );
               // ---------------------------------------------
               // いいえ
               // ---------------------------------------------
 
-              document
-                .getElementById(
-                  'name-confirm-no'
-                )
-                .addEventListener(
-                  'click',
-                  () => {
+document
+  .getElementById(
+    'name-confirm-no'
+  )
+  .addEventListener(
+    'click',
+    () => {
+
+      overlay.remove();
 
 
-                    overlay.remove();
+      const confirmNameBtn =
+        document.getElementById(
+          'confirm-name-btn'
+        );
+
+      if (confirmNameBtn) {
+        confirmNameBtn.disabled = false;
+      }
 
 
-                    document
-                      .getElementById(
-                        'player-last-input'
-                      )
-                      .focus();
-                  }
-                );
+      document
+        .getElementById(
+          'player-last-input'
+        )
+        .focus();
+    }
+  );
 
             }
           );
@@ -2604,41 +2640,44 @@ charName.style.display =
   // 第一章開始
   // =========================================================
 
-  function startChapter1() {
+function startChapter1() {
 
-    stopSkipMode();
-    stopTextTimer();
-    stopAutoMode();
-
-
-    currentScene = "chapter1";
-
-    currentStep = 0;
-
-
-    gameContainer.classList.add(
-      'fade-out'
-    );
-
-
-    setTimeout(
-      () => {
-
-
-        renderDialogueScreen();
-
-        updateDialogue();
-
-
-        gameContainer.classList.remove(
-          'fade-out'
-        );
-
-      },
-      2000
-    );
+  if (isChapterStarting) {
+    return;
   }
 
+  isChapterStarting = true;
+
+
+  stopSkipMode();
+  stopTextTimer();
+  stopAutoMode();
+
+
+  currentScene = "chapter1";
+  currentStep = 0;
+
+
+  setTimeout(
+    () => {
+
+      renderDialogueScreen();
+
+      updateDialogue();
+
+
+      // 第一章を表示
+      gameContainer.classList.remove(
+        'fade-out'
+      );
+
+
+      isChapterStarting = false;
+
+    },
+    2000
+  );
+}
 
   // =========================================================
   // 名前タグ置換
