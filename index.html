@@ -85,6 +85,43 @@ html, body {
   opacity: 0;
 }
 
+
+/* =========================================================
+   シーン切り替え用暗転
+   ========================================================= */
+
+.scene-transition-overlay {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
+
+  background-color: #000000;
+
+  opacity: 0;
+  visibility: hidden;
+
+  pointer-events: none;
+
+  transition:
+    opacity 0.6s ease,
+    visibility 0.6s ease;
+
+  z-index: 4500;
+}
+
+
+.scene-transition-overlay.active {
+  opacity: 1;
+  visibility: visible;
+
+  pointer-events: auto;
+}
+
+
     /* --- タイトル画面 --- */
     #title-text {
       font-family: 'Dancing Script', cursive;
@@ -893,6 +930,12 @@ html, body {
   <!-- ゲーム画面本体 -->
   <div id="game-container"></div>
 
+<!-- シーン切り替え用暗転レイヤー -->
+<div
+  id="scene-transition-overlay"
+  class="scene-transition-overlay"
+></div>
+
   <!-- 常駐UI：右上MENUボタン -->
   <div id="menu-trigger-container" class="menu-trigger-container">
     <button id="menu-toggle-btn" class="sys-btn">MENU</button>
@@ -1525,8 +1568,328 @@ const autoMaxWait = 1800;      // 長文でも最大〇秒
       type: "dialogue",
       name: "   ",
       text: "慌ただしいだけのいつも通りの月曜の朝。少し先を歩くお兄ちゃんの背中を追いかけて、私は大きく足を踏み出した。"
-    }
+    },
 
+　　{
+  　　id: "c1_bg002",
+  　　type: "backgroundFade",
+ 　　 image: "classroom1_morning.jpg"
+　　},
+
+
+    {
+      id: "c1_035",
+      type: "dialogue",
+      name: "   ",
+      text: "――学校にて。"
+    },
+
+    {
+      id: "c1_036",
+      type: "dialogue",
+      name: "　　　",
+      text: "キーン、コーン、カーン、コーン。"
+    },
+
+    {
+      id: "c1_037",
+      type: "dialogue",
+      name: "先生",
+      text: "よーし、出席取るぞー。えー、一番......"
+    },
+
+    {
+      id: "c1_038",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "すみません遅れましたー！！"
+    },
+
+    {
+      id: "c1_039",
+      type: "dialogue",
+      name: "先生",
+      text: "二番......っておー、{LAST_NAME}。またお前か。"
+    },
+
+    {
+      id: "c1_040",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "すみません！"
+    },
+
+    {
+      id: "c1_041",
+      type: "dialogue",
+      name: "先生",
+      text: "おー、とりあえず出席確認続けるぞー。えー三番、一ノ瀬紫苑。"
+    },
+
+    {
+      id: "c1_042",
+      type: "dialogue",
+      name: "一ノ瀬紫苑",
+      text: "はい。"
+    },
+
+    {
+      id: "c1_043",
+      type: "dialogue",
+      name: "先生",
+      text: "四番、えー......"
+    },
+
+    {
+      id: "c1_044",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "（ふぅ、危なかった......いや、ぎりぎりアウトだけど。）"
+    },
+
+    {
+      id: "c1_045",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "（お兄ちゃんがスカートなんか気にしてなければ絶対間に合ってたのに。ほんっと、そういうところ「お母さん」って感じ。）"
+    },
+
+    {
+      id: "c1_046",
+      type: "dialogue",
+      name: "一ノ瀬紫苑",
+      text: "へぇ～、今日も{FIRST_NAME}は遅刻か。随分と優雅なんですね、{FIRST_NAME}サマは。"
+    },
+
+    {
+      id: "c1_047",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "......は？うざ、黙って？"
+    },
+
+    {
+      id: "c1_048",
+      type: "dialogue",
+      name: "一ノ瀬紫苑",
+      text: "？遅刻してるくせに何様だよ。っつーか、どうせ今日も寝坊だろ？しょーもなすぎて笑えるね。"
+    },
+
+    {
+      id: "c1_049",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "......"
+    },
+
+    {
+      id: "c1_050",
+      type: "dialogue",
+      name: "一ノ瀬紫苑",
+      text: "へー、図星？"
+    },
+
+    {
+      id: "c1_051",
+      type: "dialogue",
+      name: "一ノ瀬紫苑",
+      text: "まじでお前のその寝坊癖、一生治んねえのな。\n高校生にもなって恥ずかしくねえの？"
+    },
+
+    {   
+      id: "c1_052",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "っ、はぁーー？今日は別に寝坊じゃありませんしー。\nもっと早くに家を出るはずの私を引き留めて遅刻させたお兄ちゃんのせいですがー？"
+    },
+
+    {   
+  　   id: "c1_053",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "勝手に決めつけないでもらえますか？"
+    },
+
+    {   
+      id: "c1_054,",
+      type: "dialogue",
+      name: "一ノ瀬紫苑",
+      text: "うわ出たお兄ちゃん。ただの幼馴染なんだろ？その割にベタベタしててほんっと気色悪いな。"
+    },
+
+    {   
+      id: "c1_055",
+      type: "dialogue",
+      name: "一ノ瀬紫苑",
+      text: "それこそ高校生の癖に恥ずかしくねえの？"
+    },
+
+    {   
+      id: "c1_056",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "うっわ、友だち一人もいない奴の醜い嫉妬じゃん。"
+     },
+
+    {   
+      id: "c1_057",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "ちなみに悪いけど、お兄ちゃんはあんたの友だちになんてなる予定はないからね。\nお疲れ様でーす。"
+     },
+
+    {   
+      id: "c1_058",
+      type: "dialogue",
+      name: "一ノ瀬紫苑",
+      text: "は？意味わかんなすぎ、そんな男こっちから願い下げだわ。"
+    },
+
+    {   
+      id: "c1_059",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "うわ、流石万年ぼっちは言うことが違うね。かっこいー！"
+     },
+
+    {   
+      id: "c1_060",
+      type: "dialogue",
+      name: "一ノ瀬紫苑",
+      text: "......おい、いい加減うざいんだけど。"
+    },
+
+    {   
+      id: "c1_061",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "はっ、図星指されてキレるとかガキじゃん。\nはいはい、小学生は小学校に帰りましょうね～？"
+     },
+
+    {   
+      id: "c1_062",
+      type: "dialogue",
+      name: "一ノ瀬紫苑",
+      text: "あ？"
+    },
+
+    {   
+      id: "c1_063",
+      type: "dialogue",
+      name: "　　　",
+      text: "ガタッ。"
+     },
+
+    {   
+      id: "c1_064",
+      type: "dialogue",
+      name: "一ノ瀬紫苑",
+      text: "てめえこそ精神年齢ガキの癖にほざいてんじゃねえよ、あぁ？"
+    },
+
+    {   
+      id: "c1_065",
+      type: "dialogue",
+      name: "　　　",
+      text: "小声で言い争っていたはずなのに、一ノ瀬は急に椅子から立ち上がった。\nかと思うと、そのまま勢いよく私に詰め寄ってくる。"
+     },
+
+    {   
+      id: "c1_066",
+      type: "dialogue",
+      name: "　　　",
+      text: "興奮した様子の一ノ瀬は額に青筋を立て、何やらわめいている。\n正直ムカつくことしかないが、それよりも今は――"
+    },
+
+    {   
+      id: "c1_067",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "はっ、ちょ、馬鹿......！"
+    },
+
+    {   
+      id: "c1_068",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "そんなことしたら先生に怒られ――"
+    },
+
+    {   
+      id: "c1_069",
+      type: "dialogue",
+      name: "先生",
+      text: "おい誰ださっきから喋ってる奴！！"
+    },
+
+    {   
+      id: "c1_070",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "（うっわー、案の定だ......ほんと最悪。）"
+    },
+
+    {   
+      id: "c1_071",
+      type: "dialogue",
+      name: "先生",
+      text: "一ノ瀬、と......はー、また{FIRST_NAME}か。"
+    },
+
+    {   
+      id: "c1_072",
+      type: "dialogue",
+      name: "先生",
+      text: "HRの間くらい静かに出来ないのか、お前らは？"
+    },
+
+    {   
+      id: "c1_073",
+      type: "dialogue",
+      name: "　　　",
+      text: "静かな口調。だが、そこには確実に苛立ちが含まれている。"
+    },
+
+    {   
+      id: "c1_074",
+      type: "dialogue",
+      name: "先生",
+      text: "飽きもせずお前らは......ったく、お前ら二人とも頭冷やせ。"
+    },
+
+    {   
+      id: "c1_075",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "はーい、すみませんでした。"
+    },
+
+    {   
+      id: "c1_076",
+      type: "dialogue",
+      name: "一ノ瀬紫苑",
+      text: "......チッ。"
+    },
+
+    {   
+      id: "c1_076",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "（はあ。遅刻はするし先生には怒られるし......今日は朝から踏んだり蹴ったりだな。）"
+    },
+
+    {   
+      id: "c1_077",
+      type: "dialogue",
+      name: "　　　",
+      text: "先生には見えない角度から、隣に座る一ノ瀬に向かって中指を立ててやった。"
+    },
+
+    {   
+      id: "c1_bg003",
+      type: "backgroundFade",
+ 　　 image:"classroom2_morning.jpg"
+    }
   ];
 
 
@@ -1607,6 +1970,70 @@ function preloadBackground(imageName) {
       img.src =
         `backgrounds/${imageName}`;
     }
+  );
+}
+
+
+// =========================================================
+// 暗転しながら背景を変更
+// =========================================================
+
+async function changeBackgroundWithFade(
+  imageName
+) {
+
+  const overlay =
+    document.getElementById(
+      'scene-transition-overlay'
+    );
+
+
+  if (!overlay) {
+    changeBackground(imageName);
+    return;
+  }
+
+
+  // 新しい背景を先読み
+  await preloadBackground(
+    imageName
+  );
+
+
+  // 暗転開始
+  overlay.classList.add(
+    'active'
+  );
+
+
+  // 暗転が完了するまで待つ
+  await new Promise(
+    resolve =>
+      setTimeout(
+        resolve,
+        600
+      )
+  );
+
+
+  // 完全に暗くなってから背景変更
+  changeBackground(
+    imageName
+  );
+
+
+  // ブラウザに新背景を一度描画させる
+  await new Promise(
+    resolve =>
+      requestAnimationFrame(
+        resolve
+      )
+  );
+
+
+  // 暗転解除
+  overlay.classList.remove(
+    'active'
   );
 }
 
@@ -2118,6 +2545,30 @@ if (data.type === "background") {
   currentStep++;
 
   updateDialogue();
+
+  return;
+}
+
+
+// -------------------------------------------------------
+// 暗転付き背景変更
+// -------------------------------------------------------
+
+if (data.type === "backgroundFade") {
+
+  currentStep++;
+
+
+  changeBackgroundWithFade(
+    data.image
+  ).then(
+    () => {
+
+      updateDialogue();
+
+    }
+  );
+
 
   return;
 }
