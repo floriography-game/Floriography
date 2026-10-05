@@ -1352,6 +1352,14 @@ const autoMaxWait = 1800;      // 長文でも最大〇秒
     },
 
     {
+      id: "c1_003_1",
+      type: "dialogue",
+      name: "テレビの音声",
+      text: "それでは、本日のニュースです。\n数日前に行方不明になった××町の高校性、......さんの行方について、現在も捜査が行われており――"
+    },
+
+
+    {
       id: "c1_004",
       type: "dialogue",
       name: "{NAME}",
@@ -1658,7 +1666,7 @@ const autoMaxWait = 1800;      // 長文でも最大〇秒
       id: "c1_046",
       type: "dialogue",
       name: "一ノ瀬紫苑",
-      text: "へぇ～、今日も{FIRST_NAME}は遅刻か。随分と優雅なんですね、{FIRST_NAME}サマは。"
+      text: "へぇ～、今日も{LAST_NAME}は遅刻か。随分と優雅なんですね、{FIRST_NAME}サマは。"
     },
 
     {
@@ -1693,7 +1701,7 @@ const autoMaxWait = 1800;      // 長文でも最大〇秒
       id: "c1_051",
       type: "dialogue",
       name: "一ノ瀬紫苑",
-      text: "まじでお前のその寝坊癖、一生治んねえのな。\n高校生にもなって恥ずかしくねえの？"
+      text: "お前のその寝坊癖まじでどうしようもねえな。\n決められた時間に遅れるとか、この歳にもなってほんっとあり得ねえわ。"
     },
 
     {   
@@ -1711,7 +1719,7 @@ const autoMaxWait = 1800;      // 長文でも最大〇秒
     },
 
     {   
-      id: "c1_054,",
+      id: "c1_054",
       type: "dialogue",
       name: "一ノ瀬紫苑",
       text: "うわ出たお兄ちゃん。ただの幼馴染なんだろ？その割にベタベタしててほんっと気色悪いな。"
@@ -1833,7 +1841,7 @@ const autoMaxWait = 1800;      // 長文でも最大〇秒
       id: "c1_071",
       type: "dialogue",
       name: "先生",
-      text: "一ノ瀬、と......はー、また{FIRST_NAME}か。"
+      text: "一ノ瀬、と......はー、また{LAST_NAME}か。"
     },
 
     {   
@@ -1872,7 +1880,7 @@ const autoMaxWait = 1800;      // 長文でも最大〇秒
     },
 
     {   
-      id: "c1_076",
+      id: "c1_076_1",
       type: "dialogue",
       name: "{NAME}",
       text: "（はあ。遅刻はするし先生には怒られるし......今日は朝から踏んだり蹴ったりだな。）"
@@ -1909,14 +1917,14 @@ const autoMaxWait = 1800;      // 長文でも最大〇秒
       id: "c1_080",
       type: "dialogue",
       name: "柊蓮斗",
-      text: "数学、じゃないかな？"
+      text: "総合、じゃないかな？"
     },
 
     {   
       id: "c1_081",
       type: "dialogue",
       name: "柊蓮斗",
-      text: "おはよう、{FIRST_NAME}さん。"
+      text: "おはよう、{LAST_NAME}さん。"
     },
 
     {   
@@ -1945,60 +1953,435 @@ const autoMaxWait = 1800;      // 長文でも最大〇秒
       id: "c1_085",
       type: "dialogue",
       name: "柊蓮斗",
-      text: "そ、それは......まあまあ、元気出しなよ。\nそうだ、とりあえず数学の準備したら？"
+      text: "そ、それは......まあまあ、とりあえず元気出しなよ。"
     },
 
     {   
       id: "c1_086",
       type: "dialogue",
       name: "{NAME}",
-      text: "確かに。えーっと、教科書とノートと......あれ？"
+      text: "ありがと、柊くんだけが私の癒しだよ......"
     },
 
     {   
       id: "c1_087",
       type: "dialogue",
       name: "柊蓮斗",
-      text: "どうかしたの？"
+      text: "そんな、それは大げさってものだよ。"
     },
 
     {   
       id: "c1_088",
       type: "dialogue",
-      name: "{NAME}",
-      text: "（どうしよう......シャーペンはあるのに消しゴムがない。）"
+      name: "男子生徒A",
+      text: "なあなあ、さっきの先生の話ヤバくね！？"
     },
 
     {   
       id: "c1_089",
       type: "dialogue",
-      name: "{NAME}",
-      text: "（今日の朝まではあったはずだんだけど。\n教室のどこかに落としたのかな？）"
+      name: "女子生徒A",
+      text: "え、それな！？最新技術？のモニター指定学校だっけ、超やばいんだけど！"
     },
 
     {   
       id: "c1_090",
       type: "dialogue",
-      name: "{NAME}",
-      text: "ごめん柊くん、消しゴム無くしちゃったみたいで......多分教室の中にあると思うんだけど、一緒に探してくれない？"
+      name: "　　　",
+      text: "教室の真ん中、大きな声でクラスメートが話している。いつも陽気でテンションの高い彼らの話は大体が眉唾なものばかりだが......"
     },
 
     {   
       id: "c1_091",
       type: "dialogue",
-      name: "柊蓮斗",
-      text: "わ、それは大変だ。どんな消しゴムなの？"
+      name: "{NAME}",
+      text: "さ、最新技術？モニター？"
     },
 
     {   
       id: "c1_092",
       type: "dialogue",
       name: "{NAME}",
-      text: "えーっと......ごく普通の消しゴムなんだけど。"
+      text: "な......なにそれ？"
+    },
+
+    {   
+      id: "c1_093",
+      type: "dialogue",
+      name: "柊蓮斗",
+      text: "あ、そっか。{LAST_NAME}さんは遅れてきたから聞いてないのか。"
+    },
+
+    {   
+      id: "c1_094",
+      type: "dialogue",
+      name: "柊蓮斗",
+      text: "さっきのHRで先生が言ってた話なんだけど。\nIT系の技術開発をしてる会社の最新技術のテスト、それの実験場にこの学校が選ばれたらしいんだ。"
+    },
+
+    {   
+      id: "c1_095",
+      type: "dialogue",
+      name: "柊蓮斗",
+      text: "色々変わるらしいよ。\n例えば紙の教科書が電子に変更されるとか、オンライン授業が本格的に導入されるとか。"
+    },
+
+    {   
+      id: "c1_096",
+      type: "dialogue",
+      name: "柊蓮斗",
+      text: "慣れるまでは大変そうだけど......結構便利そうな感じだったよ。"
+    },
+
+    {   
+      id: "c1_097",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "なっ、なにそれ！？"
+    },
+
+    {   
+      id: "c1_098",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "すごいすごい、すごすぎるんだけど！"
+    },
+
+    {   
+      id: "c1_099",
+      type: "dialogue",
+      name: "柊蓮斗",
+      text: "うわっ！？\nちょ、ちょっと落ち着いて......"
+    },
+
+    {   
+      id: "c1_100",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "（まさかこんなオンボロ学校で、そんなハイテク技術を使えるようになるなんて！）"
+    },
+
+    {   
+      id: "c1_101",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "ねえねえ柊くん、それっていつから導入されるの！？"
+    },
+
+    {   
+      id: "c1_102",
+      type: "dialogue",
+      name: "柊蓮斗",
+      text: "え、ええと......ほら、次の総合の時間。"
+    },
+
+    {   
+      id: "c1_103",
+      type: "dialogue",
+      name: "柊蓮斗",
+      text: "多分、そこで色々説明されるんじゃないかな。"
+    },
+
+    {   
+      id: "c1_104",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "なるほど！\n......そうと決まれば、早速準備しないとじゃん！！"
+    },
+
+    {   
+      id: "c1_104",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "（最新技術か......楽しみ！）"
+    },
+
+    {   
+      id: "c1_bg004",
+      type: "backgroundFade",
+ 　　 image:"classroom2_morning.jpg"
+    },
+
+    {   
+      id: "c1_105",
+      type: "dialogue",
+      name: "先生",
+      text: "いいかー？一回しか言わないからよーく聞いとけよ。"
+    },
+
+    {   
+      id: "c1_106",
+      type: "dialogue",
+      name: "先生",
+      text: "今からお前らに配るタブレット。\nそれに、今回導入される最新技術が詰まってるからな。"
+    },
+
+    {   
+      id: "c1_107",
+      type: "dialogue",
+      name: "先生",
+      text: "一人一台、無くしても替えはないから気を付けろよー。"
+    },
+
+    {   
+      id: "c1_108",
+      type: "dialogue",
+      name: "　　　",
+      text: "そんな説明をしながら、先生が一人ずつにタブレットを配ってゆく。\n生徒はみんな浮足立っていて、配られた人は即座に電源を付けている。"
+    },
+
+    {   
+      id: "c1_109",
+      type: "dialogue",
+      name: "　　　",
+      text: "もちろん、私も例外じゃない。"
+    },
+
+    {   
+      id: "c1_110",
+      type: "dialogue",
+      name: "先生",
+      text: "配られた人から電源付けていいぞー、って......もう勝手につけてるのか。"
+    },
+
+    {   
+      id: "c1_111",
+      type: "dialogue",
+      name: "先生",
+      text: "ちゃんと説明は聞くんだぞー。"
+    },
+
+    {   
+      id: "c1_112",
+      type: "dialogue",
+      name: "　　　",
+      text: "その言葉と共に、ついに私にもタブレットが配られた。"
+    },
+
+    {   
+      id: "c1_113",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "（やった！どんな感じなんだろ、早速――）"
+    },
+
+    {   
+      id: "c1_114",
+      type: "dialogue",
+      name: "タブレット",
+      text: "指紋認証完了。データをダウンロードします。"
+    },
+
+    {   
+      id: "c1_115",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "あれ、何か喋って......"
+    },
+
+    {   
+      id: "c1_116",
+      type: "dialogue",
+      name: "タブレット",
+      text: "ダウンロード80%完了。90%、95%......100%。\nダウンロード完了。"
+    },
+
+    {   
+      id: "c1_117",
+      type: "dialogue",
+      name: "タブレット",
+      text: "システムを起動します。"
+    },
+
+    {   
+      id: "c1_118",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "シ......システム？え、っちょ、何それ――"
+    },
+
+    {   
+      id: "c1_119",
+      type: "dialogue",
+      name: "タブレット",
+      text: "ユーザー名、{NAME}。個人情報の入力。"
+    },
+
+
+    {   
+      id: "c1_121",
+      type: "dialogue",
+      name: "タブレット",
+      text: "性別:女性。\n年齢:15。\n生年月日:――年7月7日。"
+    },
+
+    {   
+      id: "c1_122",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "（なっ、なにこれ！？個人情報とか勝手に入れられてるし......これって私だけ！？）"
+    },
+
+    {   
+      id: "c1_123",
+      type: "dialogue",
+      name: "男子生徒A",
+      text: "なんだこれ、すっげ！"
+    },
+
+    {   
+      id: "c1_124",
+      type: "dialogue",
+      name: "女子生徒A",
+      text: "え、ホーム画面もめっちゃおしゃれなんだけど！"
+    },
+
+    {   
+      id: "c1_125",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "（なんで他のみんなは平気そうなの！？やっぱりこれって私だけなのかな......"
+    },
+
+    {   
+      id: "c1_126",
+      type: "dialogue",
+      name: "　　　",
+      text: "あたりを見渡してみても、個人情報がどうのと言っている人は見当たらない。そわそわとした教室の中で、私だけが焦っている。"
+    },
+
+    {   
+      id: "c1_127",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "誰か、誰か私と同じ人は――"
+    },
+
+    {   
+      id: "c1_128",
+      type: "dialogue",
+      name: "　　　",
+      text: "っ、なに......これ。"
+    },
+
+    {   
+      id: "c1_129",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "（いた！！）"
+    },
+
+    {   
+      id: "c1_130",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "（誰、今呟いたのは......あの人じゃない、あの人も全然平気そうだし......）"
+    },
+
+    {   
+      id: "c1_130_1",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "......は、嘘。"
+    },
+
+    {   
+      id: "c1_131",
+      type: "dialogue",
+      name: "　　　",
+      text: "声は、すぐ隣――一ノ瀬の方から聞こえている。"
+    },
+
+    {   
+      id: "c1_132",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "一、ノ瀬？"
+    },
+
+    {   
+      id: "c1_133",
+      type: "dialogue",
+      name: "　　　",
+      text: "信じられないけれど、間違いなくそうだ。"
+    },
+
+    {   
+      id: "c1_133",
+      type: "dialogue",
+      name: "　　　",
+      text: "いつもの殊勝な態度はどこへやら。\n血の気が引いて真っ白な顔に、大きく見開かれた目。"
+    },
+
+    {   
+      id: "c1_134",
+      type: "dialogue",
+      name: "　　　",
+      text: "明らかに尋常ではないその様子に、思わず声をかける。"
+    },
+
+    {   
+      id: "c1_135",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "一ノ瀬？っその、顔色が――"
+    },
+
+    {   
+      id: "c1_136",
+      type: "dialogue",
+      name: "一ノ瀬紫苑",
+      text: "黙れ！！"
+    },
+
+    {   
+      id: "c1_137",
+      type: "dialogue",
+      name: "　　　",
+      text: "キーン、と。\n突き刺すような声に耳鳴りがする。"
+    },
+
+    {   
+      id: "c1_138",
+      type: "dialogue",
+      name: "先生",
+      text: "なんだー、また喧嘩......"
+    },
+
+    {   
+      id: "c1_139",
+      type: "dialogue",
+      name: "先生",
+      text: "......おい一ノ瀬、お前顔色ひどいぞ。保健室行ってこい。"
+    },
+
+    {   
+      id: "c1_140",
+      type: "dialogue",
+      name: "一ノ瀬紫苑",
+      text: "っ違う、違う違う違う......"
+    },
+
+    {   
+      id: "c1_141",
+      type: "dialogue",
+      name: "一ノ瀬紫苑",
+      text: "違うん、だよな？"
+    },
+
+    {   
+      id: "c1_142",
+      type: "dialogue",
+      name: "　　　",
+      text: "しんと静まり返った教室に、一ノ瀬の呟きが響く。"
+    },
+
+    {   
+      id: "c1_143",
+      type: "dialogue",
+      name: "　　　",
+      text: "それが何を意味しているのかは分からない、けど。"
     }
-
-
-
 
   ];
 
