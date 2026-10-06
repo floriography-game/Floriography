@@ -1375,7 +1375,7 @@ function prepareBgm(fileName) {
 {
   id: "c1_bgm001",
   type: "bgm",
-  file: "audio_theme_2.mp3"
+  file: "audio_theme_3.mp3"
 },
 
     {
@@ -2556,9 +2556,12 @@ function stopBgm() {
 
   bgmAudio.currentTime = 0;
 
-  currentBgm = null;
-}
+  bgmAudio.volume = 0.5;
 
+  currentBgm = null;
+
+  preparedBgm = null;
+}
 
 // =========================================================
 // 背景画像の先読み
@@ -3786,7 +3789,7 @@ document
 
 // 第一章BGMを無音で準備
 prepareBgm(
-  "audio_theme_2.mp3"
+  "audio_theme_3.mp3"
 );
 
       playerLastName =
@@ -4428,6 +4431,7 @@ function closeMessage() {
     stopSkipMode();
     stopTextTimer();
     stopAutoMode();
+    stopBgm();
 
     changeBackground(null);
 
@@ -5008,6 +5012,9 @@ function closeSlotModal() {
       currentBackground:
       currentBackground,
 
+currentBgm:
+  currentBgm,
+
       timestamp:
         timeStr,
 
@@ -5231,6 +5238,25 @@ if (saveData.scene) {
     changeBackground(
   saveData.currentBackground ?? null
 );
+
+
+// -------------------------------------------------------
+// BGM復元
+// -------------------------------------------------------
+
+if (saveData.currentBgm) {
+
+  playBgm(
+    saveData.currentBgm
+  );
+
+} else {
+
+  stopBgm();
+
+}
+
+
    
     renderDialogueScreen();
 
