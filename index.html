@@ -1253,48 +1253,202 @@ const autoMaxWait = 1800;      // 長文でも最大〇秒
 
   let isChapterStarting = false;
 
+
 // =========================================================
 // BGM
+// Web Audio API
 // =========================================================
+
+let audioContext = null;
+
+let bgmGainNode = null;
+
+let currentBgmSource = null;
 
 let currentBgm = null;
 
-const bgmAudio =
-  new Audio();
 
-bgmAudio.loop = true;
-bgmAudio.volume = 0.5;
+// BGMの基本音量
+const BGM_VOLUME = 0.5;
 
 
-let preparedBgm = null;
+// 一度読み込んだBGMを保存
+const bgmBufferCache =
+  new Map();
+
+
+// 同じファイルを同時に何度も読み込まないための記録
+const bgmLoadingPromises =
+  new Map();
+
+
+// 古い再生要求が後から実行されるのを防ぐ
+let bgmActionId = 0;
 
 
 // =========================================================
-// BGMを無音で準備
+// AudioContextを準備
 // =========================================================
 
-function prepareBgm(fileName) {
+function getAudioContext() {
 
-  preparedBgm = fileName;
+  if (!audioContext) {
 
-  bgmAudio.src =
-    `audio/${fileName}`;
+    const AudioContextClass =
+      window.AudioContext ||
+      window.webkitAudioContext;
 
-  bgmAudio.volume = 0;
+    audioContext =
+      new AudioContextClass();
 
-  bgmAudio.currentTime = 0;
 
-  bgmAudio.play().catch(
-    error => {
+    bgmGainNode =
+      audioContext.createGain();
 
-      console.warn(
-        "BGMの準備に失敗しました:",
-        error
+    bgmGainNode.gain.value =
+      BGM_VOLUME;
+
+    bgmGainNode.connect(
+      audioContext.destination
+    );
+  }
+
+  return audioContext;
+}
+
+
+// =========================================================
+// BGMファイルをメモリへ読み込む
+// =========================================================
+
+async function loadBgmBuffer(fileName) {
+
+  // すでに読み込み済み
+  if (
+    bgmBufferCache.has(
+      fileName
+    )
+  ) {
+
+    return bgmBufferCache.get(
+      fileName
+    );
+  }
+
+
+  // 現在読み込み中なら、その処理を待つ
+  if (
+    bgmLoadingPromises.has(
+      fileName
+    )
+  ) {
+
+    return bgmLoadingPromises.get(
+      fileName
+    );
+  }
+
+
+  const context =
+    getAudioContext();
+
+
+  const loadingPromise =
+    fetch(
+      `audio/${fileName}`
+    )
+      .then(
+        response => {
+
+          if (!response.ok) {
+
+            throw new Error(
+              `BGMファイルを取得できませんでした: ${fileName}`
+            );
+          }
+
+          return response.arrayBuffer();
+        }
+      )
+      .then(
+        arrayBuffer =>
+          context.decodeAudioData(
+            arrayBuffer
+          )
+      )
+      .then(
+        audioBuffer => {
+
+          bgmBufferCache.set(
+            fileName,
+            audioBuffer
+          );
+
+          bgmLoadingPromises.delete(
+            fileName
+          );
+
+          return audioBuffer;
+        }
+      )
+      .catch(
+        error => {
+
+          bgmLoadingPromises.delete(
+            fileName
+          );
+
+          throw error;
+        }
       );
 
-    }
+
+  bgmLoadingPromises.set(
+    fileName,
+    loadingPromise
   );
+
+
+  return loadingPromise;
 }
+
+
+// =========================================================
+// BGMを先読み
+// =========================================================
+
+async function prepareBgm(fileName) {
+
+  try {
+
+    const context =
+      getAudioContext();
+
+
+    // ユーザー操作中にAudioContextを有効化
+    if (
+      context.state ===
+      "suspended"
+    ) {
+
+      await context.resume();
+    }
+
+
+    // 音は鳴らさず、メモリへ読み込むだけ
+    await loadBgmBuffer(
+      fileName
+    );
+
+  } catch (error) {
+
+    console.warn(
+      "BGMの準備に失敗しました:",
+      error
+    );
+  }
+}
+
   // =========================================================
   // タイプライター
   // =========================================================
@@ -1375,7 +1529,7 @@ function prepareBgm(fileName) {
 {
   id: "c1_bgm001",
   type: "bgm",
-  file: "audio_theme_3.mp3"
+  file: "audio_theme_5.mp3"
 },
 
     {
@@ -1728,7 +1882,7 @@ function prepareBgm(fileName) {
       id: "c1_048",
       type: "dialogue",
       name: "一ノ瀬紫苑",
-      text: "？遅刻してるくせに何様だよ。っつーか、どうせ今日も寝坊だろ？しょーもなすぎて笑えるね。"
+      text: "は？遅刻してるくせに何様だよ。っつーか、どうせ今日も寝坊だろ？しょーもなすぎて笑えるね。"
     },
 
     {
@@ -2481,68 +2635,116 @@ function changeBackground(imageName) {
 // BGM再生
 // =========================================================
 
-function playBgm(fileName) {
+async function playBgm(fileName) {
 
-  // -------------------------------------------------------
-  // すでに無音で準備してある曲の場合
-  // -------------------------------------------------------
-
-  if (
-    preparedBgm === fileName &&
-    !bgmAudio.paused
-  ) {
-
-    currentBgm = fileName;
-
-    // 曲の冒頭へ戻す
-    bgmAudio.currentTime = 0;
-
-    // ここで初めて音を出す
-    bgmAudio.volume = 0.5;
-
-    preparedBgm = null;
-
-    return;
-  }
-
-
-  // -------------------------------------------------------
-  // 同じ曲がすでに通常再生中なら何もしない
-  // -------------------------------------------------------
-
+  // 同じ曲がすでに再生中なら何もしない
   if (
     currentBgm === fileName &&
-    !bgmAudio.paused
+    currentBgmSource
   ) {
-    return;
+
+    return true;
   }
 
 
-  // -------------------------------------------------------
-  // 通常のBGM切り替え
-  // -------------------------------------------------------
+  const actionId =
+    ++bgmActionId;
 
-  currentBgm = fileName;
 
-  preparedBgm = null;
+  try {
 
-  bgmAudio.src =
-    `audio/${fileName}`;
+    const context =
+      getAudioContext();
 
-  bgmAudio.currentTime = 0;
 
-  bgmAudio.volume = 0.5;
+    // 必要ならAudioContextを再開
+    if (
+      context.state ===
+      "suspended"
+    ) {
 
-  bgmAudio.play().catch(
-    error => {
+      await context.resume();
+    }
 
-      console.warn(
-        "BGMの再生に失敗しました:",
-        error
+
+    // 音源を読み込み
+    const buffer =
+      await loadBgmBuffer(
+        fileName
       );
 
+
+    // 読み込み中に別のBGM操作が行われていたら中止
+    if (
+      actionId !==
+      bgmActionId
+    ) {
+
+      return false;
     }
-  );
+
+
+    // 現在のBGMを停止
+    if (currentBgmSource) {
+
+      try {
+
+        currentBgmSource.stop();
+
+      } catch (error) {
+
+        // すでに停止済みなら無視
+      }
+
+
+      currentBgmSource.disconnect();
+
+      currentBgmSource = null;
+    }
+
+
+    // 新しい再生ノードを作る
+    const source =
+      context.createBufferSource();
+
+
+    source.buffer =
+      buffer;
+
+
+    // シームレスループ
+    source.loop =
+      true;
+
+
+    source.connect(
+      bgmGainNode
+    );
+
+
+    currentBgmSource =
+      source;
+
+    currentBgm =
+      fileName;
+
+
+    // 曲頭から再生
+    source.start(0);
+
+
+    return true;
+
+
+  } catch (error) {
+
+    console.warn(
+      "BGMの再生に失敗しました:",
+      error
+    );
+
+    return false;
+  }
 }
 
 
@@ -2552,16 +2754,34 @@ function playBgm(fileName) {
 
 function stopBgm() {
 
-  bgmAudio.pause();
+  // 読み込み途中のBGMも無効化
+  bgmActionId++;
 
-  bgmAudio.currentTime = 0;
 
-  bgmAudio.volume = 0.5;
+  if (currentBgmSource) {
 
-  currentBgm = null;
+    try {
 
-  preparedBgm = null;
+      currentBgmSource.stop();
+
+    } catch (error) {
+
+      // すでに停止済みなら無視
+    }
+
+
+    currentBgmSource.disconnect();
+
+    currentBgmSource =
+      null;
+  }
+
+
+  currentBgm =
+    null;
 }
+
+
 
 // =========================================================
 // 背景画像の先読み
@@ -3200,19 +3420,19 @@ if (data.type === "backgroundFade") {
   return;
 }
 
-// -------------------------------------------------------
-// BGM再生
-// -------------------------------------------------------
-
 if (data.type === "bgm") {
 
   playBgm(
     data.file
+  ).then(
+    () => {
+
+      currentStep++;
+
+      updateDialogue();
+
+    }
   );
-
-  currentStep++;
-
-  updateDialogue();
 
   return;
 }
@@ -3789,7 +4009,7 @@ document
 
 // 第一章BGMを無音で準備
 prepareBgm(
-  "audio_theme_3.mp3"
+  "audio_theme_5.mp3"
 );
 
       playerLastName =
@@ -4981,7 +5201,7 @@ function closeSlotModal() {
 
 
       // セーブデータ形式
-      version: 3,
+      version: 4,
 
 
       scene:
@@ -5061,7 +5281,7 @@ currentBgm:
   // ロード
   // =========================================================
 
-  function loadGame(slotIndex) {
+async function loadGame(slotIndex) {
 
     const rawData =
       localStorage.getItem(
@@ -5235,9 +5455,34 @@ if (saveData.scene) {
     // 画面生成
     // -------------------------------------------------------
 
-    changeBackground(
+changeBackground(
   saveData.currentBackground ?? null
 );
+
+
+// -------------------------------------------------------
+// BGM復元
+// -------------------------------------------------------
+
+if (saveData.currentBgm) {
+
+  await playBgm(
+    saveData.currentBgm
+  );
+
+} else {
+
+  stopBgm();
+}
+
+
+// -------------------------------------------------------
+// 会話画面復元
+// -------------------------------------------------------
+
+renderDialogueScreen();
+
+updateDialogue();
 
 
 // -------------------------------------------------------
