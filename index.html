@@ -1253,6 +1253,48 @@ const autoMaxWait = 1800;      // 長文でも最大〇秒
 
   let isChapterStarting = false;
 
+// =========================================================
+// BGM
+// =========================================================
+
+let currentBgm = null;
+
+const bgmAudio =
+  new Audio();
+
+bgmAudio.loop = true;
+bgmAudio.volume = 0.5;
+
+
+let preparedBgm = null;
+
+
+// =========================================================
+// BGMを無音で準備
+// =========================================================
+
+function prepareBgm(fileName) {
+
+  preparedBgm = fileName;
+
+  bgmAudio.src =
+    `audio/${fileName}`;
+
+  bgmAudio.volume = 0;
+
+  bgmAudio.currentTime = 0;
+
+  bgmAudio.play().catch(
+    error => {
+
+      console.warn(
+        "BGMの準備に失敗しました:",
+        error
+      );
+
+    }
+  );
+}
   // =========================================================
   // タイプライター
   // =========================================================
@@ -1328,6 +1370,12 @@ const autoMaxWait = 1800;      // 長文でも最大〇秒
   id: "c1_bg001",
   type: "background",
   image: "residential_morning.jpg"
+},
+
+{
+  id: "c1_bgm001",
+  type: "bgm",
+  file: "audio_theme_2.mp3"
 },
 
     {
@@ -2430,6 +2478,89 @@ function changeBackground(imageName) {
 
 
 // =========================================================
+// BGM再生
+// =========================================================
+
+function playBgm(fileName) {
+
+  // -------------------------------------------------------
+  // すでに無音で準備してある曲の場合
+  // -------------------------------------------------------
+
+  if (
+    preparedBgm === fileName &&
+    !bgmAudio.paused
+  ) {
+
+    currentBgm = fileName;
+
+    // 曲の冒頭へ戻す
+    bgmAudio.currentTime = 0;
+
+    // ここで初めて音を出す
+    bgmAudio.volume = 0.5;
+
+    preparedBgm = null;
+
+    return;
+  }
+
+
+  // -------------------------------------------------------
+  // 同じ曲がすでに通常再生中なら何もしない
+  // -------------------------------------------------------
+
+  if (
+    currentBgm === fileName &&
+    !bgmAudio.paused
+  ) {
+    return;
+  }
+
+
+  // -------------------------------------------------------
+  // 通常のBGM切り替え
+  // -------------------------------------------------------
+
+  currentBgm = fileName;
+
+  preparedBgm = null;
+
+  bgmAudio.src =
+    `audio/${fileName}`;
+
+  bgmAudio.currentTime = 0;
+
+  bgmAudio.volume = 0.5;
+
+  bgmAudio.play().catch(
+    error => {
+
+      console.warn(
+        "BGMの再生に失敗しました:",
+        error
+      );
+
+    }
+  );
+}
+
+
+// =========================================================
+// BGM停止
+// =========================================================
+
+function stopBgm() {
+
+  bgmAudio.pause();
+
+  bgmAudio.currentTime = 0;
+
+  currentBgm = null;
+}
+
+
+// =========================================================
 // 背景画像の先読み
 // =========================================================
 
@@ -3066,6 +3197,39 @@ if (data.type === "backgroundFade") {
   return;
 }
 
+// -------------------------------------------------------
+// BGM再生
+// -------------------------------------------------------
+
+if (data.type === "bgm") {
+
+  playBgm(
+    data.file
+  );
+
+  currentStep++;
+
+  updateDialogue();
+
+  return;
+}
+
+
+// -------------------------------------------------------
+// BGM停止
+// -------------------------------------------------------
+
+if (data.type === "bgmStop") {
+
+  stopBgm();
+
+  currentStep++;
+
+  updateDialogue();
+
+  return;
+}
+
 
     // 将来的に
     //
@@ -3619,6 +3783,11 @@ document
   .addEventListener(
     'click',
     () => {
+
+// 第一章BGMを無音で準備
+prepareBgm(
+  "audio_theme_2.mp3"
+);
 
       playerLastName =
         newLastName;
