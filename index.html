@@ -1782,65 +1782,101 @@ html, body {
     </div>
   </div>
 
-  <!-- 常駐UI：CONFIG（設定）モーダル画面 -->
-  <div id="config-modal-overlay" class="slot-modal-overlay">
+<!-- 常駐UI：CONFIG（設定）モーダル画面 -->
+<div
+  id="config-modal-overlay"
+  class="slot-modal-overlay"
+>
 
-    <div class="config-modal">
+  <div class="config-modal">
 
-      <div class="slot-modal-header">
-        設定
-      </div>
-
-      <div class="config-item">
-
-        <div class="config-label">
-          <span>テキスト表示速度</span>
-          <span id="speed-value-display">普通</span>
-        </div>
+    <div class="slot-modal-header">
+      設定
+    </div>
 
 
-<div class="config-item">
+    <!-- =====================================================
+         テキスト表示速度
+         ===================================================== -->
 
-  <div class="config-label">
-    <span>BGM音量</span>
-    <span id="bgm-volume-display">50%</span>
-  </div>
+    <div class="config-item">
 
-  <input
-    type="range"
-    id="bgm-volume-slider"
-    class="config-slider"
-    min="0"
-    max="100"
-    value="50"
-    step="5"
-  >
+      <div class="config-label">
 
-</div>
+        <span>
+          テキスト表示速度
+        </span>
 
-        <input
-          type="range"
-          id="text-speed-slider"
-          class="config-slider"
-          min="10"
-          max="90"
-          value="50"
-          step="10"
+        <span
+          id="speed-value-display"
         >
+          普通
+        </span>
 
       </div>
 
-      <button
-        id="config-close-btn"
-        class="sidebar-btn sidebar-close-btn"
+
+      <input
+        type="range"
+        id="text-speed-slider"
+        class="config-slider"
+        min="10"
+        max="90"
+        value="50"
+        step="10"
       >
-        閉じる
-      </button>
 
     </div>
 
+
+    <!-- =====================================================
+         BGM音量
+         ===================================================== -->
+
+    <div class="config-item">
+
+      <div class="config-label">
+
+        <span>
+          BGM音量
+        </span>
+
+        <span
+          id="bgm-volume-display"
+        >
+          50%
+        </span>
+
+      </div>
+
+
+      <input
+        type="range"
+        id="bgm-volume-slider"
+        class="config-slider"
+        min="0"
+        max="100"
+        value="50"
+        step="5"
+      >
+
+    </div>
+
+
+    <!-- =====================================================
+         閉じる
+         ===================================================== -->
+
+    <button
+      id="config-close-btn"
+      class="sidebar-btn sidebar-close-btn"
+    >
+      閉じる
+    </button>
+
   </div>
 
+</div>
 
 <!-- 共通メッセージウィンドウ -->
 <div id="message-overlay" class="message-overlay">
