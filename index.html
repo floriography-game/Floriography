@@ -1011,6 +1011,60 @@ html, body {
 
 
 /* ---------------------------------------------------------
+   調査終了ボタン
+   --------------------------------------------------------- */
+
+.investigation-finish-btn {
+  position: absolute;
+
+  left: 50%;
+  bottom: 180px;
+
+  transform:
+    translateX(-50%);
+
+  width: 220px;
+  height: 52px;
+
+  font-family:
+    'Shippori Mincho',
+    serif;
+
+  font-size: 17px;
+
+  color:
+    #d4af37;
+
+  background-color:
+    rgba(0, 0, 0, 0.86);
+
+  border:
+    1px solid #d4af37;
+
+  border-radius:
+    6px;
+
+  cursor:
+    pointer;
+
+  z-index:
+    110;
+
+  transition:
+    all 0.2s ease;
+}
+
+
+.investigation-finish-btn:hover {
+  color:
+    #000000;
+
+  background-color:
+    #d4af37;
+}
+
+
+/* ---------------------------------------------------------
    タブレット表示
    --------------------------------------------------------- */
 
@@ -1066,6 +1120,55 @@ html, body {
 
   font-size:
     14px;
+}
+
+
+/* ---------------------------------------------------------
+   調査画面：戻るボタン
+   --------------------------------------------------------- */
+
+.investigation-tablet-back-btn {
+  position: absolute;
+
+  top: 10px;
+  right: 12px;
+
+  padding:
+    6px 14px;
+
+  font-family:
+    'Shippori Mincho',
+    serif;
+
+  font-size:
+    14px;
+
+  color:
+    #d4af37;
+
+  background-color:
+    rgba(0, 0, 0, 0.65);
+
+  border:
+    1px solid #d4af37;
+
+  border-radius:
+    5px;
+
+  cursor:
+    pointer;
+
+  transition:
+    all 0.2s ease;
+}
+
+
+.investigation-tablet-back-btn:hover {
+  color:
+    #000000;
+
+  background-color:
+    #d4af37;
 }
 
 
@@ -2266,6 +2369,83 @@ function unlockTabletApp(
   ] = true;
 }
 
+
+
+// =========================================================
+// 調査・タブレット状態を初期化
+// =========================================================
+
+function resetInvestigationAndTabletState() {
+
+  // -------------------------------------------------------
+  // 調査状態
+  // -------------------------------------------------------
+
+  Object.assign(
+    investigationFlags,
+    {
+      deskChecked:
+        false,
+
+      teacherDeskChecked:
+        false,
+
+      backChecked:
+        false,
+
+      shionDeskChecked:
+        false,
+
+      studentBookFound:
+        false
+    }
+  );
+
+
+  // -------------------------------------------------------
+  // タブレットアプリ解放状態
+  // -------------------------------------------------------
+
+  Object.assign(
+    tabletAppUnlocked,
+    {
+      information:
+        false,
+
+      images:
+        false,
+
+      characters:
+        false,
+
+      map:
+        false,
+
+      timeline:
+        false,
+
+      messages:
+        false,
+
+      synthesizer:
+        false,
+
+      keypad:
+        false,
+
+      investigation:
+        true
+    }
+  );
+
+
+  // 調査画面そのものの状態も初期化
+  isInvestigationMode =
+    false;
+
+  currentInvestigationId =
+    null;
+}
 
 
 // =========================================================
@@ -3601,7 +3781,7 @@ let investigationCurrentText = "";
     },
 
     {   
-      id: "c1_104",
+      id: "c1_104_1",
       type: "dialogue",
       name: "{NAME}",
       text: "（最新技術か......楽しみ！）"
@@ -3840,7 +4020,7 @@ let investigationCurrentText = "";
     },
 
     {   
-      id: "c1_133",
+      id: "c1_133_1",
       type: "dialogue",
       name: "タブレット",
       text: "質問：ホーム画面の起動及びパスワードの設定。\n回答：システム起動中、しばらくお待ちください。"
@@ -4343,6 +4523,14 @@ await Promise.all([
   bgmResetPromise
 ]);
 
+
+// -------------------------------------------------------
+// 完全暗転した時点でバックログをリセット
+// -------------------------------------------------------
+
+resetDialogueHistory();
+
+
   // 完全に暗くなってから背景変更
   changeBackground(
     imageName
@@ -4668,6 +4856,7 @@ function renderDialogueScreen() {
 
       </div>
 
+
     </div>
   `;
 
@@ -4907,8 +5096,57 @@ function renderInvestigationScreen(
 
       </div>
 
+
+    ${
+      investigationFlags.studentBookFound
+
+        ? `
+          <button
+            type="button"
+            id="investigation-finish-btn"
+            class="investigation-finish-btn"
+          >
+            調査を終了する
+          </button>
+        `
+
+        : ''
+    }
+
+
     </div>
   `;
+
+
+
+// -------------------------------------------------------
+// 調査終了
+// -------------------------------------------------------
+
+const finishButton =
+  document.getElementById(
+    'investigation-finish-btn'
+  );
+
+
+if (finishButton) {
+
+  finishButton.addEventListener(
+    'click',
+    () => {
+
+      showConfirmMessage(
+        "調査を終了しますか？",
+        () => {
+
+          finishInvestigation();
+
+        }
+      );
+
+    }
+  );
+}
 
 
   // -------------------------------------------------------
@@ -5429,25 +5667,53 @@ screen
     'investigation-tablet-panel';
 
 
-  panel.innerHTML = `
+panel.innerHTML = `
 
-    <div
-      class="investigation-tablet-title"
-    >
-      TABLET SYSTEM
-    </div>
+  <button
+    type="button"
+    id="investigation-back-btn"
+    class="investigation-tablet-back-btn"
+  >
+    ← 戻る
+  </button>
 
-    <div
-      class="investigation-tablet-text"
-    >
-      周辺環境をスキャンしました。<br>
-      調査対象を選択してください。
-    </div>
-  `;
+
+  <div
+    class="investigation-tablet-title"
+  >
+    TABLET SYSTEM
+  </div>
+
+
+  <div
+    class="investigation-tablet-text"
+  >
+    周辺環境をスキャンしました。<br>
+    調査対象を選択してください。
+  </div>
+`;
 
 
   screen.appendChild(
     panel
+  );
+
+
+// -------------------------------------------------------
+// タブレットホームへ戻る
+// -------------------------------------------------------
+
+document
+  .getElementById(
+    'investigation-back-btn'
+  )
+  .addEventListener(
+    'click',
+    () => {
+
+      showTabletFunctionMenu();
+
+    }
   );
 
 
@@ -5523,6 +5789,70 @@ screen
 
     }
   );
+}
+
+
+
+ // =========================================================
+// 調査終了
+// =========================================================
+
+function finishInvestigation() {
+
+  // -------------------------------------------------------
+  // 調査モード終了
+  // -------------------------------------------------------
+
+  isInvestigationMode =
+    false;
+
+  currentInvestigationId =
+    null;
+
+
+  // -------------------------------------------------------
+  // タブレットBGMが流れている場合だけ
+  // 元のBGMへ戻す
+  // -------------------------------------------------------
+
+  if (
+    currentBgm ===
+    TABLET_BGM
+  ) {
+
+    if (
+      previousBgmBeforeTablet
+    ) {
+
+      playBgm(
+        previousBgmBeforeTablet
+      );
+
+    } else {
+
+      stopBgm();
+    }
+  }
+
+
+  previousBgmBeforeTablet =
+    null;
+
+
+  // -------------------------------------------------------
+  // シナリオを調査コマンドの次へ進める
+  // -------------------------------------------------------
+
+  currentStep++;
+
+
+  // -------------------------------------------------------
+  // 通常ADVへ戻る
+  // -------------------------------------------------------
+
+  renderDialogueScreen();
+
+  updateDialogue();
 }
 
 
@@ -6403,6 +6733,9 @@ charName.style.display =
     currentStep = 0;
 
 
+resetInvestigationAndTabletState();
+
+
     dialogueHistory = [];
 
 
@@ -6842,6 +7175,17 @@ CHAPTER_START_WAIT
         fullName
       );
   }
+
+
+// =========================================================
+// バックログをリセット
+// =========================================================
+
+function resetDialogueHistory() {
+
+  dialogueHistory = [];
+
+}
 
 
   // =========================================================
@@ -7864,7 +8208,7 @@ function closeSlotModal() {
 
 
       // セーブデータ形式
-      version: 4,
+      version: 5,
 
 
       scene:
@@ -7903,9 +8247,31 @@ currentBgm:
 
 
       dialogueHistory:
-        dialogueHistory
+        dialogueHistory,
 
-    };
+
+
+   // -------------------------------------------------------
+  // 調査状態
+  // -------------------------------------------------------
+
+  investigationFlags:
+    {
+      ...investigationFlags
+    },
+
+
+  // -------------------------------------------------------
+  // タブレットアプリ解放状態
+  // -------------------------------------------------------
+
+  tabletAppUnlocked:
+    {
+      ...tabletAppUnlocked
+    }
+
+};
+
 
 
     try {
@@ -8025,6 +8391,47 @@ if (saveData.scene) {
       ?? "七星";
 
 
+// -------------------------------------------------------
+// 調査・タブレット状態を一度初期化
+// -------------------------------------------------------
+
+resetInvestigationAndTabletState();
+
+
+// -------------------------------------------------------
+// 調査状態を復元
+// -------------------------------------------------------
+
+if (
+  saveData.investigationFlags &&
+  typeof saveData.investigationFlags ===
+    "object"
+) {
+
+  Object.assign(
+    investigationFlags,
+    saveData.investigationFlags
+  );
+}
+
+
+// -------------------------------------------------------
+// タブレットアプリ解放状態を復元
+// -------------------------------------------------------
+
+if (
+  saveData.tabletAppUnlocked &&
+  typeof saveData.tabletAppUnlocked ===
+    "object"
+) {
+
+  Object.assign(
+    tabletAppUnlocked,
+    saveData.tabletAppUnlocked
+  );
+}
+
+
     // -------------------------------------------------------
     // バックログ復元
     // -------------------------------------------------------
@@ -8114,9 +8521,9 @@ if (saveData.scene) {
     }
 
 
-    // -------------------------------------------------------
-    // 画面生成
-    // -------------------------------------------------------
+// -------------------------------------------------------
+// 背景復元
+// -------------------------------------------------------
 
 changeBackground(
   saveData.currentBackground ?? null
@@ -8127,7 +8534,9 @@ changeBackground(
 // BGM復元
 // -------------------------------------------------------
 
-if (saveData.currentBgm) {
+if (
+  saveData.currentBgm
+) {
 
   await playBgm(
     saveData.currentBgm
@@ -8149,32 +8558,14 @@ updateDialogue();
 
 
 // -------------------------------------------------------
-// BGM復元
+// フェード解除
 // -------------------------------------------------------
 
-if (saveData.currentBgm) {
-
-  playBgm(
-    saveData.currentBgm
-  );
-
-} else {
-
-  stopBgm();
+gameContainer.classList.remove(
+  'fade-out'
+);
 
 }
-
-
-   
-    renderDialogueScreen();
-
-    updateDialogue();
-
-
-    gameContainer.classList.remove(
-      'fade-out'
-    );
-  }
 
 
   // =========================================================
