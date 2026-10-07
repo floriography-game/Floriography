@@ -919,6 +919,814 @@ html, body {
   background-color: rgba(90, 90, 90, 0.95);
 }
 
+
+/* =========================================================
+   調査モード
+   ========================================================= */
+
+.investigation-screen {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+
+  box-sizing: border-box;
+}
+
+
+/* ---------------------------------------------------------
+   下部 2×2 メニュー
+   --------------------------------------------------------- */
+
+.investigation-menu {
+  position: absolute;
+
+  left: 50%;
+  bottom: 38px;
+
+  transform: translateX(-50%);
+
+  width: 420px;
+
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 12px;
+
+  z-index: 100;
+}
+
+
+.investigation-menu-btn {
+  height: 58px;
+
+  font-family:
+    'Shippori Mincho',
+    serif;
+
+  font-size: 18px;
+
+  color: #ffffff;
+
+  background-color:
+    rgba(0, 0, 0, 0.82);
+
+  border:
+    1px solid #d4af37;
+
+  border-radius: 6px;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+
+.investigation-menu-btn:hover {
+  color: #000000;
+
+  background-color:
+    #d4af37;
+}
+
+
+/* 使用不可 */
+.investigation-menu-btn:disabled {
+  color: #777777;
+
+  border-color: #555555;
+
+  background-color:
+    rgba(0, 0, 0, 0.65);
+
+  cursor: default;
+
+  opacity: 0.65;
+}
+
+
+/* ---------------------------------------------------------
+   タブレット表示
+   --------------------------------------------------------- */
+
+.investigation-tablet-panel {
+  position: absolute;
+
+  top: 35px;
+  left: 50%;
+
+  transform:
+    translateX(-50%);
+
+  min-width: 420px;
+
+  padding:
+    14px 22px;
+
+  box-sizing:
+    border-box;
+
+  background-color:
+    rgba(15, 25, 30, 0.88);
+
+  border:
+    1px solid #d4af37;
+
+  border-radius:
+    8px;
+
+  text-align:
+    center;
+
+  z-index:
+    110;
+}
+
+
+.investigation-tablet-title {
+  color:
+    #d4af37;
+
+  font-size:
+    19px;
+
+  margin-bottom:
+    6px;
+}
+
+
+.investigation-tablet-text {
+  color:
+    #dddddd;
+
+  font-size:
+    14px;
+}
+
+
+/* ---------------------------------------------------------
+   調査ポイント
+   --------------------------------------------------------- */
+
+.investigation-point {
+  position: absolute;
+
+  min-width:
+    145px;
+
+  padding:
+    10px 15px;
+
+  font-family:
+    'Shippori Mincho',
+    serif;
+
+  font-size:
+    16px;
+
+  color:
+    #ffffff;
+
+  background-color:
+    rgba(0, 0, 0, 0.78);
+
+  border:
+    1px solid #d4af37;
+
+  border-radius:
+    22px;
+
+  cursor:
+    pointer;
+
+  z-index:
+    90;
+
+  transition:
+    transform 0.15s ease,
+    background-color 0.15s ease;
+}
+
+
+.investigation-point:hover {
+  transform:
+    scale(1.05);
+
+  background-color:
+    rgba(212, 175, 55, 0.85);
+
+  color:
+    #000000;
+}
+
+
+/* 調査済み */
+.investigation-point.checked {
+  color:
+    #aaaaaa;
+
+  border-color:
+    #777777;
+
+  background-color:
+    rgba(0, 0, 0, 0.65);
+}
+
+
+/* ---------------------------------------------------------
+   調査結果表示
+   --------------------------------------------------------- */
+
+.investigation-result-box {
+  width:
+    calc(100% - 90px);
+
+  height:
+    180px;
+
+  position:
+    absolute;
+
+  left:
+    45px;
+
+  bottom:
+    30px;
+
+  padding:
+    20px 25px;
+
+  box-sizing:
+    border-box;
+
+  background-color:
+    rgba(0, 0, 0, 0.82);
+
+  border:
+    1px solid #d4af37;
+
+  border-radius:
+    8px;
+
+  z-index:
+    200;
+}
+
+
+.investigation-result-name {
+  position:
+    absolute;
+
+  left:
+    0;
+
+  top:
+    -48px;
+
+  min-width:
+    190px;
+
+  height:
+    42px;
+
+  padding:
+    0 18px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  box-sizing:
+    border-box;
+
+  background-color:
+    rgba(0, 0, 0, 0.82);
+
+  border:
+    1px solid #d4af37;
+
+  border-radius:
+    6px;
+
+  color:
+    #d4af37;
+
+  font-size:
+    18px;
+}
+
+
+.investigation-result-text {
+  font-size:
+    23px;
+
+  line-height:
+    1.7;
+
+  white-space:
+    pre-wrap;
+}
+
+
+.investigation-result-next {
+  position:
+    absolute;
+
+  right:
+    15px;
+
+  bottom:
+    10px;
+
+  color:
+    #d4af37;
+
+  font-size:
+    18px;
+
+  cursor:
+    pointer;
+
+  padding:
+    10px 15px;
+}
+
+
+
+/* =========================================================
+   タブレット機能メニュー
+   ========================================================= */
+
+.tablet-function-menu {
+  position: absolute;
+
+  top: 110px;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  width: 460px;
+
+  padding: 22px;
+
+  box-sizing: border-box;
+
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 14px;
+
+  background-color:
+    rgba(15, 25, 30, 0.94);
+
+  border:
+    1px solid #d4af37;
+
+  border-radius:
+    8px;
+
+  z-index:
+    120;
+}
+
+
+.tablet-function-btn {
+  height: 62px;
+
+  font-family:
+    'Shippori Mincho',
+    serif;
+
+  font-size: 18px;
+
+  color: #ffffff;
+
+  background-color:
+    rgba(0, 0, 0, 0.7);
+
+  border:
+    1px solid #d4af37;
+
+  border-radius:
+    6px;
+
+  cursor:
+    pointer;
+
+  transition:
+    all 0.2s ease;
+}
+
+
+.tablet-function-btn:hover {
+  color: #000000;
+
+  background-color:
+    #d4af37;
+}
+
+
+.tablet-function-btn:disabled {
+  color: #777777;
+
+  border-color:
+    #555555;
+
+  background-color:
+    rgba(0, 0, 0, 0.5);
+
+  cursor:
+    default;
+
+  opacity:
+    0.65;
+}
+
+
+
+/* =========================================================
+   大型タブレット画面
+   ========================================================= */
+
+/* タブレットを開いている間、背景を暗くぼかす */
+.investigation-screen.tablet-mode::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background-color:
+    rgba(0, 0, 0, 0.46);
+
+  backdrop-filter:
+    blur(3px);
+
+  z-index: 105;
+}
+
+
+/* タブレット本体 */
+.tablet-home-panel {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  transform:
+    translate(-50%, -50%);
+
+  width: 80%;
+  height: 70%;
+
+  max-width: 1020px;
+  max-height: 520px;
+
+  box-sizing: border-box;
+
+  padding:
+    55px 55px 42px;
+
+  /*
+    外装＋画面を兼ねた、
+    少し青みのあるグラファイト色
+  */
+  background:
+    linear-gradient(
+      145deg,
+      #151a1f,
+      #0c1217
+    );
+
+  border:
+    9px solid #252a30;
+
+  border-radius:
+    28px;
+
+  box-shadow:
+    0 20px 65px
+      rgba(0, 0, 0, 0.72),
+
+    inset 0 0 0 2px
+      rgba(120, 130, 140, 0.22);
+
+  z-index: 120;
+
+  overflow: hidden;
+}
+
+
+/* タブレット上部のカメラ */
+.tablet-home-panel::before {
+  content: "";
+
+  position: absolute;
+
+  top: 14px;
+  left: 50%;
+
+  transform:
+    translateX(-50%);
+
+  width: 9px;
+  height: 9px;
+
+  border-radius:
+    50%;
+
+  background-color:
+    #07090b;
+
+  box-shadow:
+    0 0 0 2px
+      rgba(120, 130, 140, 0.15);
+}
+
+
+/* タブレットのタイトル */
+.tablet-home-title {
+  font-size:
+    24px;
+
+  letter-spacing:
+    3px;
+
+  text-align:
+    center;
+
+  color:
+    #e2ebf1;
+
+  margin-bottom:
+    8px;
+}
+
+
+/* タブレットの補足表示 */
+.tablet-home-text {
+  font-size:
+    14px;
+
+  text-align:
+    center;
+
+  color:
+    #8796a2;
+
+  margin-bottom:
+    34px;
+}
+
+
+
+/* 大型タブレット内の機能メニュー */
+.tablet-home-panel .tablet-function-menu {
+  position: static;
+
+  transform: none;
+
+  width: 88%;
+
+  margin:
+    0 auto;
+
+  padding: 0;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap:
+    14px;
+
+  background:
+    transparent;
+
+  border:
+    none;
+
+  z-index:
+    auto;
+}
+
+
+
+.tablet-home-panel .tablet-function-btn {
+  height:
+    86px;
+
+  padding:
+    10px 8px;
+
+  font-size:
+    17px;
+
+  line-height:
+    1.4;
+
+  letter-spacing:
+    0.5px;
+
+  color:
+    #e7eef3;
+
+  background:
+    linear-gradient(
+      145deg,
+      #202b34,
+      #141c23
+    );
+
+  border:
+    1px solid #52616c;
+
+  border-radius:
+    12px;
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(255, 255, 255, 0.05);
+
+  transition:
+    all 0.2s ease;
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  justify-content:
+    center;
+
+  align-items:
+    center;
+
+  gap:
+    5px;
+}
+
+
+/* 解放済みアプリ名 */
+.tablet-app-label {
+  font-size:
+    17px;
+
+  text-align:
+    center;
+}
+
+
+/* 未解放表示 */
+.tablet-app-locked-label {
+  font-size:
+    15px;
+
+  letter-spacing:
+    2px;
+
+  color:
+    #626d75;
+}
+
+
+/* 未解放アプリ */
+.tablet-home-panel
+.tablet-function-btn.locked {
+
+  background:
+    linear-gradient(
+      145deg,
+      #11171c,
+      #0d1216
+    );
+
+  border-color:
+    #2b343a;
+
+  opacity:
+    0.58;
+}
+
+
+/* ホバー */
+.tablet-home-panel
+.tablet-function-btn:not(:disabled):hover {
+
+  color:
+    #ffffff;
+
+  background:
+    linear-gradient(
+      145deg,
+      #314452,
+      #22313c
+    );
+
+  border-color:
+    #8ba2b2;
+
+  transform:
+    translateY(-2px);
+}
+
+
+/* 使用不能 */
+.tablet-home-panel
+.tablet-function-btn:disabled {
+
+  color:
+    #56616a;
+
+  background:
+    #11171c;
+
+  border-color:
+    #303941;
+
+  opacity:
+    0.7;
+}
+
+
+/* タブレット右上の閉じるボタン */
+.tablet-close-btn {
+  position:
+    absolute;
+
+  top:
+    18px;
+
+  right:
+    22px;
+
+  width:
+    38px;
+
+  height:
+    38px;
+
+  padding:
+    0;
+
+  border:
+    1px solid #4c5962;
+
+  border-radius:
+    50%;
+
+  background-color:
+    rgba(10, 14, 18, 0.72);
+
+  color:
+    #aeb9c0;
+
+  font-family:
+    sans-serif;
+
+  font-size:
+    22px;
+
+  line-height:
+    1;
+
+  cursor:
+    pointer;
+
+  transition:
+    all 0.2s ease;
+
+  z-index:
+    5;
+}
+
+
+.tablet-close-btn:hover {
+  color:
+    #ffffff;
+
+  border-color:
+    #8ba2b2;
+
+  background-color:
+    #26343e;
+}
+
+
+
   </style>
 </head>
 
@@ -989,6 +1797,26 @@ html, body {
           <span>テキスト表示速度</span>
           <span id="speed-value-display">普通</span>
         </div>
+
+
+<div class="config-item">
+
+  <div class="config-label">
+    <span>BGM音量</span>
+    <span id="bgm-volume-display">50%</span>
+  </div>
+
+  <input
+    type="range"
+    id="bgm-volume-slider"
+    class="config-slider"
+    min="0"
+    max="100"
+    value="50"
+    step="5"
+  >
+
+</div>
 
         <input
           type="range"
@@ -1255,6 +2083,385 @@ const autoMaxWait = 1800;      // 長文でも最大〇秒
 
 
 // =========================================================
+// 調査システム
+// =========================================================
+
+let isInvestigationMode =
+  false;
+
+let currentInvestigationId =
+  null;
+
+
+// 第一回調査の状態
+const investigationFlags = {
+
+  deskChecked:
+    false,
+
+  teacherDeskChecked:
+    false,
+
+  backChecked:
+    false,
+
+  shionDeskChecked:
+    false,
+
+  studentBookFound:
+    false
+
+};
+
+
+// =========================================================
+// タブレットアプリ
+// =========================================================
+
+const tabletApps = [
+
+  {
+    id: "information",
+    label: "情報記録"
+  },
+
+  {
+    id: "images",
+    label: "画像フォルダ"
+  },
+
+  {
+    id: "characters",
+    label: "キャラクター情報"
+  },
+
+  {
+    id: "map",
+    label: "マップ・位置情報"
+  },
+
+  {
+    id: "timeline",
+    label: "タイムライン"
+  },
+
+  {
+    id: "messages",
+    label: "メッセージアプリ"
+  },
+
+  {
+    id: "synthesizer",
+    label: "検証・シンセサイザー"
+  },
+
+  {
+    id: "keypad",
+    label: "コード入力"
+  },
+
+  {
+    id: "investigation",
+    label: "調査"
+  }
+
+];
+
+
+// ---------------------------------------------------------
+// 初期解放状態
+// ---------------------------------------------------------
+
+const tabletAppUnlocked = {
+
+  information:
+    false,
+
+  images:
+    false,
+
+  characters:
+    false,
+
+  map:
+    false,
+
+  timeline:
+    false,
+
+  messages:
+    false,
+
+  synthesizer:
+    false,
+
+  keypad:
+    false,
+
+  investigation:
+    true
+
+};
+
+
+// =========================================================
+// タブレットアプリ解放
+// =========================================================
+
+function unlockTabletApp(
+  appId
+) {
+
+  if (
+    !(appId in tabletAppUnlocked)
+  ) {
+
+    console.warn(
+      "存在しないタブレット機能です:",
+      appId
+    );
+
+    return;
+  }
+
+
+  tabletAppUnlocked[
+    appId
+  ] = true;
+}
+
+
+
+// =========================================================
+// 調査データ
+// =========================================================
+
+const investigationData = {
+
+  classroomStudentBook: {
+
+    title:
+      "学生手帳を探す",
+
+
+    targets: {
+
+      desk: {
+
+        label:
+          "自分の机",
+
+        flag:
+          "deskChecked",
+
+        x:
+          "22%",
+
+        y:
+          "43%",
+
+        result: [
+
+          {
+            name:
+              "{NAME}",
+
+            text:
+              "（まずは自分の机かな。机の中と椅子の下を見てみよう。）"
+          },
+
+          {
+            name:
+              "タブレット",
+
+            text:
+              "周辺をスキャンしました。学生手帳に該当する物体は確認できません。"
+          },
+
+          {
+            name:
+              "{NAME}",
+
+            text:
+              "（うーん、ここじゃないか。）"
+          }
+
+        ]
+
+      },
+
+
+      teacherDesk: {
+
+        label:
+          "教卓",
+
+        flag:
+          "teacherDeskChecked",
+
+        x:
+          "51%",
+
+        y:
+          "29%",
+
+        result: [
+
+          {
+            name:
+              "{NAME}",
+
+            text:
+              "（教室に入ってきた時、教卓の近くは通ったけど……。）"
+          },
+
+          {
+            name:
+              "タブレット",
+
+            text:
+              "学生手帳に該当する物体は確認できません。"
+          },
+
+          {
+            name:
+              "先生",
+
+            text:
+              "ん？　{LAST_NAME}、何か探してるのか？"
+          },
+
+          {
+            name:
+              "{NAME}",
+
+            text:
+              "あ、ちょっと学生手帳を落としたみたいで……。"
+          }
+
+        ]
+
+      },
+
+
+      back: {
+
+        label:
+          "教室後方",
+
+        flag:
+          "backChecked",
+
+        x:
+          "77%",
+
+        y:
+          "46%",
+
+        result: [
+
+          {
+            name:
+              "タブレット",
+
+            text:
+              "周辺をスキャンしました。複数の小物を検出。"
+          },
+
+          {
+            name:
+              "{NAME}",
+
+            text:
+              "（消しゴム、プリント……あと誰かのペン。私の学生手帳はないな。）"
+          },
+
+          {
+            name:
+              "タブレット",
+
+            text:
+              "探索対象との一致率はいずれも5％未満です。"
+          }
+
+        ]
+
+      },
+
+
+      shionDesk: {
+
+        label:
+          "一ノ瀬の席",
+
+        flag:
+          "shionDeskChecked",
+
+        x:
+          "62%",
+
+        y:
+          "58%",
+
+        findStudentBook:
+          true,
+
+        result: [
+
+          {
+            name:
+              "タブレット",
+
+            text:
+              "探索対象と一致する物体を検出しました。"
+          },
+
+          {
+            name:
+              "{NAME}",
+
+            text:
+              "えっ、ほんと！？"
+          },
+
+          {
+            name:
+              "{NAME}",
+
+            text:
+              "（……あった！　私の学生手帳！）"
+          },
+
+          {
+            name:
+              "{NAME}",
+
+            text:
+              "（でも、なんで一ノ瀬の机の近くに……？）"
+          },
+
+          {
+            name:
+              "タブレット",
+
+            text:
+              "探索対象を回収しました。"
+          }
+
+        ]
+
+      }
+
+    }
+
+  }
+
+};
+
+
+
+
+// =========================================================
 // BGM
 // Web Audio API
 // =========================================================
@@ -1268,8 +2475,58 @@ let currentBgmSource = null;
 let currentBgm = null;
 
 
-// BGMの基本音量
-const BGM_VOLUME = 0.5;
+
+// =========================================================
+// BGM音量
+// 0.0 ～ 1.0
+// =========================================================
+
+let bgmVolume =
+  0.5;
+
+
+try {
+
+  const savedBgmVolume =
+    localStorage.getItem(
+      'floriography_bgm_volume'
+    );
+
+
+  if (
+    savedBgmVolume !== null
+  ) {
+
+    const parsedVolume =
+      parseFloat(
+        savedBgmVolume
+      );
+
+
+    if (
+      !Number.isNaN(
+        parsedVolume
+      )
+    ) {
+
+      bgmVolume =
+        Math.min(
+          1,
+          Math.max(
+            0,
+            parsedVolume
+          )
+        );
+    }
+  }
+
+} catch (e) {
+
+  console.error(
+    "BGM音量設定の読み込みに失敗しました。",
+    e
+  );
+}
 
 
 // 一度読み込んだBGMを保存
@@ -1305,8 +2562,8 @@ function getAudioContext() {
     bgmGainNode =
       audioContext.createGain();
 
-    bgmGainNode.gain.value =
-      BGM_VOLUME;
+bgmGainNode.gain.value =
+  bgmVolume;
 
     bgmGainNode.connect(
       audioContext.destination
@@ -1456,6 +2713,17 @@ async function prepareBgm(fileName) {
   let timerId = null;
   let isTyping = false;
   let currentText = "";
+
+
+// =========================================================
+// 調査中テキスト表示
+// =========================================================
+
+let investigationTimerId = null;
+
+let isInvestigationTyping = false;
+
+let investigationCurrentText = "";
 
 
   // =========================================================
@@ -1693,7 +2961,7 @@ async function prepareBgm(fileName) {
       id: "c1_022",
       type: "dialogue",
       name: "{NAME}",
-      text: "んー......なんとなく、だけど......\nあ、あとお兄ちゃんにはもう本物の妹がいるじゃん。私、杏奈と家族とか絶対やだもん。"
+      text: "んー......なんとなく、だけど......\nあ、だってお兄ちゃんにはもう本物の妹がいるじゃん。私、杏奈と家族とか絶対やだもん。"
     },
 
    {
@@ -1868,7 +3136,7 @@ async function prepareBgm(fileName) {
       id: "c1_046",
       type: "dialogue",
       name: "一ノ瀬紫苑",
-      text: "へぇ～、今日も{LAST_NAME}は遅刻か。随分と優雅なんですね、{FIRST_NAME}サマは。"
+      text: "へぇ～、今日も{LAST_NAME}は遅刻か。随分と優雅なんですね、{LAST_NAME}サマは。"
     },
 
     {
@@ -1882,7 +3150,7 @@ async function prepareBgm(fileName) {
       id: "c1_048",
       type: "dialogue",
       name: "一ノ瀬紫苑",
-      text: "は？遅刻してるくせに何様だよ。っつーか、どうせ今日も寝坊だろ？しょーもなすぎて笑えるね。"
+      text: "は？遅刻してるくせに何様だよ。っつーか、どうせ今日も寝坊だろ？しょーもなすぎて笑えるわ。"
     },
 
     {
@@ -1903,7 +3171,7 @@ async function prepareBgm(fileName) {
       id: "c1_051",
       type: "dialogue",
       name: "一ノ瀬紫苑",
-      text: "お前のその寝坊癖まじでどうしようもねえな。\n決められた時間に遅れるとか、この歳にもなってほんっとあり得ねえわ。"
+      text: "お前のその寝坊癖まじでどうしようもねえな。\n決められた時間に遅れるとか、人としてあり得ねえわ。"
     },
 
     {   
@@ -1931,7 +3199,7 @@ async function prepareBgm(fileName) {
       id: "c1_055",
       type: "dialogue",
       name: "一ノ瀬紫苑",
-      text: "それこそ高校生の癖に恥ずかしくねえの？"
+      text: "高校生の癖に恥ずかしくねえの？"
     },
 
     {   
@@ -1945,7 +3213,7 @@ async function prepareBgm(fileName) {
       id: "c1_057",
       type: "dialogue",
       name: "{NAME}",
-      text: "ちなみに悪いけど、お兄ちゃんはあんたの友だちになんてなる予定はないからね。\nお疲れ様でーす。"
+      text: "悪いけど、お兄ちゃんはあんたの友だちになんてなる予定はないからね。\nお疲れ様でーす。"
      },
 
     {   
@@ -2169,7 +3437,7 @@ async function prepareBgm(fileName) {
       id: "c1_087",
       type: "dialogue",
       name: "柊蓮斗",
-      text: "そんな、それは大げさってものだよ。"
+      text: "そんな、それは大げさだよ。"
     },
 
     {   
@@ -2204,7 +3472,7 @@ async function prepareBgm(fileName) {
       id: "c1_092",
       type: "dialogue",
       name: "{NAME}",
-      text: "な......なにそれ？"
+      text: "な、なにそれ？"
     },
 
     {   
@@ -2308,14 +3576,7 @@ async function prepareBgm(fileName) {
       id: "c1_105",
       type: "dialogue",
       name: "先生",
-      text: "いいかー？一回しか言わないからよーく聞いとけよ。"
-    },
-
-    {   
-      id: "c1_106",
-      type: "dialogue",
-      name: "先生",
-      text: "今からお前らに配るタブレット。\nそれに、今回導入される最新技術が詰まってるからな。"
+      text: "いいかー？一回しか言わないからよく聞いとけよ。\n今からお前らに配るタブレット、それがないと今後の学校生活が大変になるからなー。"
     },
 
     {   
@@ -2382,18 +3643,33 @@ async function prepareBgm(fileName) {
     },
 
     {   
+      id: "c1_113_1",
+      type: "dialogue",
+      name: "タブレット",
+      text: "――こんにちは、ユーザー様。"
+    },
+
+    {   
       id: "c1_114",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "あれ、誰か喋った......？"
+    },
+
+    {   
+      id: "c1_115",
       type: "dialogue",
       name: "タブレット",
       text: "認証開始。\n――指紋認証、顔認証......生体認証完了。データをダウンロードします。"
     },
 
     {   
-      id: "c1_115",
+      id: "c1_115_1",
       type: "dialogue",
       name: "{NAME}",
-      text: "あれ、何か喋って......"
+      text: "に、認証？な、ええ？"
     },
+
 
     {   
       id: "c1_116",
@@ -2413,7 +3689,7 @@ async function prepareBgm(fileName) {
       id: "c1_118",
       type: "dialogue",
       name: "{NAME}",
-      text: "シ、システム？え、っちょ、何それ――"
+      text: "シ......システム？っちょ、何それ――"
     },
 
     {   
@@ -2589,7 +3865,7 @@ async function prepareBgm(fileName) {
       id: "c1_142",
       type: "dialogue",
       name: "　　　",
-      text: "先生がタブレットに関する説明を続ける中、私だけが一人タブレットと格闘している。\nシステムの起動をキャンセルすることもできず、いつの間にか運用が開始されてしまう。"
+      text: "先生がタブレットに関する説明を続ける中、私だけが一人タブレットと格闘している。\nシステムの起動をキャンセルすることもできず、いつの間にか運用が開始されてしまっている。"
     },
 
     {   
@@ -2597,7 +3873,43 @@ async function prepareBgm(fileName) {
       type: "dialogue",
       name: "タブレット",
       text: "ホーム画面の表示。......こちらで問題ありませんか？"
-    }
+    },
+
+    {   
+      id: "c1_144",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "（いや、問題しかないけど......）"
+    },
+
+    {   
+      id: "c1_145",
+      type: "dialogue",
+      name: "タブレット",
+      text: "ユーザーの不満を検知。\nこちらはいかがですか？"
+    },
+
+    {
+       id:"c1_inv001",
+       type:"investigation",
+       investigationId:"classroomStudentBook"
+    },
+
+    {   
+      id: "c1_146",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "......え、えええ？"
+    },
+
+    {   
+      id: "c1_147",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "（な、何この画面！？）"
+    },
+
+
 
   ];
 
@@ -3206,6 +4518,7 @@ function renderDialogueScreen() {
   `;
 
 
+
   // =========================================================
   // 会話ボックス全体クリックで次へ
   // =========================================================
@@ -3367,6 +4680,1100 @@ function renderDialogueScreen() {
 
 
 
+// =========================================================
+// 調査画面
+// =========================================================
+
+function renderInvestigationScreen(
+  investigationId
+) {
+
+  isInvestigationMode =
+    true;
+
+  currentInvestigationId =
+    investigationId;
+
+
+  stopSkipMode();
+
+  stopAutoMode();
+
+  stopTextTimer();
+
+
+  menuContainer.classList.add(
+    'active'
+  );
+
+
+  gameContainer.innerHTML = `
+
+    <div
+      class="investigation-screen"
+      id="investigation-screen"
+    >
+
+      <div
+        class="investigation-menu"
+      >
+
+        <button
+          type="button"
+          id="investigation-talk-btn"
+          class="investigation-menu-btn"
+        >
+          会話
+        </button>
+
+        <button
+          type="button"
+          id="investigation-tablet-btn"
+          class="investigation-menu-btn"
+        >
+          タブレット
+        </button>
+
+        <button
+          type="button"
+          id="investigation-item-btn"
+          class="investigation-menu-btn"
+        >
+          持ち物
+        </button>
+
+        <button
+          type="button"
+          id="investigation-move-btn"
+          class="investigation-menu-btn"
+          disabled
+        >
+          移動
+        </button>
+
+      </div>
+
+    </div>
+  `;
+
+
+  // -------------------------------------------------------
+  // 会話
+  // -------------------------------------------------------
+
+  document
+    .getElementById(
+      'investigation-talk-btn'
+    )
+    .addEventListener(
+      'click',
+      () => {
+
+        showMessage(
+          "現在、会話できる相手はいません。"
+        );
+
+      }
+    );
+
+
+  // -------------------------------------------------------
+  // タブレット
+  // -------------------------------------------------------
+
+
+document
+  .getElementById(
+    'investigation-tablet-btn'
+  )
+  .addEventListener(
+    'click',
+    () => {
+
+      showTabletFunctionMenu();
+
+    }
+  );
+
+
+
+  // -------------------------------------------------------
+  // 持ち物
+  // -------------------------------------------------------
+
+  document
+    .getElementById(
+      'investigation-item-btn'
+    )
+    .addEventListener(
+      'click',
+      () => {
+
+        if (
+          investigationFlags
+            .studentBookFound
+        ) {
+
+          showMessage(
+            "【持ち物】\n学生手帳"
+          );
+
+        } else {
+
+          showMessage(
+            "現在、調査に使用できる持ち物はありません。"
+          );
+
+        }
+
+      }
+    );
+}
+
+
+
+// =========================================================
+// タブレット機能メニュー
+// =========================================================
+
+function showTabletFunctionMenu() {
+
+  const screen =
+    document.getElementById(
+      'investigation-screen'
+    );
+
+
+  if (!screen) {
+    return;
+  }
+
+
+  // -------------------------------------------------------
+  // タブレット表示モード
+  // -------------------------------------------------------
+
+  screen.classList.add(
+    'tablet-mode'
+  );
+
+
+  // 下側の調査基本メニューを隠す
+  const baseMenu =
+    screen.querySelector(
+      '.investigation-menu'
+    );
+
+
+  if (baseMenu) {
+
+    baseMenu.style.display =
+      'none';
+  }
+
+
+  // -------------------------------------------------------
+  // 既存のタブレット関連UIを削除
+  // -------------------------------------------------------
+
+  screen
+    .querySelectorAll(
+      '.tablet-home-panel, .investigation-tablet-panel, .tablet-function-menu, .investigation-point'
+    )
+    .forEach(
+      element => {
+
+        element.remove();
+
+      }
+    );
+
+
+  // -------------------------------------------------------
+  // タブレット本体
+  // -------------------------------------------------------
+
+  const tablet =
+    document.createElement(
+      'div'
+    );
+
+
+  tablet.className =
+    'tablet-home-panel';
+
+
+  tablet.innerHTML = `
+
+    <button
+      type="button"
+      id="tablet-close-btn"
+      class="tablet-close-btn"
+      aria-label="タブレットを閉じる"
+    >
+      ×
+    </button>
+
+
+    <div
+      class="tablet-home-title"
+    >
+      TABLET SYSTEM
+    </div>
+
+
+    <div
+      class="tablet-home-text"
+    >
+      使用する機能を選択してください
+    </div>
+
+
+    <div
+      class="tablet-function-menu"
+      id="tablet-function-menu"
+    ></div>
+  `;
+
+
+  screen.appendChild(
+    tablet
+  );
+
+
+  // -------------------------------------------------------
+  // 3×3アプリ一覧
+  // -------------------------------------------------------
+
+  const appMenu =
+    document.getElementById(
+      'tablet-function-menu'
+    );
+
+
+  tabletApps.forEach(
+    app => {
+
+      const button =
+        document.createElement(
+          'button'
+        );
+
+
+      button.type =
+        'button';
+
+
+      button.className =
+        'tablet-function-btn';
+
+
+      const isUnlocked =
+        tabletAppUnlocked[
+          app.id
+        ];
+
+
+      // -----------------------------------------------------
+      // 解放済み
+      // -----------------------------------------------------
+
+      if (isUnlocked) {
+
+        button.innerHTML = `
+
+          <div
+            class="tablet-app-label"
+          >
+            ${app.label}
+          </div>
+        `;
+
+
+        button.addEventListener(
+          'click',
+          () => {
+
+            openTabletApp(
+              app.id
+            );
+
+          }
+        );
+
+
+      // -----------------------------------------------------
+      // 未解放
+      // -----------------------------------------------------
+
+      } else {
+
+        button.classList.add(
+          'locked'
+        );
+
+
+        button.disabled =
+          true;
+
+
+        button.innerHTML = `
+
+          <div
+            class="tablet-app-locked-label"
+          >
+            LOCKED
+          </div>
+        `;
+      }
+
+
+      appMenu.appendChild(
+        button
+      );
+
+    }
+  );
+
+
+  // -------------------------------------------------------
+  // 閉じる
+  // -------------------------------------------------------
+
+  document
+    .getElementById(
+      'tablet-close-btn'
+    )
+    .addEventListener(
+      'click',
+      () => {
+
+        renderInvestigationScreen(
+          currentInvestigationId
+        );
+
+      }
+    );
+}
+
+
+// =========================================================
+// タブレットアプリ起動
+// =========================================================
+
+function openTabletApp(
+  appId
+) {
+
+  // -------------------------------------------------------
+  // 調査
+  // -------------------------------------------------------
+
+  if (
+    appId ===
+    "investigation"
+  ) {
+
+    showInvestigationTargets();
+
+    return;
+  }
+
+
+  // -------------------------------------------------------
+  // 情報記録
+  // 将来、本実装へ差し替える
+  // -------------------------------------------------------
+
+  if (
+    appId ===
+    "information"
+  ) {
+
+    showInvestigationInformation();
+
+    return;
+  }
+
+
+  // -------------------------------------------------------
+  // その他
+  // -------------------------------------------------------
+
+  showMessage(
+    "この機能は現在準備中です。"
+  );
+}
+ 
+
+// =========================================================
+// タブレット：取得情報
+// =========================================================
+
+function showInvestigationInformation() {
+
+  let informationText =
+    "【取得情報】\n";
+
+  // 以下続く
+
+// =========================================================
+// タブレット：取得情報
+// =========================================================
+
+
+  if (
+    investigationFlags.deskChecked
+  ) {
+
+    informationText +=
+      "\n・自分の机：学生手帳は見つからなかった";
+  }
+
+
+  if (
+    investigationFlags.teacherDeskChecked
+  ) {
+
+    informationText +=
+      "\n・教卓：学生手帳は見つからなかった";
+  }
+
+
+  if (
+    investigationFlags.backChecked
+  ) {
+
+    informationText +=
+      "\n・教室後方：学生手帳は見つからなかった";
+  }
+
+
+  if (
+    investigationFlags.studentBookFound
+  ) {
+
+    informationText +=
+      "\n・学生手帳：発見済み";
+  }
+
+
+  if (
+    informationText ===
+    "【取得情報】\n"
+  ) {
+
+    informationText +=
+      "\nまだ情報はありません。";
+  }
+
+
+  showMessage(
+    informationText
+  );
+}
+
+
+
+// =========================================================
+// タブレット：調査対象表示
+// =========================================================
+
+function showInvestigationTargets() {
+
+  const screen =
+    document.getElementById(
+      'investigation-screen'
+    );
+
+
+  if (!screen) {
+    return;
+  }
+
+
+  // 大型タブレット表示を終了
+  screen.classList.remove(
+    'tablet-mode'
+  );
+
+
+
+screen
+  .querySelectorAll(
+    '.tablet-home-panel, .investigation-tablet-panel, .tablet-function-menu, .investigation-point'
+  )
+  .forEach(
+    element => {
+      element.remove();
+    }
+  );
+
+
+
+  const investigation =
+    investigationData[
+      currentInvestigationId
+    ];
+
+  if (!investigation) {
+    return;
+  }
+
+
+  // -------------------------------------------------------
+  // タブレット表示
+  // -------------------------------------------------------
+
+  const panel =
+    document.createElement(
+      'div'
+    );
+
+
+  panel.className =
+    'investigation-tablet-panel';
+
+
+  panel.innerHTML = `
+
+    <div
+      class="investigation-tablet-title"
+    >
+      TABLET SYSTEM
+    </div>
+
+    <div
+      class="investigation-tablet-text"
+    >
+      周辺環境をスキャンしました。<br>
+      調査対象を選択してください。
+    </div>
+  `;
+
+
+  screen.appendChild(
+    panel
+  );
+
+
+  // -------------------------------------------------------
+  // 各調査ポイント
+  // -------------------------------------------------------
+
+  Object.entries(
+    investigation.targets
+  ).forEach(
+    ([targetId, target]) => {
+
+
+      const button =
+        document.createElement(
+          'button'
+        );
+
+
+      button.type =
+        'button';
+
+
+      button.className =
+        'investigation-point';
+
+
+      button.style.left =
+        target.x;
+
+
+      button.style.top =
+        target.y;
+
+
+      if (
+        investigationFlags[
+          target.flag
+        ]
+      ) {
+
+        button.classList.add(
+          'checked'
+        );
+
+
+        button.textContent =
+          `✓ ${target.label}`;
+
+      } else {
+
+        button.textContent =
+          target.label;
+
+      }
+
+
+      button.addEventListener(
+        'click',
+        () => {
+
+          startInvestigationResult(
+            targetId
+          );
+
+        }
+      );
+
+
+      screen.appendChild(
+        button
+      );
+
+    }
+  );
+}
+
+
+// =========================================================
+// 調査結果
+// =========================================================
+
+function startInvestigationResult(
+  targetId
+) {
+
+  const investigation =
+    investigationData[
+      currentInvestigationId
+    ];
+
+
+  if (!investigation) {
+    return;
+  }
+
+
+  const target =
+    investigation.targets[
+      targetId
+    ];
+
+
+  if (!target) {
+    return;
+  }
+
+
+  investigationFlags[
+    target.flag
+  ] = true;
+
+
+  if (
+    target.findStudentBook
+  ) {
+
+    investigationFlags
+      .studentBookFound =
+      true;
+  }
+
+
+  let resultIndex =
+    0;
+
+
+  function showNextResult() {
+
+    const data =
+      target.result[
+        resultIndex
+      ];
+
+
+    if (!data) {
+
+      renderInvestigationScreen(
+        currentInvestigationId
+      );
+
+      return;
+    }
+
+
+    showInvestigationResultEntry(
+      data,
+      () => {
+
+        resultIndex++;
+
+        showNextResult();
+
+      }
+    );
+  }
+
+
+  showNextResult();
+}
+
+
+// =========================================================
+// 調査中タイプライター停止
+// =========================================================
+
+function stopInvestigationTextTimer() {
+
+  if (investigationTimerId) {
+
+    clearInterval(
+      investigationTimerId
+    );
+
+    investigationTimerId =
+      null;
+  }
+
+
+  isInvestigationTyping =
+    false;
+}
+
+
+// =========================================================
+// 調査中タイプライター
+// =========================================================
+
+function typeWriterInvestigation(
+  text,
+  textElement
+) {
+
+  stopInvestigationTextTimer();
+
+
+  investigationCurrentText =
+    text;
+
+
+  textElement.textContent =
+    "";
+
+
+  let index =
+    0;
+
+
+  isInvestigationTyping =
+    true;
+
+
+  investigationTimerId =
+    setInterval(
+      () => {
+
+        // 画面切り替えなどで
+        // 要素が消えていた場合
+        if (
+          !document.body.contains(
+            textElement
+          )
+        ) {
+
+          stopInvestigationTextTimer();
+
+          return;
+        }
+
+
+        textElement.textContent +=
+          text[index];
+
+
+        index++;
+
+
+        if (
+          index >=
+          text.length
+        ) {
+
+          stopInvestigationTextTimer();
+        }
+
+      },
+
+      textSpeed
+    );
+}
+
+
+// =========================================================
+// 調査結果1行表示
+// =========================================================
+
+function showInvestigationResultEntry(
+  data,
+  onNext
+) {
+
+  const screen =
+    document.getElementById(
+      'investigation-screen'
+    );
+
+
+  if (!screen) {
+    return;
+  }
+
+
+  // 念のため前の調査用タイマーを停止
+  stopInvestigationTextTimer();
+
+
+  // 調査用メニュー類を隠す
+  screen
+    .querySelectorAll(
+      '.investigation-menu, .investigation-tablet-panel, .tablet-home-panel, .tablet-function-menu, .investigation-point'
+    )
+    .forEach(
+      element => {
+        element.remove();
+      }
+    );
+
+
+  const resultBox =
+    document.createElement(
+      'div'
+    );
+
+
+  resultBox.className =
+    'investigation-result-box';
+
+
+  const displayName =
+    replaceNameTags(
+      data.name
+    ).trim();
+
+
+  const displayText =
+    replaceNameTags(
+      data.text
+    );
+
+
+  // -------------------------------------------------------
+  // テキストボックスを先に作る
+  // 本文はまだ入れない
+  // -------------------------------------------------------
+
+  resultBox.innerHTML = `
+
+    ${
+      displayName
+
+        ? `
+          <div
+            class="investigation-result-name"
+          >
+            ${displayName}
+          </div>
+        `
+
+        : ''
+    }
+
+    <div
+      class="investigation-result-text"
+    ></div>
+
+    <div
+      class="investigation-result-next"
+    >
+      ▽
+    </div>
+  `;
+
+
+  screen.appendChild(
+    resultBox
+  );
+
+
+  const textElement =
+    resultBox.querySelector(
+      '.investigation-result-text'
+    );
+
+
+  if (!textElement) {
+    return;
+  }
+
+
+  // -------------------------------------------------------
+  // 通常会話と同じ速度でタイプライター表示
+  // -------------------------------------------------------
+
+  typeWriterInvestigation(
+    displayText,
+    textElement
+  );
+
+
+  // -------------------------------------------------------
+  // テキストボックスクリック
+  // -------------------------------------------------------
+
+  resultBox.addEventListener(
+    'click',
+    () => {
+
+      // -----------------------------------------------
+      // まだ文字表示中なら、
+      // 次へ進まず全文を一気に表示
+      // -----------------------------------------------
+
+      if (
+        isInvestigationTyping
+      ) {
+
+        stopInvestigationTextTimer();
+
+
+        textElement.textContent =
+          investigationCurrentText;
+
+
+        return;
+      }
+
+
+      // -----------------------------------------------
+      // 全文表示済みなら次の台詞へ
+      // -----------------------------------------------
+
+      resultBox.remove();
+
+
+      if (onNext) {
+        onNext();
+      }
+
+    }
+  );
+}
+
+
+// =========================================================
+// 調査中コマンド
+// =========================================================
+
+function runInvestigationCommand(
+  command,
+  onComplete
+) {
+
+  if (!command) {
+
+    if (onComplete) {
+      onComplete();
+    }
+
+    return;
+  }
+
+
+  // -------------------------------------------------------
+  // 調査中会話
+  // -------------------------------------------------------
+
+  if (
+    command.type ===
+    "investigationDialogue"
+  ) {
+
+    showInvestigationResultEntry(
+      {
+        name:
+          command.name ?? "",
+
+        text:
+          command.text ?? ""
+      },
+
+      () => {
+
+        if (onComplete) {
+          onComplete();
+        }
+
+      }
+    );
+
+    return;
+  }
+
+
+  console.warn(
+    "未対応の調査コマンドです:",
+    command.type
+  );
+
+
+  if (onComplete) {
+    onComplete();
+  }
+}
+
+// =========================================================
+// 調査中コマンドを連続実行
+// =========================================================
+
+function runInvestigationCommands(
+  commands,
+  onComplete
+) {
+
+  let index =
+    0;
+
+
+  function runNext() {
+
+    const command =
+      commands[index];
+
+
+    if (!command) {
+
+      if (onComplete) {
+        onComplete();
+      }
+
+      return;
+    }
+
+
+    runInvestigationCommand(
+      command,
+      () => {
+
+        index++;
+
+        runNext();
+
+      }
+    );
+  }
+
+
+  runNext();
+}
+
+
   // =========================================================
   // シナリオ内容を判定して表示
   // =========================================================
@@ -3475,6 +5882,25 @@ if (data.type === "bgmStop") {
     // type: "music"
     //
     // などをここへ追加可能
+
+
+
+// -------------------------------------------------------
+// 調査
+// -------------------------------------------------------
+
+if (
+  data.type ===
+  "investigation"
+) {
+
+  renderInvestigationScreen(
+    data.investigationId
+  );
+
+  return;
+}
+
 
     console.warn(
       "未対応のシナリオタイプです:",
@@ -4432,6 +6858,31 @@ CHAPTER_START_WAIT
         "低速";
     }
   }
+
+
+// =========================================================
+// BGM音量表示
+// =========================================================
+
+function updateBgmVolumeDisplay(
+  value
+) {
+
+  const display =
+    document.getElementById(
+      'bgm-volume-display'
+    );
+
+
+  if (!display) {
+    return;
+  }
+
+
+  display.textContent =
+    `${value}%`;
+}
+
 
 // =========================================================
 // 共通メッセージウィンドウ
@@ -5909,6 +8360,68 @@ document
   }
 );
 
+
+// -------------------------------------------------------
+// BGM音量
+// -------------------------------------------------------
+
+const bgmVolumeSlider =
+  document.getElementById(
+    'bgm-volume-slider'
+  );
+
+
+if (bgmVolumeSlider) {
+
+  bgmVolumeSlider.addEventListener(
+    'input',
+    (e) => {
+
+      const sliderValue =
+        parseInt(
+          e.target.value,
+          10
+        );
+
+
+      // 0～100 → 0.0～1.0
+      bgmVolume =
+        sliderValue / 100;
+
+
+      // 現在再生中のBGMにも即反映
+      if (bgmGainNode) {
+
+        bgmGainNode.gain.value =
+          bgmVolume;
+      }
+
+
+      updateBgmVolumeDisplay(
+        sliderValue
+      );
+
+
+      // 設定を保存
+      try {
+
+        localStorage.setItem(
+          'floriography_bgm_volume',
+          String(bgmVolume)
+        );
+
+      } catch (err) {
+
+        console.error(
+          "BGM音量設定の保存に失敗しました。",
+          err
+        );
+      }
+
+    }
+  );
+}
+
     // -------------------------------------------------------
     // 会話枠を再表示
     // -------------------------------------------------------
@@ -6041,6 +8554,24 @@ if (
 }
 
 
+// -------------------------------------------------------
+// 調査中テキストボックス
+// -------------------------------------------------------
+
+const investigationResultBox =
+  document.querySelector(
+    '.investigation-result-box'
+  );
+
+
+if (investigationResultBox) {
+
+  investigationResultBox.click();
+
+  return;
+}
+
+
     // 会話画面が存在しない場合は反応させない
     const dialogueBox =
       document.getElementById('dialogue-box');
@@ -6102,6 +8633,36 @@ if (
     updateSpeedDisplay(
       textSpeed
     );
+
+
+// -------------------------------------------------------
+// BGM音量設定を画面へ反映
+// -------------------------------------------------------
+
+const bgmVolumeSlider =
+  document.getElementById(
+    'bgm-volume-slider'
+  );
+
+
+const bgmVolumePercent =
+  Math.round(
+    bgmVolume * 100
+  );
+
+
+if (bgmVolumeSlider) {
+
+  bgmVolumeSlider.value =
+    String(
+      bgmVolumePercent
+    );
+}
+
+
+updateBgmVolumeDisplay(
+  bgmVolumePercent
+);
 
 
     showTitleScreen();
