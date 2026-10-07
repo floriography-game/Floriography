@@ -2232,8 +2232,11 @@ let currentInvestigationId =
   null;
 
 
-// 第一回調査の状態
-const investigationFlags = {
+// =========================================================
+// 調査フラグ初期値
+// =========================================================
+
+const DEFAULT_INVESTIGATION_FLAGS = {
 
   deskChecked:
     false,
@@ -2252,6 +2255,14 @@ const investigationFlags = {
 
 };
 
+
+// =========================================================
+// 現在の調査状態
+// =========================================================
+
+const investigationFlags = {
+  ...DEFAULT_INVESTIGATION_FLAGS
+};
 
 // =========================================================
 // タブレットアプリ
@@ -2307,11 +2318,11 @@ const tabletApps = [
 ];
 
 
-// ---------------------------------------------------------
-// 初期解放状態
-// ---------------------------------------------------------
+// =========================================================
+// タブレットアプリ初期解放状態
+// =========================================================
 
-const tabletAppUnlocked = {
+const DEFAULT_TABLET_APP_UNLOCKED = {
 
   information:
     false,
@@ -2340,6 +2351,15 @@ const tabletAppUnlocked = {
   investigation:
     true
 
+};
+
+
+// =========================================================
+// 現在のタブレットアプリ解放状態
+// =========================================================
+
+const tabletAppUnlocked = {
+  ...DEFAULT_TABLET_APP_UNLOCKED
 };
 
 
@@ -2378,68 +2398,29 @@ function unlockTabletApp(
 function resetInvestigationAndTabletState() {
 
   // -------------------------------------------------------
-  // 調査状態
+  // 調査状態を初期値へ戻す
   // -------------------------------------------------------
 
   Object.assign(
     investigationFlags,
-    {
-      deskChecked:
-        false,
-
-      teacherDeskChecked:
-        false,
-
-      backChecked:
-        false,
-
-      shionDeskChecked:
-        false,
-
-      studentBookFound:
-        false
-    }
+    DEFAULT_INVESTIGATION_FLAGS
   );
 
 
   // -------------------------------------------------------
-  // タブレットアプリ解放状態
+  // タブレットアプリ解放状態を初期値へ戻す
   // -------------------------------------------------------
 
   Object.assign(
     tabletAppUnlocked,
-    {
-      information:
-        false,
-
-      images:
-        false,
-
-      characters:
-        false,
-
-      map:
-        false,
-
-      timeline:
-        false,
-
-      messages:
-        false,
-
-      synthesizer:
-        false,
-
-      keypad:
-        false,
-
-      investigation:
-        true
-    }
+    DEFAULT_TABLET_APP_UNLOCKED
   );
 
 
+  // -------------------------------------------------------
   // 調査画面そのものの状態も初期化
+  // -------------------------------------------------------
+
   isInvestigationMode =
     false;
 
@@ -2448,19 +2429,24 @@ function resetInvestigationAndTabletState() {
 }
 
 
+
+
 // =========================================================
 // 調査データ
 // =========================================================
 
 const investigationData = {
 
-  classroomStudentBook: {
+classroomStudentBook: {
 
-    title:
-      "学生手帳を探す",
+  title:
+    "学生手帳を探す",
+
+  completionFlag:
+    "studentBookFound",
 
 
-    targets: {
+  targets: {
 
       desk: {
 
@@ -2676,6 +2662,44 @@ const investigationData = {
 
 
 
+// =========================================================
+// 調査終了可能判定
+// =========================================================
+
+function canFinishInvestigation() {
+
+  const investigation =
+    investigationData[
+      currentInvestigationId
+    ];
+
+
+  // 調査データが存在しない場合
+  if (!investigation) {
+    return false;
+  }
+
+
+  const completionFlag =
+    investigation.completionFlag;
+
+
+  // 終了条件が設定されていない場合
+  if (!completionFlag) {
+    return false;
+  }
+
+
+  // 指定されたフラグが true なら終了可能
+  return (
+    investigationFlags[
+      completionFlag
+    ] === true
+  );
+}
+
+
+
 
 // =========================================================
 // BGM
@@ -2688,10 +2712,22 @@ let bgmGainNode = null;
 
 let currentBgmSource = null;
 
-let currentBgm = null;
 
-let previousBgmBeforeTablet = null;
+// =========================================================
+// BGM状態
+// =========================================================
 
+// 現在、実際に再生されているBGM
+let currentBgm =
+  null;
+
+
+// 通常シナリオ上で本来流れるべきBGM
+let sceneBgm =
+  null;
+
+
+// タブレット専用BGM
 const TABLET_BGM =
   "audio_tablet_2.mp3";
 
@@ -4155,6 +4191,133 @@ scenario: prologueScenario
 
 
 // =========================================================
+// シナリオIDチェック
+// =========================================================
+
+function checkScenarioIds() {
+
+  const usedIds =
+    new Map();
+
+
+  const duplicateIds =
+    [];
+
+
+  const missingIds =
+    [];
+
+
+  Object.entries(
+    sceneInfo
+  ).forEach(
+    ([sceneId, sceneData]) => {
+
+      const scenario =
+        sceneData.scenario;
+
+
+      scenario.forEach(
+        (item, index) => {
+
+          // ---------------------------------------------------
+          // ID未設定チェック
+          // ---------------------------------------------------
+
+          if (
+            !item.id
+          ) {
+
+            missingIds.push({
+              sceneId,
+              index
+            });
+
+            return;
+          }
+
+
+          // ---------------------------------------------------
+          // ID重複チェック
+          // ---------------------------------------------------
+
+          if (
+            usedIds.has(
+              item.id
+            )
+          ) {
+
+            duplicateIds.push({
+              id:
+                item.id,
+
+              first:
+                usedIds.get(
+                  item.id
+                ),
+
+              second: {
+                sceneId,
+                index
+              }
+            });
+
+          } else {
+
+            usedIds.set(
+              item.id,
+              {
+                sceneId,
+                index
+              }
+            );
+          }
+
+        }
+      );
+
+    }
+  );
+
+
+  // -------------------------------------------------------
+  // 重複IDを表示
+  // -------------------------------------------------------
+
+  if (
+    duplicateIds.length > 0
+  ) {
+
+    console.error(
+      "シナリオIDの重複があります。",
+      duplicateIds
+    );
+
+  } else {
+
+    console.log(
+      "シナリオID重複チェック：問題なし"
+    );
+  }
+
+
+  // -------------------------------------------------------
+  // ID未設定を表示
+  // -------------------------------------------------------
+
+  if (
+    missingIds.length > 0
+  ) {
+
+    console.warn(
+      "ID未設定のシナリオがあります。",
+      missingIds
+    );
+  }
+}
+
+
+// =========================================================
 // 背景変更
 // =========================================================
 
@@ -4499,6 +4662,9 @@ let bgmResetPromise =
 
 
 if (resetBgm) {
+
+  sceneBgm =
+    null;
 
   bgmResetPromise =
     fadeOutAndResetBgm(
@@ -5097,22 +5263,21 @@ function renderInvestigationScreen(
       </div>
 
 
-    ${
-      investigationFlags.studentBookFound
+${
+  canFinishInvestigation()
 
-        ? `
-          <button
-            type="button"
-            id="investigation-finish-btn"
-            class="investigation-finish-btn"
-          >
-            調査を終了する
-          </button>
-        `
+    ? `
+      <button
+        type="button"
+        id="investigation-finish-btn"
+        class="investigation-finish-btn"
+      >
+        調査を終了する
+      </button>
+    `
 
-        : ''
-    }
-
+    : ''
+}
 
     </div>
   `;
@@ -5249,9 +5414,6 @@ if (
   currentBgm !==
   TABLET_BGM
 ) {
-
-  previousBgmBeforeTablet =
-    currentBgm;
 
   playBgm(
     TABLET_BGM
@@ -5462,27 +5624,24 @@ document
       // タブレットを閉じたら元のBGMへ戻す
       // -------------------------------------------------
 
-      if (
-        previousBgmBeforeTablet
-      ) {
+if (
+  sceneBgm
+) {
 
-        playBgm(
-          previousBgmBeforeTablet
-        );
+  playBgm(
+    sceneBgm
+  );
 
-      } else {
+} else {
 
-        stopBgm();
-      }
-
-
-      previousBgmBeforeTablet =
-        null;
+  stopBgm();
+}
 
 
-      renderInvestigationScreen(
-        currentInvestigationId
-      );
+renderInvestigationScreen(
+  currentInvestigationId
+);
+
 
     }
   );
@@ -5815,28 +5974,28 @@ function finishInvestigation() {
   // 元のBGMへ戻す
   // -------------------------------------------------------
 
+// -------------------------------------------------------
+// 通常シナリオのBGMへ戻す
+// -------------------------------------------------------
+
+if (
+  currentBgm ===
+  TABLET_BGM
+) {
+
   if (
-    currentBgm ===
-    TABLET_BGM
+    sceneBgm
   ) {
 
-    if (
-      previousBgmBeforeTablet
-    ) {
+    playBgm(
+      sceneBgm
+    );
 
-      playBgm(
-        previousBgmBeforeTablet
-      );
+  } else {
 
-    } else {
-
-      stopBgm();
-    }
+    stopBgm();
   }
-
-
-  previousBgmBeforeTablet =
-    null;
+}
 
 
   // -------------------------------------------------------
@@ -6369,7 +6528,18 @@ if (
   return;
 }
 
-if (data.type === "bgm") {
+if (
+  data.type ===
+  "bgm"
+) {
+
+  // -------------------------------------------------------
+  // この場面の本来のBGMとして記録
+  // -------------------------------------------------------
+
+  sceneBgm =
+    data.file;
+
 
   playBgm(
     data.file
@@ -6391,7 +6561,15 @@ if (data.type === "bgm") {
 // BGM停止
 // -------------------------------------------------------
 
-if (data.type === "bgmStop") {
+if (
+  data.type ===
+  "bgmStop"
+) {
+
+  // この場面ではBGMなし
+  sceneBgm =
+    null;
+
 
   stopBgm();
 
@@ -6726,6 +6904,9 @@ charName.style.display =
     stopSkipMode();
     stopTextTimer();
     stopAutoMode();
+
+  sceneBgm =
+    null;
 
     changeBackground(null);
 
@@ -7658,9 +7839,12 @@ function closeMessage() {
     stopSkipMode();
     stopTextTimer();
     stopAutoMode();
-    stopBgm();
+stopBgm();
 
-    changeBackground(null);
+sceneBgm =
+  null;
+
+changeBackground(null);
 
     currentScene =
       "prologue";
@@ -8208,7 +8392,7 @@ function closeSlotModal() {
 
 
       // セーブデータ形式
-      version: 5,
+      version: 6,
 
 
       scene:
@@ -8239,8 +8423,8 @@ function closeSlotModal() {
       currentBackground:
       currentBackground,
 
-currentBgm:
-  currentBgm,
+sceneBgm:
+  sceneBgm,
 
       timestamp:
         timeStr,
@@ -8531,21 +8715,32 @@ changeBackground(
 
 
 // -------------------------------------------------------
-// BGM復元
+// シーンBGM復元
+// -------------------------------------------------------
+
+sceneBgm =
+  saveData.sceneBgm
+  ?? saveData.currentBgm
+  ?? null;
+
+
+// -------------------------------------------------------
+// BGM再生
 // -------------------------------------------------------
 
 if (
-  saveData.currentBgm
+  sceneBgm
 ) {
 
   await playBgm(
-    saveData.currentBgm
+    sceneBgm
   );
 
 } else {
 
   stopBgm();
 }
+
 
 
 // -------------------------------------------------------
@@ -9203,6 +9398,8 @@ if (investigationResultBox) {
   () => {
 
     resizeGameScreen();
+
+checkScenarioIds();
 
     initUIEvents();
 
