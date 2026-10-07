@@ -2510,6 +2510,11 @@ let currentBgmSource = null;
 
 let currentBgm = null;
 
+let previousBgmBeforeTablet = null;
+
+const TABLET_BGM =
+  "audio_tablet_2.mp3";
+
 
 
 // =========================================================
@@ -4998,6 +5003,24 @@ function showTabletFunctionMenu() {
   }
 
 
+// -------------------------------------------------------
+// タブレット専用BGMへ切り替え
+// -------------------------------------------------------
+
+if (
+  currentBgm !==
+  TABLET_BGM
+) {
+
+  previousBgmBeforeTablet =
+    currentBgm;
+
+  playBgm(
+    TABLET_BGM
+  );
+}
+
+
   // -------------------------------------------------------
   // タブレット表示モード
   // -------------------------------------------------------
@@ -5189,20 +5212,42 @@ function showTabletFunctionMenu() {
   // 閉じる
   // -------------------------------------------------------
 
-  document
-    .getElementById(
-      'tablet-close-btn'
-    )
-    .addEventListener(
-      'click',
-      () => {
+document
+  .getElementById(
+    'tablet-close-btn'
+  )
+  .addEventListener(
+    'click',
+    () => {
 
-        renderInvestigationScreen(
-          currentInvestigationId
+      // -------------------------------------------------
+      // タブレットを閉じたら元のBGMへ戻す
+      // -------------------------------------------------
+
+      if (
+        previousBgmBeforeTablet
+      ) {
+
+        playBgm(
+          previousBgmBeforeTablet
         );
 
+      } else {
+
+        stopBgm();
       }
-    );
+
+
+      previousBgmBeforeTablet =
+        null;
+
+
+      renderInvestigationScreen(
+        currentInvestigationId
+      );
+
+    }
+  );
 }
 
 
