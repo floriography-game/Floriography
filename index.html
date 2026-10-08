@@ -5100,6 +5100,12 @@ let investigationCurrentText = "";
       text: "ちょっと、何勝手に記録してるの！？"
     },
 
+{
+  id: "c1_unlock_characters",
+  type: "unlockTabletApp",
+  appId: "characters"
+},
+
     {   
       id: "c1_162",
       type: "dialogue",
@@ -6839,6 +6845,23 @@ renderInvestigationScreen(
 function openTabletApp(
   appId
 ) {
+
+
+// -------------------------------------------------------
+// タブレット機能アンロック
+// -------------------------------------------------------
+
+if (data.type === "unlockTabletApp") {
+
+  unlockTabletApp(data.appId);
+
+  currentStep++;
+
+  updateDialogue();
+
+  return;
+}
+
 
   // -------------------------------------------------------
   // 調査
@@ -9678,6 +9701,14 @@ sceneBgm:
         dialogueHistory,
 
 
+// -------------------------------------------------------
+// 現在の調査画面の状態
+// -------------------------------------------------------
+
+isInvestigationMode: isInvestigationMode,
+
+currentInvestigationId: currentInvestigationId,
+
 
 // -------------------------------------------------------
 // 調査状態
@@ -10134,12 +10165,29 @@ if (
 
 
 // -------------------------------------------------------
-// 会話画面復元
+// 現在の画面を復元
 // -------------------------------------------------------
 
-renderDialogueScreen();
+const currentData = currentScenario[currentStep];
 
-updateDialogue();
+if (
+  currentData &&
+  currentData.type === "investigation"
+) {
+
+  // 調査シーンを復元
+  renderInvestigationScreen(
+    currentData.investigationId
+  );
+
+} else {
+
+  // 通常の会話画面を復元
+  renderDialogueScreen();
+
+  updateDialogue();
+
+}
 
 
 // -------------------------------------------------------
