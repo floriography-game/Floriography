@@ -1,0 +1,2185 @@
+html, body {
+  margin: 0;
+  padding: 0;
+
+  width: 100%;
+  height: 100%;
+
+  overflow: hidden;
+
+  background-color: #1a1a1a;
+  color: #ffffff;
+
+  font-family: 'Shippori Mincho', serif;
+
+  user-select: none;
+}
+
+
+/* =========================================================
+   ゲーム画面全体
+   ========================================================= */
+
+#game-stage {
+  width: 1280px;
+  height: 720px;
+
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  transform-origin: center center;
+
+  overflow: hidden;
+
+  background-color: #2b2b2b;
+
+  will-change: transform;
+
+  opacity: 0;
+
+  transition: opacity 0.25s ease;
+}
+
+#game-container {
+  width: 100%;
+  height: 100%;
+
+  background-color: #2b2b2b;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  gap: 30px;
+  padding: 20px;
+
+  box-sizing: border-box;
+
+  transition: opacity 0.4s ease;
+
+  position: relative;
+}
+
+/* 画面切り替え用フェードアウト */
+.fade-out {
+  opacity: 0;
+}
+
+
+/* =========================================================
+   シーン切り替え用暗転
+   ========================================================= */
+
+.scene-transition-overlay {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
+
+  background-color: #000000;
+
+  opacity: 0;
+  visibility: hidden;
+
+  pointer-events: none;
+
+  transition:
+    opacity 0.6s ease,
+    visibility 0.6s ease;
+
+  z-index: 4500;
+}
+
+
+.scene-transition-overlay.active {
+  opacity: 1;
+  visibility: visible;
+
+  pointer-events: auto;
+}
+
+
+    /* --- タイトル画面 --- */
+    #title-text {
+      font-family: 'Dancing Script', cursive;
+      font-size: 68px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: #ffffff;
+      text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+      margin: 0;
+      text-align: center;
+    }
+
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .btn {
+      padding: 12px 40px;
+      font-size: 20px;
+      font-family: 'Shippori Mincho', serif;
+      background-color: transparent;
+      color: #ffffff;
+      border: 1px solid #ffffff;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #ffffff;
+      color: #2b2b2b;
+    }
+
+    /* --- 右上MENUボタン --- */
+.menu-trigger-container {
+  position: absolute;
+      top: 15px;
+      right: 15px;
+      z-index: 1000;
+      display: none;
+    }
+
+    .menu-trigger-container.active {
+      display: block;
+    }
+
+    .sys-btn {
+      padding: 8px 20px;
+      font-size: 15px;
+      font-family: 'Shippori Mincho', serif;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: #d4af37;
+      border: 1px solid #d4af37;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      letter-spacing: 1px;
+    }
+
+    .sys-btn:hover {
+      background-color: #d4af37;
+      color: #000000;
+    }
+
+    /* --- サイドバー UI --- */
+    .sidebar-overlay {
+      position: absolute;     
+       top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 2000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .sidebar-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .sidebar {
+      position: absolute;
+      top: 0;
+      right: -280px;
+      width: 200px;
+      height: 100%;
+      background-color: rgba(20, 20, 20, 0.95);
+      border-left: 1px solid #d4af37;
+      box-shadow: -5px 0 15px rgba(0, 0, 0, 0.4);
+      z-index: 2001;
+      display: flex;
+      flex-direction: column;
+      padding: 30px 20px;
+      box-sizing: border-box;
+      transition: right 0.3s ease;
+    }
+
+    .sidebar.open {
+      right: 0;
+    }
+
+    .sidebar-title {
+      font-size: 20px;
+      color: #d4af37;
+      border-bottom: 1px solid #d4af37;
+      padding-bottom: 10px;
+      margin-bottom: 30px;
+      text-align: center;
+      letter-spacing: 2px;
+    }
+
+    .sidebar-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .sidebar-btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      font-family: 'Shippori Mincho', serif;
+      background-color: transparent;
+      color: #ffffff;
+      border: 1px solid rgba(212, 175, 55, 0.5);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .sidebar-btn:hover {
+      background-color: #d4af37;
+      color: #000000;
+      border-color: #d4af37;
+    }
+
+    .sidebar-close-btn {
+      margin-top: auto;
+      border-color: rgba(255, 255, 255, 0.3);
+      color: #888888;
+    }
+
+    .sidebar-close-btn:hover {
+      background-color: #ffffff;
+      color: #000000;
+    }
+
+    /* --- モーダル共通 --- */
+    .slot-modal-overlay, .log-modal-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.85);
+      z-index: 3000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .slot-modal-overlay.active, .log-modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .slot-modal {
+      width: 90%;
+      max-width: 600px;
+      background-color: rgba(25, 25, 25, 0.95);
+      border: 1px solid #d4af37;
+      border-radius: 8px;
+      padding: 25px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .slot-modal-header {
+      font-size: 22px;
+      color: #d4af37;
+      text-align: center;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+      padding-bottom: 10px;
+      letter-spacing: 2px;
+    }
+
+   .slot-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+    .slot-item {
+      padding: 15px 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      background-color: rgba(0, 0, 0, 0.5);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+
+    .slot-item:hover {
+      border-color: #d4af37;
+      background-color: rgba(212, 175, 55, 0.15);
+    }
+
+    .slot-info {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .slot-number {
+      font-size: 16px;
+      color: #d4af37;
+      font-weight: bold;
+    }
+
+    .slot-detail {
+      font-size: 14px;
+      color: #cccccc;
+    }
+
+    .slot-date {
+      font-size: 12px;
+      color: #888888;
+    }
+
+    /* --- バックログモーダル --- */
+    .log-modal {
+      width: 90%;
+      max-width: 700px;
+      height: 80vh;
+      background-color: rgba(25, 25, 25, 0.8);
+      border: 1px solid #d4af37;
+      border-radius: 8px;
+      padding: 25px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .log-modal-header {
+      font-size: 22px;
+      color: #d4af37;
+      text-align: center;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+      padding-bottom: 10px;
+      letter-spacing: 2px;
+      flex-shrink: 0;
+    }
+
+    .log-container {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      user-select: text;
+    }
+
+    .log-container::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .log-container::-webkit-scrollbar-thumb {
+      background: #d4af37;
+      border-radius: 3px;
+    }
+
+    .log-container::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .log-entry {
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+      padding-bottom: 12px;
+    }
+
+    .log-speaker {
+      color: #d4af37;
+      font-size: 15px;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .log-text {
+      color: #e0e0e0;
+      font-size: 16px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    /* --- ゲーム本編画面 --- */
+    .game-screen {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      padding-bottom: 30px;
+      box-sizing: border-box;
+    }
+
+    /* 会話枠 */
+    .dialogue-box {
+  width: calc(100% - 90px);
+  max-width: none;
+
+  height: 180px;
+
+  background-color: rgba(0, 0, 0, 0.8);
+  border: 1px solid #d4af37;
+  border-radius: 8px;
+
+  padding: 20px 25px;
+
+  box-sizing: border-box;
+
+  font-size: 18px;
+  line-height: 1.8;
+
+  position: relative;
+
+  transform: translateY(30px);
+}
+
+ .character-name {
+  position: absolute;
+
+  /* 会話ボックス左端に揃える */
+  left: 0;
+
+  /* 会話ボックスの外側へ持ち上げる */
+  top: -48px;
+
+  min-width: 190px;
+  height: 42px;
+
+  padding: 0 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  background-color: rgba(0, 0, 0, 0.82);
+
+  border: 1px solid #d4af37;
+  border-radius: 6px;
+
+  color: #d4af37;
+
+  font-size: 18px;
+  font-weight: bold;
+
+  margin: 0;
+
+  z-index: 25;
+
+  white-space: nowrap;
+}
+
+
+/* 会話本文の改行を反映 */
+#dialogue-text {
+  white-space: pre-wrap;
+  font-size: 23px;
+  line-height: 1.7;
+
+  margin-top: 6px;
+}
+
+    .next-mark {
+      position: absolute;
+      right: 15px;
+      bottom: 10px;
+      color: #d4af37;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 10px 15px;
+      animation: bounce 1s infinite alternate;
+      z-index: 10;
+    }
+
+    .next-mark:hover {
+      color: #ffffff;
+    }
+
+    /* 「×」非表示用ボタン */
+    .close-btn {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      background: transparent;
+      border: none;
+      font-size: 27px;
+      cursor: pointer;
+      color: #888;
+      padding: 0;
+      line-height: 1;
+      transition: color 0.2s ease;
+      z-index: 20;
+    }
+
+    .close-btn:hover {
+      color: #d4af37;
+    }
+
+    /* 非表示用クラス */
+    .hidden {
+      display: none !important;
+    }
+
+    /* --- 名前入力画面 --- */
+    .input-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      text-align: center;
+    }
+
+    .input-prompt {
+      font-size: 20px;
+      letter-spacing: 2px;
+      color: #d4af37;
+    }
+
+    .name-input {
+      padding: 10px 15px;
+      font-size: 20px;
+      font-family: 'Shippori Mincho', serif;
+      background-color: rgba(0, 0, 0, 0.5);
+      color: #ffffff;
+      border: 1px solid #d4af37;
+      border-radius: 4px;
+      text-align: center;
+      outline: none;
+      user-select: auto;
+    }
+
+    .name-input:focus {
+      border-color: #ffffff;
+      box-shadow: 0 0 8px rgba(212, 175, 55, 0.6);
+    }
+
+    /* --- CONFIGモーダル --- */
+    .config-modal {
+      width: 90%;
+      max-width: 500px;
+      background-color: rgba(25, 25, 25, 0.95);
+      border: 1px solid #d4af37;
+      border-radius: 8px;
+      padding: 25px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .config-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .config-label {
+      color: #d4af37;
+      font-size: 16px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .config-slider {
+      width: 100%;
+      accent-color: #d4af37;
+      cursor: pointer;
+    }
+
+    @keyframes bounce {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-5px); }
+    }
+
+/* AUTOボタン */
+.auto-btn {
+  position: absolute;
+
+  top: -18px;
+  right: 112px;
+
+  width: 64px;
+  height: 38px;
+
+  padding: 0;
+
+  border-radius: 6px;
+
+  background-color: rgba(0, 0, 0, 0.82);
+  border: 1px solid #888;
+
+  color: #888;
+
+  font-size: 13px;
+  font-family: 'Shippori Mincho', serif;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  z-index: 20;
+}
+
+
+/* SKIPボタン */
+.skip-btn {
+  position: absolute;
+
+  top: -18px;
+  right: 40px;
+
+  width: 64px;
+  height: 38px;
+
+  padding: 0;
+
+  border-radius: 6px;
+
+  background-color: rgba(0, 0, 0, 0.82);
+  border: 1px solid #888;
+
+  color: #888;
+
+  font-size: 13px;
+  font-family: 'Shippori Mincho', serif;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  z-index: 20;
+}
+
+/* カーソルを載せたとき */
+.auto-btn:hover,
+.skip-btn:hover {
+  color: #d4af37;
+  border-color: #d4af37;
+  background-color: rgba(80, 80, 80, 0.9);
+}
+
+/* AUTO実行中 */
+.auto-btn.active-auto {
+  color: #000;
+  background-color: #d4af37;
+  border-color: #d4af37;
+  font-weight: bold;
+}
+
+
+/* =========================================================
+   名前確認ウィンドウ
+   ========================================================= */
+
+.name-confirm-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 100;
+
+  /* 最初は背景を透明に */
+  background-color: rgba(0, 0, 0, 0);
+  backdrop-filter: blur(0px);
+
+  transition:
+    background-color 0.45s ease,
+    backdrop-filter 0.45s ease;
+}
+
+.name-confirm-overlay.show {
+  background-color: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(2px);
+}
+
+.name-confirm-box {
+  width: 90%;
+  max-width: 420px;
+
+  background-color: rgba(25, 25, 25, 0.97);
+
+  border: 1px solid #d4af37;
+  border-radius: 8px;
+
+  padding: 30px;
+
+  box-sizing: border-box;
+
+  text-align: center;
+
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+
+  /* 最初は透明 */
+  opacity: 0;
+
+  /* 0.12秒遅れてフェード開始 */
+  transition:
+    opacity 0.4s ease 0.5s;
+}
+
+.name-confirm-overlay.show .name-confirm-box {
+  opacity: 1;
+}
+
+.name-confirm-text {
+  font-size: 19px;
+  line-height: 1.8;
+
+  margin-bottom: 25px;
+
+  color: #ffffff;
+}
+
+.name-confirm-player-name {
+  color: #d4af37;
+
+  font-size: 23px;
+  font-weight: bold;
+
+  margin: 8px 0;
+}
+
+.name-confirm-buttons {
+  display: flex;
+  justify-content: center;
+
+  gap: 20px;
+}
+
+.name-confirm-btn {
+  min-width: 100px;
+
+  padding: 10px 25px;
+
+  font-size: 16px;
+  font-family: 'Shippori Mincho', serif;
+
+  background-color: transparent;
+  color: #ffffff;
+
+  border: 1px solid #d4af37;
+  border-radius: 4px;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.name-confirm-btn:hover {
+  background-color: #d4af37;
+  color: #000000;
+}
+
+
+/* =========================================================
+   共通メッセージウィンドウ
+   ========================================================= */
+
+.message-overlay {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: rgba(0, 0, 0, 0.55);
+
+  opacity: 0;
+  visibility: hidden;
+
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s ease;
+
+  z-index: 5000;
+}
+
+
+.message-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+
+.message-box {
+  width: 430px;
+
+  padding: 30px 35px;
+
+  box-sizing: border-box;
+
+  background-color: rgba(35, 35, 35, 0.97);
+
+  border: 1px solid #d4af37;
+  border-radius: 8px;
+
+  text-align: center;
+
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+}
+
+
+.message-text {
+  margin-bottom: 25px;
+
+  font-size: 20px;
+  line-height: 1.7;
+
+  color: #ffffff;
+
+  white-space: pre-wrap;
+}
+
+
+.message-ok-btn {
+  min-width: 110px;
+
+  padding: 10px 26px;
+
+  font-family: 'Shippori Mincho', serif;
+  font-size: 16px;
+
+  color: #d4af37;
+
+  background-color: rgba(60, 60, 60, 0.9);
+
+  border: 1px solid #d4af37;
+  border-radius: 5px;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.message-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.message-ok-btn:hover {
+  color: #ffffff;
+
+  background-color: rgba(90, 90, 90, 0.95);
+}
+
+
+/* =========================================================
+   調査モード
+   ========================================================= */
+
+.investigation-screen {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+
+  box-sizing: border-box;
+}
+
+
+/* ---------------------------------------------------------
+   下部 2×2 メニュー
+   --------------------------------------------------------- */
+
+.investigation-menu {
+  position: absolute;
+
+  left: 50%;
+  bottom: 38px;
+
+  transform: translateX(-50%);
+
+  width: 420px;
+
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 12px;
+
+  z-index: 100;
+}
+
+
+.investigation-menu-btn {
+  height: 58px;
+
+  font-family:
+    'Shippori Mincho',
+    serif;
+
+  font-size: 18px;
+
+  color: #ffffff;
+
+  background-color:
+    rgba(0, 0, 0, 0.82);
+
+  border:
+    1px solid #d4af37;
+
+  border-radius: 6px;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+
+.investigation-menu-btn:hover {
+  color: #000000;
+
+  background-color:
+    #d4af37;
+}
+
+
+/* 使用不可 */
+.investigation-menu-btn:disabled {
+  color: #777777;
+
+  border-color: #555555;
+
+  background-color:
+    rgba(0, 0, 0, 0.65);
+
+  cursor: default;
+
+  opacity: 0.65;
+}
+
+
+/* ---------------------------------------------------------
+   調査終了ボタン
+   --------------------------------------------------------- */
+
+.investigation-finish-btn {
+  position: absolute;
+
+  left: 50%;
+  bottom: 180px;
+
+  transform:
+    translateX(-50%);
+
+  width: 220px;
+  height: 52px;
+
+  font-family:
+    'Shippori Mincho',
+    serif;
+
+  font-size: 17px;
+
+  color:
+    #d4af37;
+
+  background-color:
+    rgba(0, 0, 0, 0.86);
+
+  border:
+    1px solid #d4af37;
+
+  border-radius:
+    6px;
+
+  cursor:
+    pointer;
+
+  z-index:
+    110;
+
+  transition:
+    all 0.2s ease;
+}
+
+
+.investigation-finish-btn:hover {
+  color:
+    #000000;
+
+  background-color:
+    #d4af37;
+}
+
+
+/* ---------------------------------------------------------
+   タブレット表示
+   --------------------------------------------------------- */
+
+.investigation-tablet-panel {
+  position: absolute;
+
+  top: 35px;
+  left: 50%;
+
+  transform:
+    translateX(-50%);
+
+  min-width: 420px;
+
+  padding:
+    14px 22px;
+
+  box-sizing:
+    border-box;
+
+  background-color:
+    rgba(15, 25, 30, 0.88);
+
+  border:
+    1px solid #d4af37;
+
+  border-radius:
+    8px;
+
+  text-align:
+    center;
+
+  z-index:
+    110;
+}
+
+
+.investigation-tablet-title {
+  color:
+    #d4af37;
+
+  font-size:
+    19px;
+
+  margin-bottom:
+    6px;
+}
+
+
+.investigation-tablet-text {
+  color:
+    #dddddd;
+
+  font-size:
+    14px;
+}
+
+
+/* ---------------------------------------------------------
+   調査画面：戻るボタン
+   --------------------------------------------------------- */
+
+.investigation-tablet-back-btn {
+  position: absolute;
+
+  top: 10px;
+  right: 12px;
+
+  padding:
+    6px 14px;
+
+  font-family:
+    'Shippori Mincho',
+    serif;
+
+  font-size:
+    14px;
+
+  color:
+    #d4af37;
+
+  background-color:
+    rgba(0, 0, 0, 0.65);
+
+  border:
+    1px solid #d4af37;
+
+  border-radius:
+    5px;
+
+  cursor:
+    pointer;
+
+  transition:
+    all 0.2s ease;
+}
+
+
+.investigation-tablet-back-btn:hover {
+  color:
+    #000000;
+
+  background-color:
+    #d4af37;
+}
+
+
+/* ---------------------------------------------------------
+   調査ポイント
+   --------------------------------------------------------- */
+
+.investigation-point {
+  position: absolute;
+
+  min-width:
+    145px;
+
+  padding:
+    10px 15px;
+
+  font-family:
+    'Shippori Mincho',
+    serif;
+
+  font-size:
+    16px;
+
+  color:
+    #ffffff;
+
+  background-color:
+    rgba(0, 0, 0, 0.78);
+
+  border:
+    1px solid #d4af37;
+
+  border-radius:
+    22px;
+
+  cursor:
+    pointer;
+
+  z-index:
+    90;
+
+  transition:
+    transform 0.15s ease,
+    background-color 0.15s ease;
+}
+
+
+.investigation-point:hover {
+  transform:
+    scale(1.05);
+
+  background-color:
+    rgba(212, 175, 55, 0.85);
+
+  color:
+    #000000;
+}
+
+
+/* 調査済み */
+.investigation-point.checked {
+  color:
+    #aaaaaa;
+
+  border-color:
+    #777777;
+
+  background-color:
+    rgba(0, 0, 0, 0.65);
+}
+
+
+/* ---------------------------------------------------------
+   調査結果表示
+   --------------------------------------------------------- */
+
+.investigation-result-box {
+  width:
+    calc(100% - 90px);
+
+  height:
+    180px;
+
+  position:
+    absolute;
+
+  left:
+    45px;
+
+  bottom:
+    30px;
+
+  padding:
+    20px 25px;
+
+  box-sizing:
+    border-box;
+
+  background-color:
+    rgba(0, 0, 0, 0.82);
+
+  border:
+    1px solid #d4af37;
+
+  border-radius:
+    8px;
+
+  z-index:
+    200;
+}
+
+
+.investigation-result-name {
+  position:
+    absolute;
+
+  left:
+    0;
+
+  top:
+    -48px;
+
+  min-width:
+    190px;
+
+  height:
+    42px;
+
+  padding:
+    0 18px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  box-sizing:
+    border-box;
+
+  background-color:
+    rgba(0, 0, 0, 0.82);
+
+  border:
+    1px solid #d4af37;
+
+  border-radius:
+    6px;
+
+  color:
+    #d4af37;
+
+  font-size:
+    18px;
+}
+
+
+.investigation-result-text {
+  font-size:
+    23px;
+
+  line-height:
+    1.7;
+
+  white-space:
+    pre-wrap;
+}
+
+
+.investigation-result-next {
+  position:
+    absolute;
+
+  right:
+    15px;
+
+  bottom:
+    10px;
+
+  color:
+    #d4af37;
+
+  font-size:
+    18px;
+
+  cursor:
+    pointer;
+
+  padding:
+    10px 15px;
+}
+
+
+
+/* =========================================================
+   タブレット機能メニュー
+   ========================================================= */
+
+.tablet-function-menu {
+  position: absolute;
+
+  top: 110px;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  width: 460px;
+
+  padding: 22px;
+
+  box-sizing: border-box;
+
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 14px;
+
+  background-color:
+    rgba(15, 25, 30, 0.94);
+
+  border:
+    1px solid #d4af37;
+
+  border-radius:
+    8px;
+
+  z-index:
+    120;
+}
+
+
+.tablet-function-btn {
+  height: 62px;
+
+  font-family:
+    'Shippori Mincho',
+    serif;
+
+  font-size: 18px;
+
+  color: #ffffff;
+
+  background-color:
+    rgba(0, 0, 0, 0.7);
+
+  border:
+    1px solid #d4af37;
+
+  border-radius:
+    6px;
+
+  cursor:
+    pointer;
+
+  transition:
+    all 0.2s ease;
+}
+
+
+.tablet-function-btn:hover {
+  color: #000000;
+
+  background-color:
+    #d4af37;
+}
+
+
+.tablet-function-btn:disabled {
+  color: #777777;
+
+  border-color:
+    #555555;
+
+  background-color:
+    rgba(0, 0, 0, 0.5);
+
+  cursor:
+    default;
+
+  opacity:
+    0.65;
+}
+
+
+
+/* =========================================================
+   大型タブレット画面
+   ========================================================= */
+
+/* タブレットを開いている間、背景を暗くぼかす */
+.investigation-screen.tablet-mode::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background-color:
+    rgba(0, 0, 0, 0.46);
+
+  backdrop-filter:
+    blur(3px);
+
+  z-index: 105;
+}
+
+
+/* タブレット本体 */
+.tablet-home-panel {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  transform:
+    translate(-50%, -50%);
+
+  width: 80%;
+  height: 70%;
+
+  max-width: 1020px;
+  max-height: 520px;
+
+  box-sizing: border-box;
+
+  padding:
+    55px 55px 42px;
+
+  /*
+    外装＋画面を兼ねた、
+    少し青みのあるグラファイト色
+  */
+  background:
+    linear-gradient(
+      145deg,
+      #151a1f,
+      #0c1217
+    );
+
+  border:
+    9px solid #252a30;
+
+  border-radius:
+    28px;
+
+  box-shadow:
+    0 20px 65px
+      rgba(0, 0, 0, 0.72),
+
+    inset 0 0 0 2px
+      rgba(120, 130, 140, 0.22);
+
+  z-index: 120;
+
+  overflow: hidden;
+}
+
+
+/* タブレット上部のカメラ */
+.tablet-home-panel::before {
+  content: "";
+
+  position: absolute;
+
+  top: 14px;
+  left: 50%;
+
+  transform:
+    translateX(-50%);
+
+  width: 9px;
+  height: 9px;
+
+  border-radius:
+    50%;
+
+  background-color:
+    #07090b;
+
+  box-shadow:
+    0 0 0 2px
+      rgba(120, 130, 140, 0.15);
+}
+
+
+/* タブレットのタイトル */
+.tablet-home-title {
+  font-size:
+    24px;
+
+  letter-spacing:
+    3px;
+
+  text-align:
+    center;
+
+  color:
+    #e2ebf1;
+
+  margin-bottom:
+    8px;
+}
+
+
+/* タブレットの補足表示 */
+.tablet-home-text {
+  font-size:
+    14px;
+
+  text-align:
+    center;
+
+  color:
+    #8796a2;
+
+  margin-bottom:
+    34px;
+}
+
+
+
+/* 大型タブレット内の機能メニュー */
+.tablet-home-panel .tablet-function-menu {
+  position: static;
+
+  transform: none;
+
+  width: 88%;
+
+  margin:
+    0 auto;
+
+  padding: 0;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap:
+    14px;
+
+  background:
+    transparent;
+
+  border:
+    none;
+
+  z-index:
+    auto;
+}
+
+
+
+.tablet-home-panel .tablet-function-btn {
+  height:
+    86px;
+
+  padding:
+    10px 8px;
+
+  font-size:
+    17px;
+
+  line-height:
+    1.4;
+
+  letter-spacing:
+    0.5px;
+
+  color:
+    #e7eef3;
+
+  background:
+    linear-gradient(
+      145deg,
+      #202b34,
+      #141c23
+    );
+
+  border:
+    1px solid #52616c;
+
+  border-radius:
+    12px;
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(255, 255, 255, 0.05);
+
+  transition:
+    all 0.2s ease;
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  justify-content:
+    center;
+
+  align-items:
+    center;
+
+  gap:
+    5px;
+}
+
+
+/* 解放済みアプリ名 */
+.tablet-app-label {
+  font-size:
+    17px;
+
+  text-align:
+    center;
+}
+
+
+/* 未解放表示 */
+.tablet-app-locked-label {
+  font-size:
+    15px;
+
+  letter-spacing:
+    2px;
+
+  color:
+    #626d75;
+}
+
+
+/* 未解放アプリ */
+.tablet-home-panel
+.tablet-function-btn.locked {
+
+  background:
+    linear-gradient(
+      145deg,
+      #11171c,
+      #0d1216
+    );
+
+  border-color:
+    #2b343a;
+
+  opacity:
+    0.58;
+}
+
+
+/* ホバー */
+.tablet-home-panel
+.tablet-function-btn:not(:disabled):hover {
+
+  color:
+    #ffffff;
+
+  background:
+    linear-gradient(
+      145deg,
+      #314452,
+      #22313c
+    );
+
+  border-color:
+    #8ba2b2;
+
+  transform:
+    translateY(-2px);
+}
+
+
+/* 使用不能 */
+.tablet-home-panel
+.tablet-function-btn:disabled {
+
+  color:
+    #56616a;
+
+  background:
+    #11171c;
+
+  border-color:
+    #303941;
+
+  opacity:
+    0.7;
+}
+
+
+/* タブレット右上の閉じるボタン */
+.tablet-close-btn {
+  position:
+    absolute;
+
+  top:
+    18px;
+
+  right:
+    22px;
+
+  width:
+    38px;
+
+  height:
+    38px;
+
+  padding:
+    0;
+
+  border:
+    1px solid #4c5962;
+
+  border-radius:
+    50%;
+
+  background-color:
+    rgba(10, 14, 18, 0.72);
+
+  color:
+    #aeb9c0;
+
+  font-family:
+    sans-serif;
+
+  font-size:
+    22px;
+
+  line-height:
+    1;
+
+  cursor:
+    pointer;
+
+  transition:
+    all 0.2s ease;
+
+  z-index:
+    5;
+}
+
+
+.tablet-close-btn:hover {
+  color:
+    #ffffff;
+
+  border-color:
+    #8ba2b2;
+
+  background-color:
+    #26343e;
+}
+
+
+/* =========================================================
+   タブレット起動時スピナー
+   ========================================================= */
+
+.tablet-loading-overlay {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 500;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color:
+    rgba(0, 0, 0, 0.18);
+
+  pointer-events: all;
+}
+
+
+/* =========================================================
+   二重リング・ローディング
+   ========================================================= */
+
+.tablet-loading-spinner {
+  position: relative;
+
+  width: 68px;
+  height: 68px;
+}
+
+
+/* ---------------------------------------------------------
+   外側リング
+   時計回り
+   --------------------------------------------------------- */
+
+.tablet-loading-spinner::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  box-sizing: border-box;
+
+  border-radius: 50%;
+
+  border:
+    3px solid
+    rgba(255, 255, 255, 0.12);
+
+  border-top-color:
+    rgba(212, 175, 55, 0.92);
+
+  border-right-color:
+    rgba(212, 175, 55, 0.48);
+
+  animation:
+    tabletSpinnerOuter
+    0.9s
+    linear
+    infinite;
+}
+
+
+/* ---------------------------------------------------------
+   内側リング
+   反時計回り
+   --------------------------------------------------------- */
+
+.tablet-loading-spinner::after {
+  content: "";
+
+  position: absolute;
+
+  inset: 13px;
+
+  box-sizing: border-box;
+
+  border-radius: 50%;
+
+  border:
+    3px solid
+    rgba(255, 255, 255, 0.10);
+
+  border-bottom-color:
+    rgba(185, 200, 208, 0.88);
+
+  border-left-color:
+    rgba(185, 200, 208, 0.42);
+
+  animation:
+    tabletSpinnerInner
+    0.65s
+    linear
+    infinite;
+}
+
+
+/* =========================================================
+   外側：時計回り
+   ========================================================= */
+
+@keyframes tabletSpinnerOuter {
+
+  from {
+    transform:
+      rotate(0deg);
+  }
+
+  to {
+    transform:
+      rotate(360deg);
+  }
+}
+
+
+/* =========================================================
+   内側：反時計回り
+   ========================================================= */
+
+@keyframes tabletSpinnerInner {
+
+  from {
+    transform:
+      rotate(0deg);
+  }
+
+  to {
+    transform:
+      rotate(-360deg);
+  }
+}
+
+
+/* =========================================================
+   選択肢
+   ========================================================= */
+
+.choice-box {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  transform:
+    translate(-50%, -50%);
+
+  width: 520px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 14px;
+
+  z-index: 350;
+}
+
+
+.choice-btn {
+  width: 100%;
+
+  padding:
+    15px 22px;
+
+  box-sizing:
+    border-box;
+
+  font-family:
+    'Shippori Mincho',
+    serif;
+
+  font-size:
+    18px;
+
+  color:
+    #ffffff;
+
+  background-color:
+    rgba(20, 20, 20, 0.90);
+
+  border:
+    1px solid #d4af37;
+
+  border-radius:
+    6px;
+
+  cursor:
+    pointer;
+
+  transition:
+    all 0.2s ease;
+}
+
+
+.choice-btn:hover {
+  color:
+    #000000;
+
+  background-color:
+    #d4af37;
+}
+
+
+/* =========================================================
+   持ち物一覧
+   ========================================================= */
+
+.inventory-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.inventory-item-btn {
+  width: 100%;
+  padding: 12px 18px;
+
+  font-family: 'Shippori Mincho', serif;
+  font-size: 18px;
+
+  color: #ffffff;
+  background-color: rgba(30, 30, 30, 0.95);
+
+  border: 1px solid #d4af37;
+  border-radius: 6px;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.inventory-item-btn:hover {
+  color: #000000;
+  background-color: #d4af37;
+}
+
+
+/* =========================================================
+   持ち物専用ウィンドウ
+   ========================================================= */
+
+.inventory-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3500;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: rgba(0, 0, 0, 0.7);
+
+  opacity: 0;
+  visibility: hidden;
+
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.inventory-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.inventory-panel {
+  width: 680px;
+  max-height: 85%;
+  padding: 28px;
+
+  box-sizing: border-box;
+
+  background: rgba(25, 29, 35, 0.98);
+  border: 1px solid #d4af37;
+  border-radius: 10px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.inventory-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  color: #d4af37;
+  font-size: 24px;
+  letter-spacing: 2px;
+}
+
+.inventory-close-btn {
+  background: transparent;
+  border: none;
+  color: #aaaaaa;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.inventory-close-btn:hover {
+  color: #d4af37;
+}
+
+.inventory-content {
+  overflow-y: auto;
+  min-height: 100px;
+}
+
+.inventory-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.inventory-item-btn {
+  padding: 20px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 18px;
+
+  color: #ffffff;
+  background: #222a32;
+
+  border: 1px solid #64717c;
+  border-radius: 8px;
+
+  cursor: pointer;
+}
+
+.inventory-item-btn:hover {
+  border-color: #d4af37;
+  color: #d4af37;
+}
+
+.inventory-detail {
+  text-align: center;
+}
+
+.inventory-detail-name {
+  color: #d4af37;
+  font-size: 24px;
+  margin-bottom: 15px;
+}
+
+.inventory-detail-description {
+  color: #ffffff;
+  font-size: 18px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+.inventory-back-btn {
+  margin-top: 25px;
+  padding: 10px 25px;
+
+  color: #d4af37;
+  background: transparent;
+
+  border: 1px solid #d4af37;
+  border-radius: 5px;
+
+  font-family: 'Shippori Mincho', serif;
+  font-size: 16px;
+  cursor: pointer;
+}
+
