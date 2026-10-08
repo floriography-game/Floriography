@@ -1829,6 +1829,212 @@ html, body {
 }
 
 
+/* =========================================================
+   タブレット起動時スピナー
+   ========================================================= */
+
+.tablet-loading-overlay {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 500;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color:
+    rgba(0, 0, 0, 0.18);
+
+  pointer-events: all;
+}
+
+
+/* =========================================================
+   二重リング・ローディング
+   ========================================================= */
+
+.tablet-loading-spinner {
+  position: relative;
+
+  width: 68px;
+  height: 68px;
+}
+
+
+/* ---------------------------------------------------------
+   外側リング
+   時計回り
+   --------------------------------------------------------- */
+
+.tablet-loading-spinner::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  box-sizing: border-box;
+
+  border-radius: 50%;
+
+  border:
+    3px solid
+    rgba(255, 255, 255, 0.12);
+
+  border-top-color:
+    rgba(212, 175, 55, 0.92);
+
+  border-right-color:
+    rgba(212, 175, 55, 0.48);
+
+  animation:
+    tabletSpinnerOuter
+    0.9s
+    linear
+    infinite;
+}
+
+
+/* ---------------------------------------------------------
+   内側リング
+   反時計回り
+   --------------------------------------------------------- */
+
+.tablet-loading-spinner::after {
+  content: "";
+
+  position: absolute;
+
+  inset: 13px;
+
+  box-sizing: border-box;
+
+  border-radius: 50%;
+
+  border:
+    3px solid
+    rgba(255, 255, 255, 0.10);
+
+  border-bottom-color:
+    rgba(185, 200, 208, 0.88);
+
+  border-left-color:
+    rgba(185, 200, 208, 0.42);
+
+  animation:
+    tabletSpinnerInner
+    0.65s
+    linear
+    infinite;
+}
+
+
+/* =========================================================
+   外側：時計回り
+   ========================================================= */
+
+@keyframes tabletSpinnerOuter {
+
+  from {
+    transform:
+      rotate(0deg);
+  }
+
+  to {
+    transform:
+      rotate(360deg);
+  }
+}
+
+
+/* =========================================================
+   内側：反時計回り
+   ========================================================= */
+
+@keyframes tabletSpinnerInner {
+
+  from {
+    transform:
+      rotate(0deg);
+  }
+
+  to {
+    transform:
+      rotate(-360deg);
+  }
+}
+
+
+/* =========================================================
+   選択肢
+   ========================================================= */
+
+.choice-box {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  transform:
+    translate(-50%, -50%);
+
+  width: 520px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 14px;
+
+  z-index: 350;
+}
+
+
+.choice-btn {
+  width: 100%;
+
+  padding:
+    15px 22px;
+
+  box-sizing:
+    border-box;
+
+  font-family:
+    'Shippori Mincho',
+    serif;
+
+  font-size:
+    18px;
+
+  color:
+    #ffffff;
+
+  background-color:
+    rgba(20, 20, 20, 0.90);
+
+  border:
+    1px solid #d4af37;
+
+  border-radius:
+    6px;
+
+  cursor:
+    pointer;
+
+  transition:
+    all 0.2s ease;
+}
+
+
+.choice-btn:hover {
+  color:
+    #000000;
+
+  background-color:
+    #d4af37;
+}
+
 
   </style>
 </head>
@@ -2232,6 +2438,7 @@ let currentInvestigationId =
   null;
 
 
+
 // =========================================================
 // 調査フラグ初期値
 // =========================================================
@@ -2251,9 +2458,587 @@ const DEFAULT_INVESTIGATION_FLAGS = {
     false,
 
   studentBookFound:
+    false,
+
+};
+
+
+// =========================================================
+// 持ち物初期状態
+// =========================================================
+
+const DEFAULT_INVENTORY = {
+
+  charm:
+    false,
+
+  studentBook:
     false
 
 };
+
+
+// =========================================================
+// 現在の持ち物
+// =========================================================
+
+const inventory = {
+  ...DEFAULT_INVENTORY
+};
+
+
+// =========================================================
+// 持ち物を取得
+// =========================================================
+
+function addItem(
+  itemId
+) {
+
+  if (
+    !(itemId in inventory)
+  ) {
+
+    console.warn(
+      "存在しない持ち物です:",
+      itemId
+    );
+
+    return;
+  }
+
+
+  inventory[
+    itemId
+  ] = true;
+}
+
+
+// =========================================================
+// 持ち物を失う
+// =========================================================
+
+function removeItem(
+  itemId
+) {
+
+  if (
+    !(itemId in inventory)
+  ) {
+
+    console.warn(
+      "存在しない持ち物です:",
+      itemId
+    );
+
+    return;
+  }
+
+
+  inventory[
+    itemId
+  ] = false;
+}
+
+
+// =========================================================
+// 持ち物所持判定
+// =========================================================
+
+function hasItem(
+  itemId
+) {
+
+  return (
+    inventory[
+      itemId
+    ] === true
+  );
+}
+
+
+// =========================================================
+// 持ち物初期化
+// =========================================================
+
+function resetInventory() {
+
+  Object.assign(
+    inventory,
+    DEFAULT_INVENTORY
+  );
+}
+
+
+// =========================================================
+// キャラクターパラメータ初期値
+// =========================================================
+
+const DEFAULT_CHARACTER_PARAMS = {
+
+  kyoya: {
+    affection: 60,
+    possessiveness: 35
+  },
+
+  suishi: {
+    affection: 20,
+    empathy: 20
+  },
+
+  aoi: {
+    affection: 15,
+    trust: 25
+  },
+
+  shion: {
+    affection: 5,
+    attachment: 30
+  },
+
+  anna: {
+    affection: 45,
+    honesty: 20
+  },
+
+  rento: {
+    affection: 30,
+    understanding: 25
+  }
+
+};
+
+
+// =========================================================
+// 現在のキャラクターパラメータ
+// =========================================================
+
+const characterParams = {
+
+  kyoya: {
+    ...DEFAULT_CHARACTER_PARAMS.kyoya
+  },
+
+  suishi: {
+    ...DEFAULT_CHARACTER_PARAMS.suishi
+  },
+
+  aoi: {
+    ...DEFAULT_CHARACTER_PARAMS.aoi
+  },
+
+  shion: {
+    ...DEFAULT_CHARACTER_PARAMS.shion
+  },
+
+  anna: {
+    ...DEFAULT_CHARACTER_PARAMS.anna
+  },
+
+  rento: {
+    ...DEFAULT_CHARACTER_PARAMS.rento
+  }
+
+};
+
+
+// =========================================================
+// キャラクターパラメータ増減
+// 0～100の範囲に収める
+// =========================================================
+
+function addCharacterParam(
+  characterId,
+  paramName,
+  amount
+) {
+
+  const character =
+    characterParams[
+      characterId
+    ];
+
+
+  if (!character) {
+
+    console.warn(
+      "存在しないキャラクターです:",
+      characterId
+    );
+
+    return;
+  }
+
+
+  if (
+    !(paramName in character)
+  ) {
+
+    console.warn(
+      "存在しないパラメータです:",
+      characterId,
+      paramName
+    );
+
+    return;
+  }
+
+
+  const newValue =
+    character[
+      paramName
+    ] + amount;
+
+
+  character[
+    paramName
+  ] =
+    Math.max(
+      0,
+      Math.min(
+        100,
+        newValue
+      )
+    );
+}
+
+
+
+// =========================================================
+// キャラクターパラメータ初期化
+// =========================================================
+
+function resetCharacterParams() {
+
+  Object.keys(
+    DEFAULT_CHARACTER_PARAMS
+  ).forEach(
+    characterId => {
+
+      characterParams[
+        characterId
+      ] = {
+        ...DEFAULT_CHARACTER_PARAMS[
+          characterId
+        ]
+      };
+
+    }
+  );
+}
+
+
+
+// =========================================================
+// 選択肢のパラメータ変化をまとめて適用
+// =========================================================
+
+function applyChoiceEffects(
+  effects
+) {
+
+  if (
+    !Array.isArray(
+      effects
+    )
+  ) {
+
+    return;
+  }
+
+
+  effects.forEach(
+    effect => {
+
+      if (
+        !effect ||
+        !effect.character ||
+        !effect.param
+      ) {
+
+        return;
+      }
+
+
+      addCharacterParam(
+        effect.character,
+        effect.param,
+        effect.amount ?? 0
+      );
+
+    }
+  );
+}
+
+
+
+// =========================================================
+// シナリオIDから現在位置を移動
+// =========================================================
+
+function jumpToScenarioId(
+  targetId
+) {
+
+  const currentScenario =
+    getCurrentScenario();
+
+
+  const targetIndex =
+    currentScenario.findIndex(
+      item =>
+        item.id ===
+        targetId
+    );
+
+
+  if (
+    targetIndex === -1
+  ) {
+
+    console.warn(
+      "移動先のシナリオIDが見つかりません:",
+      targetId
+    );
+
+    return false;
+  }
+
+
+  currentStep =
+    targetIndex;
+
+
+  updateDialogue();
+
+
+  return true;
+}
+
+
+
+// =========================================================
+// 選択肢表示
+// =========================================================
+
+function showChoice(
+  data
+) {
+
+  stopSkipMode();
+  stopAutoMode();
+  stopTextTimer();
+
+
+  const gameScreen =
+    document.getElementById(
+      'game-screen'
+    );
+
+
+  if (!gameScreen) {
+
+    console.warn(
+      "選択肢を表示する画面が見つかりません。"
+    );
+
+    return;
+  }
+
+
+  const oldChoiceBox =
+    document.getElementById(
+      'choice-box'
+    );
+
+
+  if (oldChoiceBox) {
+
+    oldChoiceBox.remove();
+  }
+
+
+  const choiceBox =
+    document.createElement(
+      'div'
+    );
+
+
+  choiceBox.id =
+    'choice-box';
+
+  choiceBox.className =
+    'choice-box';
+
+
+  const choices =
+    Array.isArray(
+      data.choices
+    )
+      ? data.choices
+      : [];
+
+
+  choices.forEach(
+    choice => {
+
+      const button =
+        document.createElement(
+          'button'
+        );
+
+
+      button.type =
+        'button';
+
+      button.className =
+        'choice-btn';
+
+      button.textContent =
+        choice.text ?? "選択肢";
+
+
+      button.addEventListener(
+        'click',
+        () => {
+
+          applyChoiceEffects(
+            choice.effects
+          );
+
+
+          choiceBox.remove();
+
+
+          if (
+            choice.nextId
+          ) {
+
+            jumpToScenarioId(
+              choice.nextId
+            );
+
+          } else {
+
+            currentStep++;
+
+            updateDialogue();
+          }
+
+        }
+      );
+
+
+      choiceBox.appendChild(
+        button
+      );
+
+    }
+  );
+
+
+  gameScreen.appendChild(
+    choiceBox
+  );
+}
+
+
+// =========================================================
+// キャラクター別エンディング判定基準
+// =========================================================
+
+const CHARACTER_ENDING_THRESHOLDS = {
+
+  kyoya: {
+    affection: 70,
+    possessiveness: 60
+  },
+
+  suishi: {
+    affection: 65,
+    empathy: 70
+  },
+
+  aoi: {
+    affection: 75,
+    trust: 65
+  },
+
+  shion: {
+    affection: 60,
+    attachment: 75
+  },
+
+  anna: {
+    affection: 70,
+    honesty: 65
+  },
+
+  rento: {
+    affection: 65,
+    understanding: 70
+  }
+
+};
+
+
+// =========================================================
+// キャラクター別 B / C エンディング判定
+// =========================================================
+
+function getCharacterEndingType(
+  characterId
+) {
+
+  const params =
+    characterParams[
+      characterId
+    ];
+
+
+  const threshold =
+    CHARACTER_ENDING_THRESHOLDS[
+      characterId
+    ];
+
+
+  if (
+    !params ||
+    !threshold
+  ) {
+
+    console.warn(
+      "エンディング判定情報がありません:",
+      characterId
+    );
+
+    return null;
+  }
+
+
+  const paramNames =
+    Object.keys(
+      threshold
+    );
+
+
+  const allPassed =
+    paramNames.every(
+      paramName => {
+
+        return (
+          params[paramName] >=
+          threshold[paramName]
+        );
+
+      }
+    );
+
+
+  return allPassed
+    ? "C"
+    : "B";
+}
 
 
 // =========================================================
@@ -2485,7 +3270,7 @@ classroomStudentBook: {
               "{NAME}",
 
             text:
-              "（うーん、ここじゃないか。）"
+              "（あると思ったんだけど......ここじゃないか。）"
           }
 
         ]
@@ -2493,28 +3278,32 @@ classroomStudentBook: {
       },
 
 
-      teacherDesk: {
+teacherDesk: {
 
-        label:
-          "教卓",
+  label:
+    "ロッカー",
 
-        flag:
-          "teacherDeskChecked",
+  flag:
+    "teacherDeskChecked",
 
-        x:
-          "51%",
+  findCharm:
+    true,
 
-        y:
-          "29%",
+  x:
+    "51%",
 
-        result: [
+  y:
+    "29%",
+
+  result: [
+
 
           {
             name:
               "{NAME}",
 
             text:
-              "（教室に入ってきた時、教卓の近くは通ったけど……。）"
+              "（教室に入ってきた時、ここの近くは通ったけど……。）"
           },
 
           {
@@ -2522,15 +3311,15 @@ classroomStudentBook: {
               "タブレット",
 
             text:
-              "学生手帳に該当する物体は確認できません。"
+              "候補：ユーザー名、{NAME}と一致する文字列を認識。"
           },
 
           {
             name:
-              "先生",
+              "タブレット",
 
             text:
-              "ん？　{LAST_NAME}、何か探してるのか？"
+              "ユーザーの足元から反応あり。"
           },
 
           {
@@ -2538,7 +3327,40 @@ classroomStudentBook: {
               "{NAME}",
 
             text:
-              "あ、ちょっと学生手帳を落としたみたいで……。"
+              "（足元？一体何が......）"
+          },
+
+          {
+            name:
+              "{NAME}",
+
+            text:
+              "あ、私のお守り！"
+          },
+
+          {
+            name:
+              "{NAME}",
+
+            text:
+              "わざわざ神社に行って名前を入れてもらったんだっけ。いつの間にか無くなってたけど......こんなとこにあったんだ。"
+          },
+
+          {
+            name:
+              "タブレット",
+
+            text:
+              "紛失物の取得を確認。\n......学生手帳の候補となる物体は確認できませんでした。"
+          },
+
+
+          {
+            name:
+              "{NAME}",
+
+            text:
+              "（うーん、ここにはないっか。）"
           }
 
         ]
@@ -4129,21 +4951,84 @@ let investigationCurrentText = "";
       id: "c1_143",
       type: "dialogue",
       name: "タブレット",
-      text: "ホーム画面の表示。......こちらで問題ありませんか？"
+      text: "ユーザーの身辺情報を確認。"
     },
 
     {   
       id: "c1_144",
       type: "dialogue",
-      name: "{NAME}",
-      text: "（いや、問題しかないけど......）"
+      name: "タブレット",
+      text: "学生手帳を提示して下さい。"
     },
 
     {   
       id: "c1_145",
       type: "dialogue",
+      name: "{NAME}",
+      text: "いや、誰が大人しく従うと......"
+    },
+
+    {   
+      id: "c1_146",
+      type: "dialogue",
       name: "タブレット",
-      text: "ユーザーの不満を検知。\nこちらはいかがですか？"
+      text: "エラー。学生手帳を提示して下さい。\nエラー。学生手帳を提示して下さい。\nエラー。額せて調を提示して下さ――"
+    },
+
+    {   
+      id: "c1_147",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "ちょっ、はあ！？"
+    },
+
+    {   
+      id: "c1_148",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "（エラーって......あーもう、出せばいいんでしょ、出せば！）"
+    },
+
+    {   
+      id: "c1_148_1",
+      type: "dialogue",
+      name: "　　　",
+      text: "とりあえずエラーを吐き続けるタブレットを何とか落ち着かせなくては。\n手探りでバッグの中を漁るものの、学生手帳は一向に見つかりそうもない。"
+    },
+
+    {   
+      id: "c1_149",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "あれ、いつもここに入れているはずなのに......"
+    },
+
+    {   
+      id: "c1_150",
+      type: "dialogue",
+      name: "タブレット",
+      text: "エラー。学生手帳を......\n学生手帳の紛失を確認。"
+    },
+
+    {   
+      id: "c1_151",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "あ、やっと静かになっ......"
+    },
+
+    {   
+      id: "c1_151_1",
+      type: "dialogue",
+      name: "タブレット",
+      text: "調査モードを起動します。"
+    },
+
+    {   
+      id: "c1_152",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "えっ、ちょ......はあ！？"
     },
 
     {
@@ -4153,18 +5038,102 @@ let investigationCurrentText = "";
     },
 
     {   
-      id: "c1_146",
+      id: "c1_153",
       type: "dialogue",
       name: "{NAME}",
-      text: "......え、えええ？"
+      text: "み、見つかっちゃった......"
     },
 
     {   
-      id: "c1_147",
+      id: "c1_154",
       type: "dialogue",
       name: "{NAME}",
-      text: "（な、何この画面！？）"
+      text: "（まさか本当に見つかるなんて。\n怪し過ぎるけど、ちょっとは信用できるのかも。）"
     },
+
+    {   
+      id: "c1_155",
+      type: "dialogue",
+      name: "タブレット",
+      text: "賞賛として受け取っておきます。"
+    },
+
+    {   
+      id: "c1_156",
+      type: "dialogue",
+      name: "タブレット",
+      text: "学生手帳の取得を確認。学生手帳を提示して下さい。"
+    },
+
+    {   
+      id: "c1_157",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "はいはい、仕方ないなあ......"
+    },
+
+    {   
+      id: "c1_158",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "（不本意だけど、ほんっとうに不本意だけど、見つけられたのはこのタブレットのおかげだし。\nまたエラーって言われても困るし......このくらいは大丈夫、だよね？）"
+    },
+
+    {   
+      id: "c1_159",
+      type: "dialogue",
+      name: "タブレット",
+      text: "情報読み取り、個人情報の照合。\n姓名、容姿、生年月日、性別。"
+    },
+
+    {   
+      id: "c1_160",
+      type: "dialogue",
+      name: "タブレット",
+      text: "照合完了、同一人物であることを確認。\n情報を記録します。"
+    },
+
+    {   
+      id: "c1_161",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "ちょっと、何勝手に記録してるの！？"
+    },
+
+    {   
+      id: "c1_162",
+      type: "dialogue",
+      name: "タブレット",
+      text: "人物情報をアンロック、情報はこちらから確認できます。\nお確かめください。"
+    },
+
+    {   
+      id: "c1_163",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "あー、もー！！"
+    },
+
+    {   
+      id: "c1_164",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "（やっぱり情報なんて渡すんじゃなかった！記録とか意味わかんないし！！）"
+    },
+
+    {   
+      id: "c1_165",
+      type: "dialogue",
+      name: "タブレット",
+      text: "情報の記録、調査など......何でもお任せください、我々はユーザー様の味方です。"
+    },
+
+    {   
+      id: "c1_166",
+      type: "dialogue",
+      name: "　　　",
+      text: "いつでもお呼びください、という言葉と共にタブレットの電源が自動で落ちる。\n調査だとか、情報の記録だとか......一体、このタブレットは何なのだろうか？"
+    }
 
 
 
@@ -4730,6 +5699,70 @@ function getCurrentScenario() {
     ?? prologueScenario
   );
 }
+
+
+// =========================================================
+// 現在位置までのシナリオから
+// 本来のシーンBGMを取得
+// =========================================================
+
+function getSceneBgmFromScenario(
+  scenario,
+  step
+) {
+
+  let bgm =
+    null;
+
+
+  for (
+    let i = 0;
+    i <= step &&
+    i < scenario.length;
+    i++
+  ) {
+
+    const data =
+      scenario[i];
+
+
+    if (
+      data.type ===
+      "bgm"
+    ) {
+
+      bgm =
+        data.file;
+    }
+
+
+    if (
+      data.type ===
+      "bgmStop"
+    ) {
+
+      bgm =
+        null;
+    }
+
+
+    if (
+      data.type ===
+        "backgroundFade" &&
+      data.resetBgm ===
+        true
+    ) {
+
+      bgm =
+        null;
+    }
+  }
+
+
+  return bgm;
+}
+
+
 
 // =========================================================
 // 現在の章名取得
@@ -5347,7 +6380,7 @@ document
     'click',
     () => {
 
-      showTabletFunctionMenu();
+      openTabletWithLoading();
 
     }
   );
@@ -5358,33 +6391,184 @@ document
   // 持ち物
   // -------------------------------------------------------
 
-  document
-    .getElementById(
-      'investigation-item-btn'
-    )
-    .addEventListener(
-      'click',
-      () => {
+document
+  .getElementById(
+    'investigation-item-btn'
+  )
+  .addEventListener(
+    'click',
+    () => {
 
-        if (
-          investigationFlags
-            .studentBookFound
-        ) {
+      const items =
+        [];
 
-          showMessage(
-            "【持ち物】\n学生手帳"
-          );
 
-        } else {
+      if (
+        hasItem(
+          "charm"
+        )
+      ) {
 
-          showMessage(
-            "現在、調査に使用できる持ち物はありません。"
-          );
-
-        }
-
+        items.push(
+          "お守り"
+        );
       }
-    );
+
+
+      if (
+        hasItem(
+          "studentBook"
+        )
+      ) {
+
+        items.push(
+          "学生手帳"
+        );
+      }
+
+
+      if (
+        items.length > 0
+      ) {
+
+        showMessage(
+          "【持ち物】\n" +
+          items
+            .map(
+              item =>
+                `・${item}`
+            )
+            .join("\n")
+        );
+
+      } else {
+
+        showMessage(
+          "現在、調査に使用できる持ち物はありません。"
+        );
+      }
+
+    }
+  );
+
+} 
+
+// =========================================================
+// タブレット起動スピナー
+// =========================================================
+
+let isTabletStarting =
+  false;
+
+
+function showTabletLoadingSpinner() {
+
+  return new Promise(
+    resolve => {
+
+      if (isTabletStarting) {
+        resolve(false);
+        return;
+      }
+
+
+      isTabletStarting =
+        true;
+
+
+      const screen =
+        document.getElementById(
+          'investigation-screen'
+        );
+
+
+      if (!screen) {
+
+        isTabletStarting =
+          false;
+
+        resolve(false);
+
+        return;
+      }
+
+
+      const oldOverlay =
+        screen.querySelector(
+          '.tablet-loading-overlay'
+        );
+
+
+      if (oldOverlay) {
+        oldOverlay.remove();
+      }
+
+
+      const overlay =
+        document.createElement(
+          'div'
+        );
+
+
+      overlay.className =
+        'tablet-loading-overlay';
+
+
+      overlay.innerHTML = `
+        <div
+          class="tablet-loading-spinner"
+        ></div>
+      `;
+
+
+      screen.appendChild(
+        overlay
+      );
+
+
+      setTimeout(
+        () => {
+
+          overlay.remove();
+
+
+          isTabletStarting =
+            false;
+
+
+          resolve(true);
+
+        },
+
+        300
+      );
+
+    }
+  );
+}
+
+
+// =========================================================
+// スピナー後にタブレットを開く
+// =========================================================
+
+async function openTabletWithLoading() {
+
+  if (isTabletStarting) {
+    return;
+  }
+
+
+  const completed =
+    await showTabletLoadingSpinner();
+
+
+  if (!completed) {
+    return;
+  }
+
+
+  showTabletFunctionMenu();
 }
 
 
@@ -5974,9 +7158,6 @@ function finishInvestigation() {
   // 元のBGMへ戻す
   // -------------------------------------------------------
 
-// -------------------------------------------------------
-// 通常シナリオのBGMへ戻す
-// -------------------------------------------------------
 
 if (
   currentBgm ===
@@ -6050,6 +7231,10 @@ function startInvestigationResult(
   ] = true;
 
 
+// -------------------------------------------------------
+// 学生手帳取得
+// -------------------------------------------------------
+
   if (
     target.findStudentBook
   ) {
@@ -6057,8 +7242,30 @@ function startInvestigationResult(
     investigationFlags
       .studentBookFound =
       true;
+
+    addItem(
+      "studentBook"
+    );
   }
 
+
+// -------------------------------------------------------
+// お守り取得
+// -------------------------------------------------------
+
+  if (
+    target.findCharm
+  ) {
+
+    addItem(
+      "charm"
+    );
+  }
+
+
+// -------------------------------------------------------
+// 調査結果表示
+// -------------------------------------------------------
 
   let resultIndex =
     0;
@@ -6097,7 +7304,6 @@ function startInvestigationResult(
 
   showNextResult();
 }
-
 
 // =========================================================
 // 調査中タイプライター停止
@@ -6608,6 +7814,24 @@ if (
 }
 
 
+
+// -------------------------------------------------------
+// 選択肢
+// -------------------------------------------------------
+
+if (
+  data.type ===
+  "choice"
+) {
+
+  showChoice(
+    data
+  );
+
+  return;
+}
+
+
     console.warn(
       "未対応のシナリオタイプです:",
       data.type
@@ -6707,7 +7931,23 @@ charName.style.display =
   // 次の文章へ
   // =========================================================
 
- function nextDialogue() {
+function nextDialogue() {
+
+  // =========================================================
+  // 選択肢表示中は通常の会話送りを禁止
+  // =========================================================
+
+  const choiceBox =
+    document.getElementById(
+      'choice-box'
+    );
+
+
+  if (choiceBox) {
+
+    return;
+  }
+
 
   const currentScenario =
     getCurrentScenario();
@@ -6915,6 +8155,10 @@ charName.style.display =
 
 
 resetInvestigationAndTabletState();
+
+resetInventory();
+
+resetCharacterParams();
 
 
     dialogueHistory = [];
@@ -8392,7 +9636,7 @@ function closeSlotModal() {
 
 
       // セーブデータ形式
-      version: 6,
+      version: 8,
 
 
       scene:
@@ -8435,28 +9679,68 @@ sceneBgm:
 
 
 
-   // -------------------------------------------------------
-  // 調査状態
-  // -------------------------------------------------------
+// -------------------------------------------------------
+// 調査状態
+// -------------------------------------------------------
 
-  investigationFlags:
-    {
-      ...investigationFlags
-    },
+investigationFlags:
+{
+  ...investigationFlags
+},
 
 
-  // -------------------------------------------------------
-  // タブレットアプリ解放状態
-  // -------------------------------------------------------
+// -------------------------------------------------------
+// タブレットアプリ解放状態
+// -------------------------------------------------------
 
-  tabletAppUnlocked:
-    {
-      ...tabletAppUnlocked
-    }
+tabletAppUnlocked:
+{
+  ...tabletAppUnlocked
+},
+
+
+// -------------------------------------------------------
+// 持ち物
+// -------------------------------------------------------
+
+inventory:
+{
+  ...inventory
+},
+
+
+// -------------------------------------------------------
+// キャラクターパラメータ
+// -------------------------------------------------------
+
+characterParams:
+{
+  kyoya: {
+    ...characterParams.kyoya
+  },
+
+  suishi: {
+    ...characterParams.suishi
+  },
+
+  aoi: {
+    ...characterParams.aoi
+  },
+
+  shion: {
+    ...characterParams.shion
+  },
+
+  anna: {
+    ...characterParams.anna
+  },
+
+  rento: {
+    ...characterParams.rento
+  }
+}
 
 };
-
-
 
     try {
 
@@ -8582,6 +9866,16 @@ if (saveData.scene) {
 resetInvestigationAndTabletState();
 
 
+resetInventory();
+
+
+// -------------------------------------------------------
+// キャラクターパラメータも一度初期化
+// -------------------------------------------------------
+
+resetCharacterParams();
+
+
 // -------------------------------------------------------
 // 調査状態を復元
 // -------------------------------------------------------
@@ -8600,6 +9894,38 @@ if (
 
 
 // -------------------------------------------------------
+// 持ち物を復元
+// -------------------------------------------------------
+
+if (
+  saveData.inventory &&
+  typeof saveData.inventory ===
+    "object"
+) {
+
+  Object.assign(
+    inventory,
+    saveData.inventory
+  );
+
+} else {
+
+  // -----------------------------------------------------
+  // 旧セーブデータ互換
+  // -----------------------------------------------------
+
+  if (
+    investigationFlags
+      .studentBookFound
+  ) {
+
+    inventory.studentBook =
+      true;
+  }
+}
+
+
+// -------------------------------------------------------
 // タブレットアプリ解放状態を復元
 // -------------------------------------------------------
 
@@ -8612,6 +9938,46 @@ if (
   Object.assign(
     tabletAppUnlocked,
     saveData.tabletAppUnlocked
+  );
+}
+
+
+// -------------------------------------------------------
+// キャラクターパラメータを復元
+// -------------------------------------------------------
+
+if (
+  saveData.characterParams &&
+  typeof saveData.characterParams ===
+    "object"
+) {
+
+  Object.keys(
+    DEFAULT_CHARACTER_PARAMS
+  ).forEach(
+    characterId => {
+
+      const savedCharacter =
+        saveData.characterParams[
+          characterId
+        ];
+
+
+      if (
+        savedCharacter &&
+        typeof savedCharacter ===
+          "object"
+      ) {
+
+        Object.assign(
+          characterParams[
+            characterId
+          ],
+          savedCharacter
+        );
+      }
+
+    }
   );
 }
 
@@ -8718,10 +10084,34 @@ changeBackground(
 // シーンBGM復元
 // -------------------------------------------------------
 
-sceneBgm =
-  saveData.sceneBgm
-  ?? saveData.currentBgm
-  ?? null;
+if (
+  Object.prototype.hasOwnProperty.call(
+    saveData,
+    "sceneBgm"
+  )
+) {
+
+  // version 6以降
+  sceneBgm =
+    saveData.sceneBgm
+    ?? null;
+
+} else {
+
+  // -----------------------------------------------------
+  // 旧セーブデータ
+  //
+  // 旧currentBgmにはタブレットBGMなどが
+  // 入っている可能性があるため、
+  // シナリオから本来のBGMを再計算する
+  // -----------------------------------------------------
+
+  sceneBgm =
+    getSceneBgmFromScenario(
+      currentScenario,
+      currentStep
+    );
+}
 
 
 // -------------------------------------------------------
