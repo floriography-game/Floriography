@@ -1250,6 +1250,24 @@
       text: "人物情報をアンロック、情報はこちらから確認できます。\nお確かめください。"
     },
 
+{
+  id: "c1_unlock_shion",
+  type: "unlockCharacter",
+  characterId: "shion"
+},
+
+{
+  id: "c1_unlock_kyoya",
+  type: "unlockCharacter",
+  characterId: "kyoya"
+},
+
+{
+  id: "c1_unlock_rento",
+  type: "unlockCharacter",
+  characterId: "rento"
+},
+
     {   
       id: "c1_163",
       type: "dialogue",
@@ -1276,7 +1294,14 @@
       type: "dialogue",
       name: "　　　",
       text: "いつでもお呼びください、という言葉と共にタブレットの電源が自動で落ちる。\n調査だとか、情報の記録だとか......一体、このタブレットは何なのだろうか？"
-    }
+    },
+
+    {   
+      id: "c1_167",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "（まあ、こうなっちゃったら仕方ないよね。\nとりあえず人物情報を確認してみようかな？"
+    },
 
 
 

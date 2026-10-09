@@ -346,7 +346,7 @@ function updateTabletButtonVisibility() {
   // 第一章のタブレット受け取り位置を取得
   const unlockIndex =
     chapter1Scenario.findIndex(
-      data => data.id === "c1_112"
+      data => data.id === "c1_167"
     );
 
   // 第一章でタブレット受け取り後なら表示
@@ -768,7 +768,7 @@ const DEFAULT_CHARACTER_PARAMS = {
     possessiveness: 35
   },
 
-  suishi: {
+  kezi: {
     affection: 20,
     empathy: 20
   },
@@ -806,8 +806,8 @@ const characterParams = {
     ...DEFAULT_CHARACTER_PARAMS.kyoya
   },
 
-  suishi: {
-    ...DEFAULT_CHARACTER_PARAMS.suishi
+  kezi: {
+    ...DEFAULT_CHARACTER_PARAMS.kezi
   },
 
   aoi: {
@@ -1141,7 +1141,7 @@ const CHARACTER_ENDING_THRESHOLDS = {
     possessiveness: 60
   },
 
-  suishi: {
+  kezi: {
     affection: 65,
     empathy: 70
   },
@@ -1359,6 +1359,77 @@ function unlockTabletApp(
   tabletAppUnlocked[
     appId
   ] = true;
+}
+
+
+
+// =========================================================
+// 人物情報：初期解放状態
+// =========================================================
+
+const DEFAULT_CHARACTER_UNLOCKED = {
+  protagonist: true,
+  kyoya: false,
+  kezi: false,
+  aoi: false,
+  shion: false,
+  anna: false,
+  rento: false
+};
+
+
+// =========================================================
+// 人物情報：現在の解放状態
+// =========================================================
+
+const characterUnlocked = {
+  ...DEFAULT_CHARACTER_UNLOCKED
+};
+
+
+// =========================================================
+// 人物情報：個別アンロック
+// =========================================================
+
+function unlockCharacter(characterId) {
+
+  if (!(characterId in DEFAULT_CHARACTER_UNLOCKED)) {
+
+    console.warn(
+      "登録されていない人物IDです:",
+      characterId
+    );
+
+    return;
+  }
+
+  characterUnlocked[characterId] = true;
+
+}
+
+
+// =========================================================
+// 人物情報：解放済みかどうか
+// =========================================================
+
+function isCharacterUnlocked(characterId) {
+
+  return characterUnlocked[characterId] === true;
+
+}
+
+
+// =========================================================
+// 人物情報：解放状態を初期化
+// =========================================================
+
+function resetCharacterUnlocked() {
+
+  Object.assign(
+    characterUnlocked,
+    DEFAULT_CHARACTER_UNLOCKED
+  );
+
 }
 
 
@@ -3220,6 +3291,15 @@ if (
   );
 
 
+// 調査終了ボタンは調査ホームでのみ表示
+const finishButton =
+  screen.querySelector(".investigation-finish-btn");
+
+if (finishButton) {
+  finishButton.remove();
+}
+
+
   // 下側の調査基本メニューを隠す
   const baseMenu =
     screen.querySelector(
@@ -3574,9 +3654,38 @@ function showCharacterList() {
   menu.innerHTML = "";
   menu.classList.add("character-view");
 
-  // 登録されている人物を一覧表示
+// -------------------------------------------------------
+// 解放済みの人物だけを取得
+// -------------------------------------------------------
+
+const unlockedCharacters =
   Object.entries(CHARACTER_PROFILE_DATA)
-    .forEach(([characterId, character]) => {
+    .filter(([characterId]) =>
+      isCharacterUnlocked(characterId)
+    );
+
+
+if (unlockedCharacters.length === 0) {
+
+  const emptyMessage =
+    document.createElement("div");
+
+  emptyMessage.className =
+    "character-empty-message";
+
+  emptyMessage.textContent =
+    "現在、登録されている人物情報はありません。";
+
+  menu.appendChild(emptyMessage);
+}
+
+
+// -------------------------------------------------------
+// 解放済み人物を一覧表示
+// -------------------------------------------------------
+
+unlockedCharacters.forEach(
+  ([characterId, character]) => {
 
       const button =
         document.createElement("button");
@@ -3584,7 +3693,8 @@ function showCharacterList() {
       button.type = "button";
       button.className = "character-profile-btn";
 
-      button.textContent = character.name;
+      button.textContent =
+  replaceNameTags(character.name);
 
       button.addEventListener("click", () => {
         showCharacterDetail(characterId);
@@ -3616,15 +3726,24 @@ function showCharacterList() {
 
 function showCharacterDetail(characterId) {
 
+  // 未解放の人物は表示しない
+  if (!isCharacterUnlocked(characterId)) {
+    return;
+  }
+
+  // 人物プロフィールを取得
   const character =
     CHARACTER_PROFILE_DATA[characterId];
 
+  // 該当する人物データがない場合
   if (!character) {
     return;
   }
 
   const tablet =
     document.querySelector(".tablet-home-panel");
+
+  // 以下は既存の処理をそのまま残す
 
   if (!tablet) {
     return;
@@ -3655,14 +3774,16 @@ function showCharacterDetail(characterId) {
     document.createElement("div");
 
   name.className = "character-detail-name";
-  name.textContent = character.name;
+  name.textContent =
+  replaceNameTags(character.name);
 
   // 関係性
   const relation =
     document.createElement("div");
 
   relation.className = "character-detail-relation";
-  relation.textContent = character.relation;
+  relation.textContent =
+  replaceNameTags(character.relation);
 
   // 紹介文
   const description =
@@ -3671,7 +3792,8 @@ function showCharacterDetail(characterId) {
   description.className =
     "character-detail-description";
 
-  description.textContent = character.description;
+  description.textContent =
+  replaceNameTags(character.description);
 
   // 一覧へ戻る
   const backButton =
@@ -4236,16 +4358,22 @@ function showInvestigationResultEntry(
   stopInvestigationTextTimer();
 
 
-  // 調査用メニュー類を隠す
-  screen
-    .querySelectorAll(
-      '.investigation-menu, .investigation-tablet-panel, .tablet-home-panel, .tablet-function-menu, .investigation-point'
-    )
-    .forEach(
-      element => {
-        element.remove();
-      }
-    );
+// -------------------------------------------------------
+// 調査中の会話表示に不要なUIを削除
+// -------------------------------------------------------
+
+screen
+  .querySelectorAll(
+    '.investigation-menu, ' +
+    '.investigation-tablet-panel, ' +
+    '.tablet-home-panel, ' +
+    '.tablet-function-menu, ' +
+    '.investigation-point, ' +
+    '.investigation-finish-btn'
+  )
+  .forEach(element => {
+    element.remove();
+  });
 
 
   const resultBox =
@@ -4635,6 +4763,23 @@ if (data.type === "unlockTabletApp") {
 
 
 // -------------------------------------------------------
+// 人物情報の個別アンロック
+// -------------------------------------------------------
+
+if (data.type === "unlockCharacter") {
+
+  unlockCharacter(data.characterId);
+
+  currentStep++;
+
+  updateDialogue();
+
+  return;
+}
+
+
+
+// -------------------------------------------------------
 // 調査
 // -------------------------------------------------------
 
@@ -4996,6 +5141,8 @@ resetInvestigationAndTabletState();
 resetInventory();
 
 resetCharacterParams();
+
+resetCharacterUnlocked();
 
 
     dialogueHistory = [];
@@ -6548,6 +6695,15 @@ tabletAppUnlocked:
 
 
 // -------------------------------------------------------
+// 人物情報の個別解放状態
+// -------------------------------------------------------
+
+characterUnlocked: {
+  ...characterUnlocked
+},
+
+
+// -------------------------------------------------------
 // 持ち物
 // -------------------------------------------------------
 
@@ -6566,8 +6722,8 @@ characterParams:
     ...characterParams.kyoya
   },
 
-  suishi: {
-    ...characterParams.suishi
+  kezi: {
+    ...characterParams.kezi
   },
 
   aoi: {
@@ -6723,6 +6879,9 @@ resetInventory();
 resetCharacterParams();
 
 
+resetCharacterUnlocked();
+
+
 // -------------------------------------------------------
 // 調査状態を復元
 // -------------------------------------------------------
@@ -6786,6 +6945,27 @@ if (
     tabletAppUnlocked,
     saveData.tabletAppUnlocked
   );
+}
+
+
+// -------------------------------------------------------
+// 人物情報の個別解放状態を復元
+// -------------------------------------------------------
+
+if (
+  saveData.characterUnlocked &&
+  typeof saveData.characterUnlocked === "object"
+) {
+
+  Object.keys(DEFAULT_CHARACTER_UNLOCKED)
+    .forEach(characterId => {
+
+characterUnlocked[characterId] =
+  typeof saveData.characterUnlocked[characterId] === "boolean"
+    ? saveData.characterUnlocked[characterId]
+    : DEFAULT_CHARACTER_UNLOCKED[characterId];
+
+    });
 }
 
 

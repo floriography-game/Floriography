@@ -2313,3 +2313,14 @@ html, body {
 }
 
 
+.character-empty-message {
+  padding: 20px 10px;
+
+  text-align: center;
+  color: #a6b9c5;
+
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+
