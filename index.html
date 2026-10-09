@@ -28,6 +28,25 @@
   class="scene-transition-overlay"
 ></div>
 
+
+<!-- =====================================================
+     常駐UI：タブレットボタン
+     ===================================================== -->
+
+<div
+  id="tablet-trigger-container"
+  class="tablet-trigger-container"
+>
+  <button
+    id="tablet-toggle-btn"
+    class="sys-btn"
+    type="button"
+  >
+    TABLET
+  </button>
+</div>
+
+
   <!-- 常駐UI：右上MENUボタン -->
   <div id="menu-trigger-container" class="menu-trigger-container">
     <button id="menu-toggle-btn" class="sys-btn">MENU</button>
@@ -254,7 +273,7 @@
 
 <script src="data/investigation-data.js"></script>
 <script src="data/inventory-data.js"></script>
-
+<script src="data/character-data.js"></script>
 
 <script>
 
@@ -306,6 +325,51 @@ function resizeGameScreen() {
   gameStage.style.transform =
     `translate(-50%, -50%) scale(${scale})`;
 }
+
+
+
+// =========================================================
+// TABLETボタンの表示状態を更新
+// =========================================================
+
+function updateTabletButtonVisibility() {
+
+  const buttonContainer =
+    document.getElementById(
+      "tablet-trigger-container"
+    );
+
+  if (!buttonContainer) {
+    return;
+  }
+
+  // 第一章のタブレット受け取り位置を取得
+  const unlockIndex =
+    chapter1Scenario.findIndex(
+      data => data.id === "c1_112"
+    );
+
+  // 第一章でタブレット受け取り後なら表示
+  // 今後の章でも表示する
+  const hasTablet =
+    currentScene === "chapter1"
+      ? unlockIndex !== -1 &&
+        currentStep >= unlockIndex
+      : currentScene !== "prologue";
+
+  // 通常会話画面でのみ表示
+  const isDialogueScreen =
+    document.getElementById(
+      "game-screen"
+    ) !== null;
+
+  buttonContainer.classList.toggle(
+    "active",
+    hasTablet && isDialogueScreen
+  );
+}
+
+
 
   // =========================================================
   // プレイヤーデータ
@@ -2745,9 +2809,12 @@ function renderDialogueScreen() {
 // 調査画面
 // =========================================================
 
-function renderInvestigationScreen(
-  investigationId
-) {
+function renderInvestigationScreen(investigationId) {
+
+  document
+    .getElementById("tablet-trigger-container")
+    ?.classList.remove("active");
+
 
   isInvestigationMode =
     true;
@@ -3045,6 +3112,74 @@ async function openTabletWithLoading() {
 
 
 // =========================================================
+// 通常会話からタブレットを開く
+// =========================================================
+
+function openDialogueTablet() {
+
+  // 二重起動防止
+  if (
+    document.querySelector(
+      ".dialogue-tablet-screen"
+    )
+  ) {
+    return;
+  }
+
+  const gameScreen =
+    document.getElementById("game-screen");
+
+  const dialogueBox =
+    document.getElementById("dialogue-box");
+
+  if (!gameScreen || !dialogueBox) {
+    return;
+  }
+
+  // AUTO・SKIPを停止
+  stopAutoMode();
+  stopSkipMode();
+
+  // 表示途中の文章は全文表示にする
+  if (isTyping) {
+
+    stopTextTimer();
+
+    const dialogueText =
+      document.getElementById("dialogue-text");
+
+    if (dialogueText) {
+      dialogueText.textContent = currentText;
+    }
+  }
+
+  // 会話画面を一時的に非表示
+  gameScreen.style.display = "none";
+
+  // TABLETボタンも一時的に隠す
+  document
+    .getElementById("tablet-trigger-container")
+    ?.classList.remove("active");
+
+  // タブレット表示用の画面を作成
+  const screen =
+    document.createElement("div");
+
+  screen.id = "investigation-screen";
+
+  screen.className =
+    "investigation-screen dialogue-tablet-screen";
+
+  screen.dataset.tabletOrigin = "dialogue";
+
+  gameContainer.appendChild(screen);
+
+  // 既存のタブレットホームを表示
+  showTabletFunctionMenu();
+}
+
+
+// =========================================================
 // タブレット機能メニュー
 // =========================================================
 
@@ -3205,7 +3340,22 @@ if (
       // 解放済み
       // -----------------------------------------------------
 
-      if (isUnlocked) {
+if (
+  isUnlocked &&
+  app.id === "investigation" &&
+  !isInvestigationMode
+) {
+
+  // 通常会話中の調査アプリは使用不可
+  button.disabled = true;
+
+  button.innerHTML = `
+    <div class="tablet-app-locked-label">
+      調査シーンのみ
+    </div>
+  `;
+
+} else if (isUnlocked) {
 
         button.innerHTML = `
 
@@ -3293,23 +3443,44 @@ if (
 }
 
 
-renderInvestigationScreen(
-  currentInvestigationId
-);
 
+if (
+  screen.dataset.tabletOrigin === "dialogue"
+) {
 
-    }
+  // 通常会話から開いたタブレットを削除
+  screen.remove();
+
+  // 元の会話画面を表示
+  const gameScreen =
+    document.getElementById("game-screen");
+
+  if (gameScreen) {
+    gameScreen.style.display = "";
+  }
+
+  // TABLETボタンの表示条件を再判定
+  updateTabletButtonVisibility();
+
+} else {
+
+  // 調査シーンから開いた場合は従来どおり
+  renderInvestigationScreen(
+    currentInvestigationId
   );
+
 }
+
+    } // クリック時の処理を終了
+  );  // addEventListener を終了
+}     // showTabletFunctionMenu を終了
 
 
 // =========================================================
 // タブレットアプリ起動
 // =========================================================
 
-function openTabletApp(
-  appId
-) {
+function openTabletApp(appId) {
 
 
 
@@ -3346,6 +3517,18 @@ function openTabletApp(
   }
 
 
+// -------------------------------------------------------
+// 人物情報
+// -------------------------------------------------------
+
+if (appId === "characters") {
+
+  showCharacterList();
+
+  return;
+}
+
+
   // -------------------------------------------------------
   // その他
   // -------------------------------------------------------
@@ -3355,6 +3538,163 @@ function openTabletApp(
   );
 }
  
+
+
+// =========================================================
+// 人物情報：一覧表示
+// =========================================================
+
+function showCharacterList() {
+
+  const tablet =
+    document.querySelector(".tablet-home-panel");
+
+  if (!tablet) {
+    return;
+  }
+
+  const title =
+    tablet.querySelector(".tablet-home-title");
+
+  const subtitle =
+    tablet.querySelector(".tablet-home-text");
+
+  const menu =
+    tablet.querySelector(".tablet-function-menu");
+
+  if (!title || !subtitle || !menu) {
+    return;
+  }
+
+  title.textContent = "CHARACTER INFORMATION";
+
+  subtitle.textContent =
+    "閲覧する人物を選択してください";
+
+  menu.innerHTML = "";
+  menu.classList.add("character-view");
+
+  // 登録されている人物を一覧表示
+  Object.entries(CHARACTER_PROFILE_DATA)
+    .forEach(([characterId, character]) => {
+
+      const button =
+        document.createElement("button");
+
+      button.type = "button";
+      button.className = "character-profile-btn";
+
+      button.textContent = character.name;
+
+      button.addEventListener("click", () => {
+        showCharacterDetail(characterId);
+      });
+
+      menu.appendChild(button);
+    });
+
+  // タブレットホームへ戻る
+  const backButton =
+    document.createElement("button");
+
+  backButton.type = "button";
+  backButton.className = "character-back-btn";
+
+  backButton.textContent = "← タブレットホームへ";
+
+  backButton.addEventListener("click", () => {
+    showTabletFunctionMenu();
+  });
+
+  menu.appendChild(backButton);
+}
+
+
+// =========================================================
+// 人物情報：詳細表示
+// =========================================================
+
+function showCharacterDetail(characterId) {
+
+  const character =
+    CHARACTER_PROFILE_DATA[characterId];
+
+  if (!character) {
+    return;
+  }
+
+  const tablet =
+    document.querySelector(".tablet-home-panel");
+
+  if (!tablet) {
+    return;
+  }
+
+  const title =
+    tablet.querySelector(".tablet-home-title");
+
+  const subtitle =
+    tablet.querySelector(".tablet-home-text");
+
+  const menu =
+    tablet.querySelector(".tablet-function-menu");
+
+  if (!title || !subtitle || !menu) {
+    return;
+  }
+
+  title.textContent = "CHARACTER INFORMATION";
+
+  subtitle.textContent = "人物の詳細情報";
+
+  menu.innerHTML = "";
+  menu.classList.add("character-view");
+
+  // 人物名
+  const name =
+    document.createElement("div");
+
+  name.className = "character-detail-name";
+  name.textContent = character.name;
+
+  // 関係性
+  const relation =
+    document.createElement("div");
+
+  relation.className = "character-detail-relation";
+  relation.textContent = character.relation;
+
+  // 紹介文
+  const description =
+    document.createElement("div");
+
+  description.className =
+    "character-detail-description";
+
+  description.textContent = character.description;
+
+  // 一覧へ戻る
+  const backButton =
+    document.createElement("button");
+
+  backButton.type = "button";
+  backButton.className = "character-back-btn";
+
+  backButton.textContent = "← 人物一覧へ戻る";
+
+  backButton.addEventListener("click", () => {
+    showCharacterList();
+  });
+
+  menu.append(
+    name,
+    relation,
+    description,
+    backButton
+  );
+}
+
+
 
 // =========================================================
 // タブレット：取得情報
@@ -3668,7 +4008,9 @@ if (
   renderDialogueScreen();
 
   updateDialogue();
+
 }
+
 
 
 // =========================================================
@@ -4143,10 +4485,12 @@ function runInvestigationCommands(
   // シナリオ内容を判定して表示
   // =========================================================
 
-  function updateDialogue() {
+function updateDialogue() {
 
-    const currentScenario =
-      getCurrentScenario();
+  updateTabletButtonVisibility();
+
+  const currentScenario =
+    getCurrentScenario();
 
 
     const data =
@@ -4691,6 +5035,11 @@ GAME_START_WAIT
   // =========================================================
 
   function showNameScene() {
+
+document
+  .getElementById("tablet-trigger-container")
+  ?.classList.remove("active");
+
 
     stopSkipMode();
     stopTextTimer();
@@ -5562,6 +5911,12 @@ function closeMessage() {
   // =========================================================
 
   function showTitleScreen() {
+
+
+document
+  .getElementById("tablet-trigger-container")
+  ?.classList.remove("active");
+
 
    isChapterStarting = false;
 
@@ -6692,19 +7047,6 @@ gameContainer.classList.remove(
       );
 
 
-// 持ち物ウィンドウが開いている場合は
-// Enterキーで会話を進めない
-
-const inventoryOverlay =
-  document.getElementById("inventory-overlay");
-
-if (
-  inventoryOverlay &&
-  inventoryOverlay.classList.contains("active")
-) {
-  return;
-}
-
 
     // -------------------------------------------------------
     // MENUを閉じる
@@ -6766,6 +7108,20 @@ menuToggleBtn
         'click',
         closeSidebar
       );
+
+
+// =========================================================
+// 通常会話：TABLETボタン
+// =========================================================
+
+document
+  .getElementById("tablet-toggle-btn")
+  .addEventListener("click", () => {
+
+    // 通常会話からタブレットを開く
+    openDialogueTablet();
+
+  });
 
 
     // -------------------------------------------------------
@@ -7185,6 +7541,33 @@ document.addEventListener(
     if (e.key !== 'Enter') {
       return;
     }
+
+
+// -------------------------------------------------------
+// 持ち物ウィンドウ表示中
+// -------------------------------------------------------
+
+const inventoryOverlay =
+  document.getElementById("inventory-overlay");
+
+if (
+  inventoryOverlay &&
+  inventoryOverlay.classList.contains("active")
+) {
+  return;
+}
+
+
+// -------------------------------------------------------
+// 通常会話からタブレットを開いている間
+// -------------------------------------------------------
+
+if (
+  document.querySelector(".dialogue-tablet-screen")
+) {
+  return;
+}
+
 
     // 名前入力欄など、入力中なら反応させない
     const activeElement = document.activeElement;
