@@ -55,7 +55,7 @@ const CHARACTER_PROFILE_DATA = {
     relation: "同級生",
     descriptions:{
      1: "佐久間杏也の妹。\n" +
-      "{NAME}を目の敵にしている。"
+      "{NAME}を目の敵にしている。",
 
      2:"あ",
 
