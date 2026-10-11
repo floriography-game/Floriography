@@ -274,6 +274,7 @@
 <script src="data/investigation-data.js"></script>
 <script src="data/inventory-data.js"></script>
 <script src="data/character-data.js"></script>
+<script src="data/ebook-data.js"></script>
 
 <script>
 
@@ -1257,10 +1258,10 @@ const tabletApps = [
     label: "キャラクター情報"
   },
 
-  {
-    id: "map",
-    label: "マップ・位置情報"
-  },
+{
+  id: "ebooks",
+  label: "電子書籍"
+},
 
   {
     id: "timeline",
@@ -1287,6 +1288,7 @@ const tabletApps = [
     label: "調査"
   }
 
+
 ];
 
 
@@ -1305,7 +1307,7 @@ const DEFAULT_TABLET_APP_UNLOCKED = {
   characters:
     false,
 
-  map:
+  ebooks:
     false,
 
   timeline:
@@ -1430,6 +1432,123 @@ function resetCharacterUnlocked() {
     DEFAULT_CHARACTER_UNLOCKED
   );
 
+}
+
+
+// =========================================================
+// 人物情報：現在のプロフィール段階
+// =========================================================
+
+const characterProfileStage = {};
+
+
+// =========================================================
+// 人物情報：プロフィール段階を取得
+// =========================================================
+
+function getCharacterProfileStage(characterId) {
+
+  return characterProfileStage[characterId] ?? 1;
+
+}
+
+
+// =========================================================
+// 人物情報：プロフィールを更新
+// =========================================================
+
+function updateCharacterProfile(characterId, stage) {
+
+  // 登録されていない人物は更新しない
+  if (!CHARACTER_PROFILE_DATA[characterId]) {
+    console.warn("人物データがありません:", characterId);
+    return;
+  }
+
+  // 段階は1以上の整数
+  if (!Number.isInteger(stage) || stage < 1) {
+    console.warn("不正なプロフィール段階です:", stage);
+    return;
+  }
+
+  // すでに進んだ段階には戻さない
+  const currentStage =
+    getCharacterProfileStage(characterId);
+
+  characterProfileStage[characterId] =
+    Math.max(currentStage, stage);
+
+}
+
+
+// =========================================================
+// 人物情報：プロフィール段階を初期化
+// =========================================================
+
+function resetCharacterProfileStage() {
+
+  Object.keys(characterProfileStage).forEach(
+    characterId => {
+      delete characterProfileStage[characterId];
+    }
+  );
+
+}
+
+
+
+// =========================================================
+// 人物情報：最後に閲覧したプロフィール段階
+// =========================================================
+
+const characterProfileReadStage = {};
+
+
+// =========================================================
+// 人物情報：NEW表示の判定
+// =========================================================
+
+function isCharacterProfileNew(characterId) {
+
+  if (!isCharacterUnlocked(characterId)) {
+    return false;
+  }
+
+  const currentStage =
+    getCharacterProfileStage(characterId);
+
+  const readStage =
+    characterProfileReadStage[characterId] ?? 0;
+
+  return currentStage > readStage;
+}
+
+
+// =========================================================
+// 人物情報：プロフィールを既読にする
+// =========================================================
+
+function markCharacterProfileAsRead(characterId) {
+
+  if (!isCharacterUnlocked(characterId)) {
+    return;
+  }
+
+  characterProfileReadStage[characterId] =
+    getCharacterProfileStage(characterId);
+}
+
+
+// =========================================================
+// 人物情報：既読状態の初期化
+// =========================================================
+
+function resetCharacterProfileReadStage() {
+
+  Object.keys(characterProfileReadStage)
+    .forEach(characterId => {
+      delete characterProfileReadStage[characterId];
+    });
 }
 
 
@@ -3609,6 +3728,18 @@ if (appId === "characters") {
 }
 
 
+// -------------------------------------------------------
+// 電子書籍
+// -------------------------------------------------------
+
+if (appId === "ebooks") {
+
+  showEbookList();
+
+  return;
+}
+
+
   // -------------------------------------------------------
   // その他
   // -------------------------------------------------------
@@ -3618,6 +3749,445 @@ if (appId === "characters") {
   );
 }
  
+
+// =========================================================
+// 電子書籍：文書一覧
+// =========================================================
+
+function showEbookList() {
+
+  const tablet =
+    document.querySelector(".tablet-home-panel");
+
+  if (!tablet) {
+    return;
+  }
+
+  const title =
+    tablet.querySelector(".tablet-home-title");
+
+  const subtitle =
+    tablet.querySelector(".tablet-home-text");
+
+  const menu =
+    tablet.querySelector(".tablet-function-menu");
+
+  if (!title || !subtitle || !menu) {
+    return;
+  }
+
+  title.textContent = "E-BOOK READER";
+
+  subtitle.textContent =
+    "閲覧する文書を選択してください";
+
+  menu.innerHTML = "";
+
+  menu.classList.remove("character-view");
+  menu.classList.add("ebook-view");
+
+  // 登録済み文書を一覧表示
+  Object.entries(EBOOK_DATA).forEach(
+    ([bookId, book]) => {
+
+      const button =
+        document.createElement("button");
+
+      button.type = "button";
+      button.className = "ebook-list-btn";
+
+      button.textContent = book.title;
+
+      button.addEventListener("click", () => {
+        showEbookPage(bookId, 0);
+      });
+
+      menu.appendChild(button);
+    }
+  );
+
+  // 文書が登録されていない場合
+  if (Object.keys(EBOOK_DATA).length === 0) {
+
+    const emptyMessage =
+      document.createElement("div");
+
+    emptyMessage.className = "ebook-empty-message";
+
+    emptyMessage.textContent =
+      "現在、閲覧できる文書はありません。";
+
+    menu.appendChild(emptyMessage);
+  }
+
+  // タブレットホームへ戻る
+  const backButton =
+    document.createElement("button");
+
+  backButton.type = "button";
+  backButton.className = "ebook-back-btn";
+
+  backButton.textContent =
+    "← タブレットホームへ";
+
+  backButton.addEventListener("click", () => {
+    showTabletFunctionMenu();
+  });
+
+  menu.appendChild(backButton);
+}
+
+
+// =========================================================
+// 電子書籍：ページ表示
+// =========================================================
+
+function showEbookPage(bookId, pageIndex) {
+
+  const book = EBOOK_DATA[bookId];
+
+  if (!book || !Array.isArray(book.pages)) {
+    return;
+  }
+
+  const totalPages = book.pages.length;
+
+  if (totalPages === 0) {
+    return;
+  }
+
+  // ページ番号を範囲内に収める
+  pageIndex = Math.max(
+    0,
+    Math.min(pageIndex, totalPages - 1)
+  );
+
+  const tablet =
+    document.querySelector(".tablet-home-panel");
+
+  if (!tablet) {
+    return;
+  }
+
+  const title =
+    tablet.querySelector(".tablet-home-title");
+
+  const subtitle =
+    tablet.querySelector(".tablet-home-text");
+
+  const menu =
+    tablet.querySelector(".tablet-function-menu");
+
+  if (!title || !subtitle || !menu) {
+    return;
+  }
+
+  title.textContent = book.title;
+
+  subtitle.textContent =
+    `${pageIndex + 1} / ${totalPages} ページ`;
+
+  menu.innerHTML = "";
+
+  menu.classList.remove("character-view");
+  menu.classList.add("ebook-view");
+
+// -------------------------------------------------------
+// 電子書籍本文・スマートハイライト表示
+// -------------------------------------------------------
+
+const page =
+  document.createElement("div");
+
+page.className = "ebook-page";
+
+// ページデータを取得
+const pageData = book.pages[pageIndex];
+
+// 従来の文字列形式にも対応
+const pageText =
+  typeof pageData === "string"
+    ? pageData
+    : pageData.text ?? "";
+
+// ハイライト情報を取得
+const highlights =
+  typeof pageData === "object" &&
+  pageData !== null &&
+  Array.isArray(pageData.highlights)
+    ? pageData.highlights
+    : [];
+
+// ハイライト付き本文を生成
+renderEbookHighlights(
+  page,
+  pageText,
+  highlights
+);
+
+menu.appendChild(page);
+
+
+
+  // -------------------------------------------------------
+  // ページ操作ボタン
+  // -------------------------------------------------------
+
+  const controls =
+    document.createElement("div");
+
+  controls.className = "ebook-controls";
+
+  // 前のページ
+  const prevButton =
+    document.createElement("button");
+
+  prevButton.type = "button";
+  prevButton.className = "ebook-page-btn";
+  prevButton.textContent = "← 前のページ";
+
+  prevButton.disabled = pageIndex === 0;
+
+  prevButton.addEventListener("click", () => {
+    showEbookPage(bookId, pageIndex - 1);
+  });
+
+  // 次のページ
+  const nextButton =
+    document.createElement("button");
+
+  nextButton.type = "button";
+  nextButton.className = "ebook-page-btn";
+  nextButton.textContent = "次のページ →";
+
+  nextButton.disabled =
+    pageIndex === totalPages - 1;
+
+  nextButton.addEventListener("click", () => {
+    showEbookPage(bookId, pageIndex + 1);
+  });
+
+  controls.append(
+    prevButton,
+    nextButton
+  );
+
+  menu.appendChild(controls);
+
+  // -------------------------------------------------------
+  // 文書一覧へ戻る
+  // -------------------------------------------------------
+
+  const backButton =
+    document.createElement("button");
+
+  backButton.type = "button";
+  backButton.className = "ebook-back-btn";
+
+  backButton.textContent = "← 文書一覧へ戻る";
+
+  backButton.addEventListener("click", () => {
+    showEbookList();
+  });
+
+  menu.appendChild(backButton);
+}
+
+
+
+// =========================================================
+// 電子書籍：スマートハイライト生成
+// =========================================================
+
+function renderEbookHighlights(
+  container,
+  text,
+  highlights
+) {
+
+  container.innerHTML = "";
+
+  // 有効なハイライトだけを抽出
+  const targets = highlights
+    .filter(item =>
+      item &&
+      typeof item.phrase === "string" &&
+      item.phrase.length > 0
+    );
+
+  // 本文中のハイライト位置を取得
+  const matches = [];
+
+  targets.forEach(item => {
+
+    const index = text.indexOf(item.phrase);
+
+    if (index === -1) {
+      console.warn(
+        "ハイライト対象が本文にありません:",
+        item.phrase
+      );
+      return;
+    }
+
+    matches.push({
+      start: index,
+      end: index + item.phrase.length,
+      data: item
+    });
+
+  });
+
+  // 本文に出現する順番に並べる
+  matches.sort((a, b) => a.start - b.start);
+
+  let position = 0;
+
+  matches.forEach(match => {
+
+    // ほかのハイライトと重なっている場合は無視
+    if (match.start < position) {
+      console.warn(
+        "ハイライト範囲が重複しています:",
+        match.data.phrase
+      );
+      return;
+    }
+
+    // ハイライト前の通常文章
+    container.appendChild(
+      document.createTextNode(
+        text.slice(position, match.start)
+      )
+    );
+
+    // クリック可能なハイライト
+    const button =
+      document.createElement("button");
+
+    button.type = "button";
+    button.className = "ebook-highlight";
+
+    button.textContent =
+      text.slice(match.start, match.end);
+
+    button.addEventListener("click", event => {
+
+      event.stopPropagation();
+
+      showEbookAnalysis(match.data);
+
+    });
+
+    container.appendChild(button);
+
+    position = match.end;
+
+  });
+
+  // 最後に残った通常文章
+  container.appendChild(
+    document.createTextNode(
+      text.slice(position)
+    )
+  );
+
+}
+
+
+
+// =========================================================
+// 電子書籍：スマート解析パネル
+// =========================================================
+
+function showEbookAnalysis(data) {
+
+  const tablet =
+    document.querySelector(".tablet-home-panel");
+
+  if (!tablet) {
+    return;
+  }
+
+  // すでにパネルがあれば削除
+  const oldOverlay =
+    tablet.querySelector(".ebook-analysis-overlay");
+
+  if (oldOverlay) {
+    oldOverlay.remove();
+  }
+
+  // 背景レイヤー
+  const overlay =
+    document.createElement("div");
+
+  overlay.className = "ebook-analysis-overlay";
+
+  // 解析パネル
+  const panel =
+    document.createElement("div");
+
+  panel.className = "ebook-analysis-panel";
+
+  // ヘッダー
+  const header =
+    document.createElement("div");
+
+  header.className = "ebook-analysis-header";
+  header.textContent = "DEEP ANALYSIS";
+
+  // 閉じるボタン
+  const closeButton =
+    document.createElement("button");
+
+  closeButton.type = "button";
+  closeButton.className = "ebook-analysis-close";
+  closeButton.textContent = "×";
+
+  closeButton.addEventListener("click", () => {
+    overlay.remove();
+  });
+
+  // 解析タイトル
+  const title =
+    document.createElement("div");
+
+  title.className = "ebook-analysis-title";
+  title.textContent = data.title ?? "解析結果";
+
+  // 解析本文
+  const description =
+    document.createElement("div");
+
+  description.className = "ebook-analysis-description";
+
+  description.textContent =
+    replaceNameTags(data.description ?? "");
+
+  // 画面構成
+  panel.append(
+    header,
+    closeButton,
+    title,
+    description
+  );
+
+  overlay.appendChild(panel);
+
+  tablet.appendChild(overlay);
+
+  // パネル外をクリックした場合も閉じる
+  overlay.addEventListener("click", event => {
+
+    if (event.target === overlay) {
+      overlay.remove();
+    }
+
+  });
+
+}
+
+
 
 
 // =========================================================
@@ -3693,8 +4263,25 @@ unlockedCharacters.forEach(
       button.type = "button";
       button.className = "character-profile-btn";
 
-      button.textContent =
+// 人物名
+const nameSpan = document.createElement("span");
+
+nameSpan.textContent =
   replaceNameTags(character.name);
+
+button.appendChild(nameSpan);
+
+
+// 未読情報がある場合はNEWを表示
+if (isCharacterProfileNew(characterId)) {
+
+  const newMark = document.createElement("span");
+
+  newMark.className = "character-new-mark";
+  newMark.textContent = "NEW";
+
+  button.appendChild(newMark);
+}
 
       button.addEventListener("click", () => {
         showCharacterDetail(characterId);
@@ -3792,8 +4379,28 @@ function showCharacterDetail(characterId) {
   description.className =
     "character-detail-description";
 
-  description.textContent =
-  replaceNameTags(character.description);
+const stage =
+  getCharacterProfileStage(characterId);
+
+// 指定段階の文章がなければ、
+// それ以前の段階から最新のものを使用する
+let descriptionText = character.description ?? "";
+
+if (character.descriptions) {
+
+  for (let i = 1; i <= stage; i++) {
+
+    if (typeof character.descriptions[i] === "string") {
+      descriptionText = character.descriptions[i];
+    }
+
+  }
+
+}
+
+description.textContent =
+  replaceNameTags(descriptionText);
+
 
   // 一覧へ戻る
   const backButton =
@@ -3814,6 +4421,9 @@ function showCharacterDetail(characterId) {
     description,
     backButton
   );
+
+markCharacterProfileAsRead(characterId);
+
 }
 
 
@@ -4780,6 +5390,26 @@ if (data.type === "unlockCharacter") {
 
 
 // -------------------------------------------------------
+// 人物情報の段階的更新
+// -------------------------------------------------------
+
+if (data.type === "updateCharacterProfile") {
+
+  updateCharacterProfile(
+    data.characterId,
+    data.stage
+  );
+
+  currentStep++;
+
+  updateDialogue();
+
+  return;
+}
+
+
+
+// -------------------------------------------------------
 // 調査
 // -------------------------------------------------------
 
@@ -5143,6 +5773,10 @@ resetInventory();
 resetCharacterParams();
 
 resetCharacterUnlocked();
+
+resetCharacterProfileStage();
+
+resetCharacterProfileReadStage();
 
 
     dialogueHistory = [];
@@ -6704,6 +7338,21 @@ characterUnlocked: {
 
 
 // -------------------------------------------------------
+// 人物プロフィールの更新段階
+// -------------------------------------------------------
+
+characterProfileStage: {
+  ...characterProfileStage
+},
+
+
+// 人物情報：閲覧済みプロフィール段階
+characterProfileReadStage: {
+  ...characterProfileReadStage
+},
+
+
+// -------------------------------------------------------
 // 持ち物
 // -------------------------------------------------------
 
@@ -6882,6 +7531,12 @@ resetCharacterParams();
 resetCharacterUnlocked();
 
 
+resetCharacterProfileStage();
+
+
+resetCharacterProfileReadStage();
+
+
 // -------------------------------------------------------
 // 調査状態を復元
 // -------------------------------------------------------
@@ -6967,6 +7622,65 @@ characterUnlocked[characterId] =
 
     });
 }
+
+
+// -------------------------------------------------------
+// 人物プロフィールの更新段階を復元
+// -------------------------------------------------------
+
+if (
+  saveData.characterProfileStage &&
+  typeof saveData.characterProfileStage === "object"
+) {
+
+  Object.entries(saveData.characterProfileStage)
+    .forEach(([characterId, stage]) => {
+
+      if (
+        CHARACTER_PROFILE_DATA[characterId] &&
+        Number.isInteger(stage) &&
+        stage >= 1
+      ) {
+
+        characterProfileStage[characterId] = stage;
+
+      }
+
+    });
+
+}
+
+
+
+// =========================================================
+// 人物情報：閲覧済みプロフィール段階を復元
+// =========================================================
+
+if (
+  saveData.characterProfileReadStage &&
+  typeof saveData.characterProfileReadStage === "object"
+) {
+
+  Object.entries(saveData.characterProfileReadStage)
+    .forEach(([characterId, stage]) => {
+
+      if (
+        CHARACTER_PROFILE_DATA[characterId] &&
+        Number.isInteger(stage) &&
+        stage >= 0
+      ) {
+
+        characterProfileReadStage[characterId] =
+          Math.min(
+            stage,
+            getCharacterProfileStage(characterId)
+          );
+
+      }
+
+    });
+}
+
 
 
 // -------------------------------------------------------

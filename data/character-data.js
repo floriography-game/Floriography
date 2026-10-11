@@ -39,17 +39,27 @@ const CHARACTER_PROFILE_DATA = {
   shion: {
     name: "一ノ瀬紫苑",
     relation: "同級生",
-    description:
-      "{NAME}と口論になることが多い男子生徒。\n" +
-      "挑発的な言動が目立つ。"
-  },
+    description: {
+    1: "{NAME}と口論になることが多い男子生徒。\n" +
+      "挑発的な言動が目立つ。",
+  
+    2:"あ"
+
+    3:"あ"
+
+  }
+ 　 },
 
 　anna: {
     name: "佐久間杏奈",
     relation: "同級生",
-    description:
-      "佐久間杏也の妹。\n" +
+    description:{
+     1: "佐久間杏也の妹。\n" +
       "{NAME}を目の敵にしている。"
+
+     2:
+
+     3: 
   },
 
   rento: {
