@@ -1496,7 +1496,7 @@
       id: "c1_190",
       type: "dialogue",
       name: "白紬彗司",
-      text: "〇〇会社の技術開発責任者、白紬彗司です。\n以後、お見知りおきを。"
+      text: "〇〇株式会社の技術開発責任者、白紬彗司です。\n以後、お見知りおきを。"
     },
 
     {   
@@ -1597,18 +1597,18 @@
       text: "ユーザーの要望を確認。電子書籍閲覧機能を開放します。"
     },
 
+{
+  id: "c1_unlock_ebooks",
+  type: "unlockTabletApp",
+  appId: "ebooks"
+},
+
     {   
       id: "c1_204",
       type: "dialogue",
       name: "　　　",
       text: "その言葉と共に、タブレット画面に表示されている「lock」が1つ消える。\n代わりに、その文字が「電子書籍」に変化した。"
     },
-
-{
-  id: "c1_unlock_ebooks",
-  type: "unlockTabletApp",
-  appId: "ebooks"
-},
 
     {   
       id: "c1_205",
