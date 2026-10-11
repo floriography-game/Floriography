@@ -1337,6 +1337,58 @@ const tabletAppUnlocked = {
 };
 
 
+
+// =========================================================
+// 電子書籍：文書ごとの初期解放状態
+// =========================================================
+
+const DEFAULT_EBOOK_UNLOCKED = {
+  biology_1: true,
+  biology_2: true,
+  biology_3: true,
+  biology_4: true,
+  biology_5: true,
+  schoolDocument: true,
+  stampDocument: false
+};
+
+// =========================================================
+// 電子書籍：現在の解放状態
+// =========================================================
+
+const ebookUnlocked = {
+  ...DEFAULT_EBOOK_UNLOCKED
+};
+
+// =========================================================
+// 電子書籍：文書をアンロック
+// =========================================================
+
+function unlockEbook(bookId) {
+
+  if (!(bookId in DEFAULT_EBOOK_UNLOCKED)) {
+    console.warn("未登録の文書IDです:", bookId);
+    return;
+  }
+
+  ebookUnlocked[bookId] = true;
+}
+
+// =========================================================
+// 電子書籍：解放状態を初期化
+// =========================================================
+
+function resetEbookUnlocked() {
+
+  Object.assign(
+    ebookUnlocked,
+    DEFAULT_EBOOK_UNLOCKED
+  );
+
+}
+
+
+
 // =========================================================
 // タブレットアプリ解放
 // =========================================================
@@ -3787,7 +3839,9 @@ function showEbookList() {
   menu.classList.add("ebook-view");
 
   // 登録済み文書を一覧表示
-  Object.entries(EBOOK_DATA).forEach(
+Object.entries(EBOOK_DATA)
+  .filter(([bookId]) => ebookUnlocked[bookId] === true)
+  .forEach(
     ([bookId, book]) => {
 
       const button =
@@ -3807,7 +3861,11 @@ function showEbookList() {
   );
 
   // 文書が登録されていない場合
-  if (Object.keys(EBOOK_DATA).length === 0) {
+if (
+  !Object.keys(EBOOK_DATA).some(
+    bookId => ebookUnlocked[bookId] === true
+  )
+) {
 
     const emptyMessage =
       document.createElement("div");
@@ -3843,6 +3901,10 @@ function showEbookList() {
 // =========================================================
 
 function showEbookPage(bookId, pageIndex) {
+
+if (ebookUnlocked[bookId] !== true) {
+  return;
+}
 
   const book = EBOOK_DATA[bookId];
 
@@ -5371,6 +5433,22 @@ if (data.type === "unlockTabletApp") {
 }
 
 
+// =========================================================
+// 電子書籍：個別文書アンロック
+// =========================================================
+
+if (data.type === "unlockEbook") {
+
+  unlockEbook(data.bookId);
+
+  currentStep++;
+
+  updateDialogue();
+
+  return;
+}
+
+
 
 // -------------------------------------------------------
 // 人物情報の個別アンロック
@@ -5767,6 +5845,8 @@ function nextDialogue() {
 
 
 resetInvestigationAndTabletState();
+
+resetEbookUnlocked();
 
 resetInventory();
 
@@ -7328,6 +7408,11 @@ tabletAppUnlocked:
 },
 
 
+ebookUnlocked: {
+  ...ebookUnlocked
+},
+
+
 // -------------------------------------------------------
 // 人物情報の個別解放状態
 // -------------------------------------------------------
@@ -7517,6 +7602,7 @@ if (saveData.scene) {
 
 resetInvestigationAndTabletState();
 
+resetEbookUnlocked();
 
 resetInventory();
 
@@ -7600,6 +7686,28 @@ if (
     tabletAppUnlocked,
     saveData.tabletAppUnlocked
   );
+}
+
+
+// =========================================================
+// 電子書籍：文書解放状態を復元
+// =========================================================
+
+if (
+  saveData.ebookUnlocked &&
+  typeof saveData.ebookUnlocked === "object"
+) {
+
+  Object.keys(DEFAULT_EBOOK_UNLOCKED).forEach(
+    bookId => {
+
+      if (typeof saveData.ebookUnlocked[bookId] === "boolean") {
+        ebookUnlocked[bookId] = saveData.ebookUnlocked[bookId];
+      }
+
+    }
+  );
+
 }
 
 
