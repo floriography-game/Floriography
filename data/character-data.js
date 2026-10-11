@@ -60,6 +60,8 @@ const CHARACTER_PROFILE_DATA = {
      2:"あ",
 
      3: "あ"
+}
+
   },
 
   rento: {
