@@ -535,6 +535,22 @@ const DEFAULT_INVESTIGATION_FLAGS = {
   studentBookFound:
     false,
 
+  parkStampFound:
+    false,
+
+　parkSignChecked: false,
+　parkBenchChecked: false,
+　parkFlowerbedChecked: false,
+
+
+　clockStampFound: false,
+
+　wagashiStampFound: false,
+
+　cafeStampFound: false,
+　
+　observatoryStampFound: false,
+
 };
 
 
@@ -3179,20 +3195,13 @@ if (finishButton) {
   // 会話
   // -------------------------------------------------------
 
-  document
-    .getElementById(
-      'investigation-talk-btn'
-    )
-    .addEventListener(
-      'click',
-      () => {
+document
+  .getElementById("investigation-talk-btn")
+  .addEventListener("click", () => {
 
-        showMessage(
-          "現在、会話できる相手はいません。"
-        );
+    showInvestigationTalks();
 
-      }
-    );
+  });
 
 
   // -------------------------------------------------------
@@ -3963,14 +3972,53 @@ const page =
 
 page.className = "ebook-page";
 
+
+
+// =========================================================
+// 電子書籍：ページの状態に応じて文章を選択
+// =========================================================
+
 // ページデータを取得
 const pageData = book.pages[pageIndex];
 
-// 従来の文字列形式にも対応
-const pageText =
-  typeof pageData === "string"
-    ? pageData
-    : pageData.text ?? "";
+let rawPageText = "";
+
+// 従来の文字列形式
+if (typeof pageData === "string") {
+
+  rawPageText = pageData;
+
+// フラグによる切り替え形式
+} else if (
+  pageData &&
+  typeof pageData.flag === "string"
+) {
+
+  const acquired =
+    investigationFlags[pageData.flag] === true;
+
+  rawPageText = acquired
+    ? pageData.after ?? ""
+    : pageData.before ?? "";
+
+// 従来のオブジェクト形式
+} else {
+
+  rawPageText = pageData?.text ?? "";
+
+}
+
+// スタンプ獲得状況の置換も引き続き利用
+const pageText = rawPageText.replace(
+  /\{\{stamp:([a-zA-Z0-9_]+)\}\}/g,
+  (match, flagName) => {
+    return investigationFlags[flagName] === true
+      ? "取得済み"
+      : "未取得";
+  }
+);
+
+
 
 // ハイライト情報を取得
 const highlights =
@@ -4560,6 +4608,124 @@ function showInvestigationInformation() {
 
 
 // =========================================================
+// 調査モード：会話相手一覧
+// =========================================================
+
+function showInvestigationTalks() {
+
+  const investigation =
+    investigationData[currentInvestigationId];
+
+  const talks = investigation?.talks;
+
+  if (!talks || Object.keys(talks).length === 0) {
+
+    showMessage("現在、会話できる相手はいません。");
+    return;
+
+  }
+
+  const screen =
+    document.getElementById("investigation-screen");
+
+  if (!screen) return;
+
+  screen.innerHTML = "";
+
+  const panel = document.createElement("div");
+
+  panel.className = "investigation-tablet-panel";
+
+  const title = document.createElement("div");
+  title.className = "investigation-tablet-title";
+  title.textContent = "会話する相手を選択してください";
+
+  panel.appendChild(title);
+  screen.appendChild(panel);
+
+  Object.entries(talks).forEach(([talkId, talk]) => {
+
+    const button = document.createElement("button");
+
+    button.type = "button";
+    button.className = "investigation-menu-btn";
+    button.textContent = talk.label;
+
+    button.style.display = "block";
+    button.style.margin = "12px auto";
+
+    button.addEventListener("click", () => {
+      startInvestigationTalk(talkId);
+    });
+
+    panel.appendChild(button);
+
+  });
+
+  const backButton = document.createElement("button");
+
+  backButton.type = "button";
+  backButton.className = "investigation-menu-btn";
+  backButton.textContent = "← 戻る";
+
+  backButton.style.display = "block";
+  backButton.style.margin = "24px auto";
+
+  backButton.addEventListener("click", () => {
+
+    renderInvestigationScreen(currentInvestigationId);
+
+  });
+
+  panel.appendChild(backButton);
+
+}
+
+
+// =========================================================
+// 調査モード：会話再生
+// =========================================================
+
+function startInvestigationTalk(talkId) {
+
+  const investigation =
+    investigationData[currentInvestigationId];
+
+  const talk = investigation?.talks?.[talkId];
+
+  if (!talk) return;
+
+  let talkIndex = 0;
+
+  function showNextTalk() {
+
+    const data = talk.result[talkIndex];
+
+    if (!data) {
+
+      // 会話終了後、相手一覧へ戻る
+      showInvestigationTalks();
+
+      return;
+
+    }
+
+    showInvestigationResultEntry(data, () => {
+
+      talkIndex++;
+      showNextTalk();
+
+    });
+
+  }
+
+  showNextTalk();
+
+}
+
+
+
+// =========================================================
 // タブレット：調査対象表示
 // =========================================================
 
@@ -4890,15 +5056,13 @@ function startInvestigationResult(
       ];
 
 
-    if (!data) {
+if (!data) {
 
-      renderInvestigationScreen(
-        currentInvestigationId
-      );
+  // 調査地点の選択画面へ直接戻る
+  showInvestigationTargets();
 
-      return;
-    }
-
+  return;
+}
 
     showInvestigationResultEntry(
       data,

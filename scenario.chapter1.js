@@ -2249,6 +2249,80 @@
       type: "dialogue",
       name: "{NAME}",
       text: "どれどれ......早速見てみよっと。"
-    }
+    },
+
+    {   
+      id: "c1_287",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "公園に広場、和菓子屋、カフェ、最後に展望台か。"
+    },
+
+    {   
+      id: "c1_288",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "（うん、どれもそんな遠くないし......まずは公園から行ってみようかな。）"
+    },
+
+    {   
+      id: "c1_289",
+      type: "dialogue",
+      name: "タブレット",
+      text: "ユーザーによる本端末の輸送開始。スキャンモードに移行します。"
+    },
+
+    {   
+      id: "c1_290",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "だからスキャンモードって一体......あーもう、好きにして！"
+    },
+
+    {   
+      id: "c1_bg007",
+      type: "backgroundFade",
+ 　　 image:"park_morning.jpg"
+    },
+
+    {
+       id:"c1_inv002",
+       type:"investigation",
+       investigationId:"stampRallyPark"
+    },
+
+    {   
+      id: "c1_291",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "よし、1つ目のスタンプゲット！"
+    },
+
+    {   
+      id: "c1_292",
+      type: "dialogue",
+      name: "タブレット",
+      text: "スタンプ取得に伴い電子書籍「スタンプラリー」を更新。お確かめください。"
+    },
+
+    {   
+      id: "c1_293",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "へえ、スタンプを集めるだけじゃなくてちょっとした解説もつくんだ。\nなかなか面白いじゃん！"
+    },
+
+    {   
+      id: "c1_294",
+      type: "dialogue",
+      name: "タブレット",
+      text: "輸送開始、調査モードを起動します。"
+    },
+
+    {
+       id:"c1_inv003",
+       type:"investigation",
+       investigationId:"stampRallyPark_1"
+    },
 
   ];
