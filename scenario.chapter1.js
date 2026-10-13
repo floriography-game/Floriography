@@ -2315,7 +2315,7 @@
     {   
       id: "c1_bg008",
       type: "backgroundFade",
- 　　 image:" shrine_morning.jpg
+ 　　 image:" shrine_morning.jpg"
     },
 
     {
