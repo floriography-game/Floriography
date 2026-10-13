@@ -521,6 +521,115 @@ stampRallyPark: {
 
   }
 
+},
+
+
+// =========================================================
+// 浅華町スタンプラリー：中央広場時計台
+// =========================================================
+
+stampRallyClock: {
+
+  title: "中央広場時計台",
+
+  completionFlag: "clockStampFound",
+
+  targets: {
+
+    // ① スタンプ台
+    clockStamp: {
+
+      label: "スタンプ台",
+
+      x: "50%",
+      y: "50%",
+
+      flag: "clockStampFound",
+
+      result: [
+        {
+          name: "{NAME}",
+          text: "あっ、スタンプ台発見！"
+        },
+        {
+          name: "{NAME}",
+          text: "これで2つ目のスタンプだね！"
+        },
+        {
+          name: "タブレット",
+          text: "スタンプの取得を確認しました。"
+        }
+      ]
+    },
+
+    // ② 時計台
+    clockTower: {
+
+      label: "時計台",
+
+      x: "50%",
+      y: "25%",
+
+      flag: "clockTowerChecked",
+
+      result: [
+        {
+          name: "{NAME}",
+          text: "わあ、近くで見ると結構大きいんだなあ。"
+        },
+        {
+          name: "タブレット",
+          text: "中央広場時計台を確認しました。"
+        }
+      ]
+    },
+
+    // ③ ベンチ
+    clockBench: {
+
+      label: "ベンチ",
+
+      x: "25%",
+      y: "70%",
+
+      flag: "clockBenchChecked",
+
+      result: [
+        {
+          name: "{NAME}",
+          text: "広場のベンチだ。"
+        },
+        {
+          name: "{NAME}",
+          text: "待ち合わせをしている人も多いみたい。"
+        }
+      ]
+    },
+
+    // ④ 案内板
+    clockSign: {
+
+      label: "案内板",
+
+      x: "75%",
+      y: "45%",
+
+      flag: "clockSignChecked",
+
+      result: [
+        {
+          name: "{NAME}",
+          text: "時計台についての説明が書かれているみたい。"
+        },
+        {
+          name: "{NAME}",
+          text: "浅華町のシンボルなんだって。"
+        }
+      ]
+    }
+
+  }
+
 }
 
 
