@@ -2278,6 +2278,12 @@
  　　 image:"park_morning.jpg"
     },
 
+　　{
+  　　id: "c1_bgm003",
+  　　type: "bgm",
+  　　file: "audio_theme_7.mp3"
+　　},
+
     {
        id:"c1_inv002",
        type:"investigation",
@@ -2315,7 +2321,7 @@
     {   
       id: "c1_bg008",
       type: "backgroundFade",
- 　　 image:"shrine_morning.jpg"
+ 　　 image:" shrine_morning.jpg"
     },
 
     {
