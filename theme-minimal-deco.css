@@ -407,12 +407,3 @@
   outline: 2px solid var(--deco-accent);
   outline-offset: 3px;
 }
-
-
-
-/* 読み込み確認用テスト */
-
-#game-stage .dialogue-box {
-  background: red !important;
-  border: 4px solid yellow !important;
-}
