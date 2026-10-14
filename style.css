@@ -2706,3 +2706,57 @@ html, body {
 
 
 
+
+/* =========================================================
+   タブレット：NEW通知
+   ========================================================= */
+
+/* 通知を表示するボタン */
+.tablet-new-anchor {
+  position: relative;
+}
+
+/* NEWマーク */
+.tablet-new-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+
+  padding: 3px 7px;
+  border-radius: 12px;
+
+  background: #e85469;
+  color: #ffffff;
+
+  font-size: 11px;
+  font-weight: bold;
+  line-height: 1.2;
+  letter-spacing: 0.5px;
+
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* TABLETボタン用の小さな通知 */
+.tablet-new-dot {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+
+  background: #e85469;
+  border: 2px solid #ffffff;
+
+  box-shadow: 0 0 7px rgba(232,84,105,0.6);
+
+  pointer-events: none;
+  z-index: 5;
+}
+
+

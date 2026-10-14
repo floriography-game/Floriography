@@ -378,6 +378,97 @@ function updateTabletButtonVisibility() {
 
 
 // =========================================================
+// タブレット：NEW通知管理
+// =========================================================
+
+// 未確認の更新があるアプリ
+const tabletNewNotifications = new Set();
+
+// NEW通知を追加
+function addTabletNewNotification(appId) {
+
+  tabletNewNotifications.add(appId);
+
+  updateTabletNewBadge();
+
+}
+
+// NEW通知を既読にする
+function clearTabletNewNotification(appId) {
+
+  tabletNewNotifications.delete(appId);
+
+  updateTabletNewBadge();
+
+}
+
+// TABLETボタンの通知を更新
+function updateTabletNewBadge() {
+
+  const button =
+    document.getElementById("tablet-toggle-btn");
+
+  if (!button) return;
+
+  button.classList.add("tablet-new-anchor");
+
+  // 以前の通知を削除
+  button.querySelectorAll(".tablet-new-dot")
+    .forEach(el => el.remove());
+
+  // 未確認の更新がなければ終了
+  if (tabletNewNotifications.size === 0) return;
+
+  const dot = document.createElement("span");
+
+  dot.className = "tablet-new-dot";
+  dot.setAttribute("aria-hidden", "true");
+
+  button.appendChild(dot);
+}
+
+// アプリのNEWマークを更新
+function updateTabletAppNewBadges() {
+
+  document.querySelectorAll("[data-tablet-app-id]")
+    .forEach(button => {
+
+      button.classList.add("tablet-new-anchor");
+
+      button.querySelectorAll(".tablet-new-badge")
+        .forEach(el => el.remove());
+
+      const appId = button.dataset.tabletAppId;
+
+      if (!tabletNewNotifications.has(appId)) {
+        return;
+      }
+
+      const badge = document.createElement("span");
+
+      badge.className = "tablet-new-badge";
+      badge.textContent = "NEW";
+      badge.setAttribute("aria-hidden", "true");
+
+      button.appendChild(badge);
+
+    });
+
+}
+
+// 通知状態を初期化
+function resetTabletNewNotifications() {
+
+  tabletNewNotifications.clear();
+
+  updateTabletNewBadge();
+
+}
+
+
+
+
+// =========================================================
 // タブレット・スポットライト演出
 // =========================================================
 
@@ -1420,7 +1511,14 @@ function unlockEbook(bookId) {
     return;
   }
 
+  const wasLocked = ebookUnlocked[bookId] !== true;
+
   ebookUnlocked[bookId] = true;
+
+  if (wasLocked) {
+    addTabletNewNotification("ebooks");
+  }
+
 }
 
 // =========================================================
@@ -1442,26 +1540,21 @@ function resetEbookUnlocked() {
 // タブレットアプリ解放
 // =========================================================
 
-function unlockTabletApp(
-  appId
-) {
+function unlockTabletApp(appId) {
 
-  if (
-    !(appId in tabletAppUnlocked)
-  ) {
-
-    console.warn(
-      "存在しないタブレット機能です:",
-      appId
-    );
-
+  if (!(appId in tabletAppUnlocked)) {
+    console.warn("存在しないタブレット機能です:", appId);
     return;
   }
 
+  const wasLocked = tabletAppUnlocked[appId] !== true;
 
-  tabletAppUnlocked[
-    appId
-  ] = true;
+  tabletAppUnlocked[appId] = true;
+
+  if (wasLocked) {
+    addTabletNewNotification(appId);
+  }
+
 }
 
 
@@ -1497,16 +1590,17 @@ const characterUnlocked = {
 function unlockCharacter(characterId) {
 
   if (!(characterId in DEFAULT_CHARACTER_UNLOCKED)) {
-
-    console.warn(
-      "登録されていない人物IDです:",
-      characterId
-    );
-
+    console.warn("登録されていない人物IDです:", characterId);
     return;
   }
 
+  const wasLocked = characterUnlocked[characterId] !== true;
+
   characterUnlocked[characterId] = true;
+
+  if (wasLocked) {
+    addTabletNewNotification("characters");
+  }
 
 }
 
@@ -1689,6 +1783,9 @@ function resetInvestigationAndTabletState() {
 
   currentInvestigationId =
     null;
+
+setInvestigationReturnView("home");
+
 }
 
 
@@ -3304,6 +3401,8 @@ function renderDialogueScreen() {
 
 function renderInvestigationScreen(investigationId) {
 
+setInvestigationReturnView("home");
+
   document
     .getElementById("tablet-trigger-container")
     ?.classList.remove("active");
@@ -3824,6 +3923,8 @@ if (finishButton) {
       button.className =
         'tablet-function-btn';
 
+button.dataset.tabletAppId = app.id;
+
 
       const isUnlocked =
         tabletAppUnlocked[
@@ -3906,6 +4007,12 @@ if (
 
     }
   );
+
+
+
+updateTabletAppNewBadges();
+
+
 
 
   // -------------------------------------------------------
@@ -4018,6 +4125,9 @@ function openTabletApp(appId) {
 
 if (appId === "characters") {
 
+  // 人物情報のNEWを既読にする
+  clearTabletNewNotification("characters");
+
   showCharacterList();
 
   return;
@@ -4029,6 +4139,9 @@ if (appId === "characters") {
 // -------------------------------------------------------
 
 if (appId === "ebooks") {
+
+  // 電子書籍のNEWを既読にする
+  clearTabletNewNotification("ebooks");
 
   showEbookList();
 
@@ -4843,6 +4956,83 @@ function showInvestigationInformation() {
 
 
 // =========================================================
+// 調査モード：会話終了後の戻り先管理
+// =========================================================
+
+// 戻り先の初期値
+let investigationReturnView = "home";
+
+// 戻り先を登録
+function setInvestigationReturnView(view) {
+
+  const allowedViews = [
+    "home",
+    "talks",
+    "targets"
+  ];
+
+  if (!allowedViews.includes(view)) {
+    console.warn("不正な調査画面:", view);
+    return;
+  }
+
+  investigationReturnView = view;
+}
+
+// 登録された画面に戻る
+function returnToInvestigationView() {
+
+  switch (investigationReturnView) {
+
+    case "talks":
+      showInvestigationTalks();
+      break;
+
+    case "targets":
+      showInvestigationTargets();
+      break;
+
+    default:
+      renderInvestigationScreen(currentInvestigationId);
+      break;
+
+  }
+
+}
+
+
+
+// =========================================================
+// 調査モード：画面切り替え時の共通処理
+// =========================================================
+
+function clearInvestigationView() {
+
+  const screen =
+    document.getElementById("investigation-screen");
+
+  if (!screen) return null;
+
+  // 調査中の文字表示を停止
+  stopInvestigationTextTimer();
+
+  // 調査画面内の一時的なUIを削除
+  screen.querySelectorAll(
+    ".tablet-home-panel, " +
+    ".investigation-tablet-panel, " +
+    ".tablet-function-menu, " +
+    ".investigation-point, " +
+    ".investigation-result-box"
+  ).forEach(element => {
+    element.remove();
+  });
+
+  return screen;
+}
+
+
+
+// =========================================================
 // 調査モード：会話相手一覧
 // =========================================================
 
@@ -4860,12 +5050,15 @@ function showInvestigationTalks() {
 
   }
 
-  const screen =
-    document.getElementById("investigation-screen");
+const screen = clearInvestigationView();
 
-  if (!screen) return;
+if (!screen) return;
 
-  screen.innerHTML = "";
+// 会話相手の選択画面では基本メニューを隠す
+screen.querySelector(".investigation-menu")?.remove();
+
+screen.querySelector(".investigation-finish-btn")?.remove();
+
 
   const panel = document.createElement("div");
 
@@ -4926,24 +5119,25 @@ function startInvestigationTalk(talkId) {
   const investigation =
     investigationData[currentInvestigationId];
 
-  const talk = investigation?.talks?.[talkId];
+const talk = investigation?.talks?.[talkId];
 
-  if (!talk) return;
+if (!talk) return;
 
-  let talkIndex = 0;
+// 会話終了後は会話相手一覧に戻る
+setInvestigationReturnView("talks");
+
+let talkIndex = 0;
 
   function showNextTalk() {
 
     const data = talk.result[talkIndex];
 
-    if (!data) {
+if (!data) {
 
-      // 会話終了後、相手一覧へ戻る
-      showInvestigationTalks();
+  returnToInvestigationView();
 
-      return;
-
-    }
+  return;
+}
 
     showInvestigationResultEntry(data, () => {
 
@@ -4984,15 +5178,7 @@ function showInvestigationTargets() {
 
 
 
-screen
-  .querySelectorAll(
-    '.tablet-home-panel, .investigation-tablet-panel, .tablet-function-menu, .investigation-point'
-  )
-  .forEach(
-    element => {
-      element.remove();
-    }
-  );
+clearInvestigationView();
 
 
 
@@ -5208,6 +5394,89 @@ if (
 
 
 
+
+// =========================================================
+// 調査地点：フラグ・持ち物・通知の更新
+// =========================================================
+
+function applyInvestigationTargetEffects(target) {
+
+  if (!target) return;
+
+  // -------------------------------------------------------
+  // ① 調査フラグを更新
+  // -------------------------------------------------------
+
+  const flag = target.flag;
+
+  const wasUnchecked =
+    flag && investigationFlags[flag] !== true;
+
+  if (flag) {
+    investigationFlags[flag] = true;
+  }
+
+// -------------------------------------------------------
+// ② アイテム取得
+// -------------------------------------------------------
+
+// 新方式：1個取得
+if (typeof target.giveItem === "string") {
+  addItem(target.giveItem);
+}
+
+// 新方式：複数取得
+if (Array.isArray(target.giveItems)) {
+
+  target.giveItems.forEach(itemId => {
+    addItem(itemId);
+  });
+
+}
+
+// 旧方式との互換性
+if (target.findStudentBook) {
+  addItem("studentBook");
+}
+
+if (target.findCharm) {
+  addItem("charm");
+}
+
+// 学生手帳発見フラグ
+if (
+  target.findStudentBook ||
+  target.giveItem === "studentBook" ||
+  target.giveItems?.includes("studentBook")
+) {
+  investigationFlags.studentBookFound = true;
+}
+
+
+  // -------------------------------------------------------
+  // ④ スタンプ取得時のNEW通知
+  // -------------------------------------------------------
+
+  const stampFlags = [
+    "parkStampFound",
+    "clockStampFound",
+    "wagashiStampFound",
+    "cafeStampFound",
+    "observatoryStampFound"
+  ];
+
+  if (
+    wasUnchecked &&
+    stampFlags.includes(flag)
+  ) {
+    addTabletNewNotification("ebooks");
+  }
+
+}
+
+
+
+
 // =========================================================
 // 調査結果
 // =========================================================
@@ -5233,55 +5502,21 @@ function startInvestigationResult(
     ];
 
 
-  if (!target) {
-    return;
-  }
+if (!target) {
+  return;
+}
 
+// 調査終了後は地点選択画面に戻る
+setInvestigationReturnView("targets");
 
-  investigationFlags[
-    target.flag
-  ] = true;
-
-
-// -------------------------------------------------------
-// 学生手帳取得
-// -------------------------------------------------------
-
-  if (
-    target.findStudentBook
-  ) {
-
-    investigationFlags
-      .studentBookFound =
-      true;
-
-    addItem(
-      "studentBook"
-    );
-  }
-
-
-// -------------------------------------------------------
-// お守り取得
-// -------------------------------------------------------
-
-  if (
-    target.findCharm
-  ) {
-
-    addItem(
-      "charm"
-    );
-  }
-
+// フラグ・持ち物・NEW通知をまとめて処理
+applyInvestigationTargetEffects(target);
 
 // -------------------------------------------------------
 // 調査結果表示
 // -------------------------------------------------------
 
-  let resultIndex =
-    0;
-
+let resultIndex = 0;
 
   function showNextResult() {
 
@@ -5293,8 +5528,7 @@ function startInvestigationResult(
 
 if (!data) {
 
-  // 調査地点の選択画面へ直接戻る
-  showInvestigationTargets();
+  returnToInvestigationView();
 
   return;
 }
@@ -5433,18 +5667,14 @@ function showInvestigationResultEntry(
 // 調査中の会話表示に不要なUIを削除
 // -------------------------------------------------------
 
-screen
-  .querySelectorAll(
-    '.investigation-menu, ' +
-    '.investigation-tablet-panel, ' +
-    '.tablet-home-panel, ' +
-    '.tablet-function-menu, ' +
-    '.investigation-point, ' +
-    '.investigation-finish-btn'
-  )
-  .forEach(element => {
-    element.remove();
-  });
+// 調査画面内の一時的なUIを削除
+clearInvestigationView();
+
+// 調査結果の表示中は基本メニューを隠す
+screen.querySelector(".investigation-menu")?.remove();
+
+// 調査終了ボタンも非表示にする
+screen.querySelector(".investigation-finish-btn")?.remove();
 
 
   const resultBox =
@@ -6261,6 +6491,8 @@ function nextDialogue() {
 
 
 resetInvestigationAndTabletState();
+
+resetTabletNewNotifications();
 
 setTabletSpotlight(false);
 
@@ -7807,6 +8039,8 @@ currentInvestigationId: currentInvestigationId,
 
 isTabletSpotlightActive: isTabletSpotlightActive,
 
+tabletNewNotifications: Array.from(tabletNewNotifications),
+
 
 // -------------------------------------------------------
 // 調査状態
@@ -8023,6 +8257,23 @@ if (saveData.scene) {
 resetInvestigationAndTabletState();
 
 resetEbookUnlocked();
+
+// NEW通知を初期化・復元
+tabletNewNotifications.clear();
+
+if (Array.isArray(saveData.tabletNewNotifications)) {
+
+  saveData.tabletNewNotifications.forEach(appId => {
+
+    if (appId in DEFAULT_TABLET_APP_UNLOCKED) {
+      tabletNewNotifications.add(appId);
+    }
+
+  });
+
+}
+
+updateTabletNewBadge();
 
 resetInventory();
 

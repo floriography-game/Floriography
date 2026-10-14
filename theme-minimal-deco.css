@@ -1,0 +1,409 @@
+
+/* =========================================================
+   Floriography - Minimal Deco Theme
+   現代的なミニマルデザイン＋控えめなアール・デコ
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   1. 基本配色
+   --------------------------------------------------------- */
+
+:root {
+  --deco-bg: #101d2b;
+  --deco-panel: rgba(16, 29, 43, 0.93);
+  --deco-panel-light: #213448;
+
+  --deco-line: rgba(215, 191, 161, 0.52);
+  --deco-line-soft: rgba(215, 191, 161, 0.22);
+
+  --deco-gold: #d7bfa1;
+  --deco-text: #e8edf0;
+  --deco-muted: #acbbc5;
+
+  --deco-accent: #8ebbc8;
+
+  --deco-radius: 4px;
+  --deco-transition: 0.2s ease;
+}
+
+
+/* ---------------------------------------------------------
+   2. メイン会話ボックス
+   --------------------------------------------------------- */
+
+.dialogue-box {
+  background: var(--deco-panel);
+
+  border: 1px solid var(--deco-line);
+  border-radius: var(--deco-radius);
+
+  box-shadow:
+    0 6px 22px rgba(0, 0, 0, 0.18);
+
+  color: var(--deco-text);
+}
+
+/* 左上の短い装飾ライン */
+.dialogue-box::before {
+  content: "";
+  position: absolute;
+
+  top: 7px;
+  left: 7px;
+
+  width: 30px;
+  height: 1px;
+
+  background: var(--deco-gold);
+
+  pointer-events: none;
+}
+
+/* 右下の短い装飾ライン */
+.dialogue-box::after {
+  content: "";
+  position: absolute;
+
+  right: 7px;
+  bottom: 7px;
+
+  width: 30px;
+  height: 1px;
+
+  background: var(--deco-gold);
+
+  pointer-events: none;
+}
+
+/* 本文 */
+#dialogue-text {
+  color: var(--deco-text);
+}
+
+/* 話者名 */
+.character-name {
+  color: var(--deco-gold);
+
+  letter-spacing: 0.08em;
+}
+
+/* 次へ進むマーク */
+.next-mark {
+  color: var(--deco-gold);
+}
+
+
+/* ---------------------------------------------------------
+   3. 通常画面のシステムボタン
+   --------------------------------------------------------- */
+
+.sys-btn {
+  background: var(--deco-panel);
+
+  border: 1px solid var(--deco-line);
+  border-radius: var(--deco-radius);
+
+  color: var(--deco-text);
+
+  letter-spacing: 0.1em;
+
+  box-shadow:
+    0 3px 12px rgba(0, 0, 0, 0.12);
+
+  transition:
+    background var(--deco-transition),
+    border-color var(--deco-transition),
+    color var(--deco-transition);
+}
+
+.sys-btn:hover {
+  background: var(--deco-panel-light);
+
+  border-color: var(--deco-gold);
+  color: #ffffff;
+}
+
+
+/* ---------------------------------------------------------
+   4. AUTO・SKIP・閉じるボタン
+   --------------------------------------------------------- */
+
+.auto-btn,
+.skip-btn,
+.close-btn {
+  background: transparent;
+
+  color: var(--deco-muted);
+
+  border: 1px solid transparent;
+  border-radius: var(--deco-radius);
+
+  transition:
+    color var(--deco-transition),
+    border-color var(--deco-transition);
+}
+
+.auto-btn:hover,
+.skip-btn:hover,
+.close-btn:hover {
+  color: var(--deco-gold);
+
+  border-color: var(--deco-line-soft);
+}
+
+
+/* ---------------------------------------------------------
+   5. 調査モード
+   --------------------------------------------------------- */
+
+.investigation-menu-btn {
+  background: var(--deco-panel);
+
+  color: var(--deco-text);
+
+  border: 1px solid var(--deco-line);
+  border-radius: var(--deco-radius);
+
+  transition:
+    background var(--deco-transition),
+    border-color var(--deco-transition);
+}
+
+.investigation-menu-btn:hover:not(:disabled) {
+  background: var(--deco-panel-light);
+  border-color: var(--deco-gold);
+}
+
+.investigation-menu-btn:disabled {
+  opacity: 0.45;
+}
+
+.investigation-point {
+  background: var(--deco-panel);
+
+  color: var(--deco-text);
+
+  border: 1px solid var(--deco-line);
+  border-radius: var(--deco-radius);
+
+  transition:
+    background var(--deco-transition),
+    border-color var(--deco-transition);
+}
+
+.investigation-point:hover {
+  background: var(--deco-panel-light);
+  border-color: var(--deco-gold);
+}
+
+/* 調査結果テキストボックス */
+.investigation-result-box {
+  background: var(--deco-panel);
+
+  border: 1px solid var(--deco-line);
+  border-radius: var(--deco-radius);
+
+  color: var(--deco-text);
+
+  box-shadow:
+    0 5px 18px rgba(0, 0, 0, 0.18);
+}
+
+.investigation-result-name,
+.investigation-result-next {
+  color: var(--deco-gold);
+}
+
+.investigation-result-text {
+  color: var(--deco-text);
+}
+
+.investigation-finish-btn {
+  background: var(--deco-panel-light);
+
+  color: var(--deco-text);
+
+  border: 1px solid var(--deco-line);
+  border-radius: var(--deco-radius);
+}
+
+
+/* ---------------------------------------------------------
+   6. タブレット
+   --------------------------------------------------------- */
+
+.tablet-home-panel {
+  background: var(--deco-bg);
+
+  border: 1px solid var(--deco-line);
+  border-radius: var(--deco-radius);
+
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.22);
+}
+
+/* 見出し */
+.tablet-home-title {
+  color: var(--deco-gold);
+
+  letter-spacing: 0.12em;
+}
+
+/* 説明文 */
+.tablet-home-text {
+  color: var(--deco-muted);
+}
+
+/* アプリボタン */
+.tablet-function-btn {
+  background: var(--deco-panel-light);
+
+  border: 1px solid var(--deco-line-soft);
+  border-radius: var(--deco-radius);
+
+  color: var(--deco-text);
+
+  box-shadow: none;
+
+  transition:
+    background var(--deco-transition),
+    border-color var(--deco-transition);
+}
+
+.tablet-function-btn:hover:not(:disabled) {
+  background: #2a4155;
+
+  border-color: var(--deco-gold);
+
+  transform: none;
+}
+
+/* 解放済みアプリ名 */
+.tablet-app-label {
+  color: var(--deco-text);
+}
+
+/* 未解放アプリ */
+.tablet-function-btn.locked {
+  background: rgba(33, 52, 72, 0.4);
+
+  border-color: rgba(172, 187, 197, 0.15);
+  opacity: 0.55;
+}
+
+
+/* ---------------------------------------------------------
+   7. 電子書籍・人物情報
+   --------------------------------------------------------- */
+
+.ebook-list-btn,
+.character-profile-btn {
+  background: var(--deco-panel-light);
+
+  border: 1px solid var(--deco-line-soft);
+  border-radius: var(--deco-radius);
+
+  color: var(--deco-text);
+}
+
+.ebook-list-btn:hover,
+.character-profile-btn:hover {
+  border-color: var(--deco-gold);
+}
+
+/* 電子書籍のページは読みやすさ優先 */
+.ebook-page {
+  border: 1px solid var(--deco-line-soft);
+  border-radius: var(--deco-radius);
+}
+
+/* 戻るボタン */
+.ebook-back-btn,
+.character-back-btn {
+  border-radius: var(--deco-radius);
+}
+
+
+/* ---------------------------------------------------------
+   8. システムメニュー
+   --------------------------------------------------------- */
+
+.sidebar {
+  background: var(--deco-bg);
+
+  border-left: 1px solid var(--deco-line);
+}
+
+.sidebar-title {
+  color: var(--deco-gold);
+
+  letter-spacing: 0.12em;
+}
+
+.sidebar-btn {
+  background: var(--deco-panel-light);
+
+  border: 1px solid var(--deco-line-soft);
+  border-radius: var(--deco-radius);
+
+  color: var(--deco-text);
+}
+
+.sidebar-btn:hover {
+  background: #2a4155;
+  border-color: var(--deco-gold);
+}
+
+
+/* ---------------------------------------------------------
+   9. セーブ・ロード・設定・メッセージ
+   --------------------------------------------------------- */
+
+.slot-modal,
+.config-modal,
+.log-modal,
+.message-box {
+  background: var(--deco-bg);
+
+  border: 1px solid var(--deco-line);
+  border-radius: var(--deco-radius);
+
+  color: var(--deco-text);
+}
+
+.slot-item {
+  border-radius: var(--deco-radius);
+}
+
+.slot-modal-header,
+.log-modal-header {
+  color: var(--deco-gold);
+}
+
+
+/* ---------------------------------------------------------
+   10. NEW通知
+   --------------------------------------------------------- */
+
+.tablet-new-badge,
+.character-new-mark {
+  background: #b97979;
+  color: #ffffff;
+}
+
+.tablet-new-dot {
+  background: #b97979;
+}
+
+
+/* ---------------------------------------------------------
+   11. キーボード操作時の視認性
+   --------------------------------------------------------- */
+
+.sys-btn:focus-visible,
+.tablet-function-btn:focus-visible,
+.investigation-menu-btn:focus-visible,
+.sidebar-btn:focus-visible {
+  outline: 2px solid var(--deco-accent);
+  outline-offset: 3px;
+}

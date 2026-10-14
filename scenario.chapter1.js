@@ -1651,6 +1651,12 @@
       text: "電子書籍の閲覧を開始します。"
     },
 
+{
+  id: "c1_tablet_spotlight002",
+  type: "tabletSpotlight",
+  enabled: true
+},
+
     {   
       id: "c1_210",
       type: "dialogue",
@@ -2250,6 +2256,12 @@
       text: "どれどれ......早速見てみよっと。"
     },
 
+{
+  id: "c1_tablet_spotlight003",
+  type: "tabletSpotlight",
+  enabled: true
+},
+
     {   
       id: "c1_287",
       type: "dialogue",
@@ -2309,6 +2321,12 @@
       name: "タブレット",
       text: "スタンプ取得に伴い電子書籍「スタンプラリー」を更新。お確かめください。"
     },
+
+{
+  id: "c1_tablet_spotlight004",
+  type: "tabletSpotlight",
+  enabled: true
+},
 
     {   
       id: "c1_293",
