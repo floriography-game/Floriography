@@ -146,8 +146,7 @@ teacherDesk: {
   flag:
     "teacherDeskChecked",
 
-  findCharm:
-    true,
+  giveItem: "charm",
 
   x:
     "51%",
@@ -287,8 +286,7 @@ teacherDesk: {
         y:
           "58%",
 
-        findStudentBook:
-          true,
+        giveItem: "studentBook",
 
         result: [
 
