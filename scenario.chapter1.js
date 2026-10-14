@@ -2075,6 +2075,12 @@
  　　 image:"city_morning.jpg"
     },
 
+　　{
+  　　id: "c1_bgm003",
+  　　type: "bgm",
+  　　file: "audio_theme_7.mp3"
+　　},
+
     {   
       id: "c1_262",
       type: "dialogue",
@@ -2297,9 +2303,9 @@
     },
 
 　　{
-  　　id: "c1_bgm003",
+  　　id: "c1_bgm004",
   　　type: "bgm",
-  　　file: "audio_theme_7.mp3"
+  　　file: "audio_theme_9.mp3"
 　　},
 
     {
