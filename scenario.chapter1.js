@@ -2063,6 +2063,12 @@
  　　 image:"city_morning.jpg"
     },
 
+    　　{
+  　　id: "c1_bgm003",
+  　　type: "bgm",
+  　　file: "audio_theme_7.mp3"
+　　},
+
     {   
       id: "c1_262",
       type: "dialogue",
@@ -2271,12 +2277,6 @@
       name: "{NAME}",
       text: "だからスキャンモードって一体......あーもう、好きにして！"
     },
-
-　　{
-  　　id: "c1_bgm003",
-  　　type: "bgm",
-  　　file: "audio_theme_7.mp3"
-　　},
     
     {   
       id: "c1_bg007",
