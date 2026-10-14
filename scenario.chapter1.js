@@ -1303,6 +1303,12 @@
       text: "（まあ、こうなっちゃったら仕方ないよね。\nとりあえず人物情報を確認してみようかな？"
     },
 
+{
+  id: "c1_tablet_spotlight001",
+  type: "tabletSpotlight",
+  enabled: true
+},
+
     {   
       id: "c1_168",
       type: "dialogue",
@@ -2063,12 +2069,6 @@
  　　 image:"city_morning.jpg"
     },
 
-    　　{
-  　　id: "c1_bgm003",
-  　　type: "bgm",
-  　　file: "audio_theme_7.mp3"
-　　},
-
     {   
       id: "c1_262",
       type: "dialogue",
@@ -2277,13 +2277,19 @@
       name: "{NAME}",
       text: "だからスキャンモードって一体......あーもう、好きにして！"
     },
-    
+
     {   
       id: "c1_bg007",
       type: "backgroundFade",
  　　 image:"park_morning.jpg"
     },
-    
+
+　　{
+  　　id: "c1_bgm003",
+  　　type: "bgm",
+  　　file: "audio_theme_7.mp3"
+　　},
+
     {
        id:"c1_inv002",
        type:"investigation",

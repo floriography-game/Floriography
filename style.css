@@ -2631,3 +2631,78 @@ html, body {
 }
 
 
+
+
+/* =========================================================
+   タブレット・スポットライト演出
+   ========================================================= */
+
+/* 画面全体を暗くするレイヤー */
+#tablet-spotlight-overlay {
+  position: absolute;
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.78);
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  z-index: 10000;
+
+  transition:
+    opacity 0.4s ease,
+    visibility 0.4s ease;
+}
+
+/* スポットライト開始 */
+#game-stage.tablet-spotlight-active
+#tablet-spotlight-overlay {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* TABLETボタンだけを暗転レイヤーより手前に置く */
+#game-stage.tablet-spotlight-active
+#tablet-trigger-container {
+  z-index: 10001 !important;
+}
+
+/* TABLETボタンの発光 */
+#game-stage.tablet-spotlight-active
+#tablet-toggle-btn {
+  position: relative;
+
+  box-shadow:
+    0 0 0 3px rgba(180, 235, 255, 0.95),
+    0 0 18px 6px rgba(110, 215, 255, 0.7);
+
+  animation: tabletSpotlightGlow 2s ease-in-out infinite;
+}
+
+/* ゆっくりした光の脈動 */
+@keyframes tabletSpotlightGlow {
+  0%, 100% {
+    box-shadow:
+      0 0 0 3px rgba(180, 235, 255, 0.85),
+      0 0 14px 4px rgba(110, 215, 255, 0.45);
+  }
+
+  50% {
+    box-shadow:
+      0 0 0 4px rgba(205, 245, 255, 1),
+      0 0 25px 9px rgba(110, 215, 255, 0.85);
+  }
+}
+
+/* 動きを抑える設定への対応 */
+@media (prefers-reduced-motion: reduce) {
+  #game-stage.tablet-spotlight-active
+  #tablet-toggle-btn {
+    animation: none;
+  }
+}
+
+
+

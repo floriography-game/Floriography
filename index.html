@@ -29,6 +29,10 @@
 ></div>
 
 
+<!-- タブレット誘導用の暗転レイヤー -->
+<div id="tablet-spotlight-overlay"></div>
+
+
 <!-- =====================================================
      常駐UI：タブレットボタン
      ===================================================== -->
@@ -372,6 +376,29 @@ function updateTabletButtonVisibility() {
 
 
 
+
+// =========================================================
+// タブレット・スポットライト演出
+// =========================================================
+
+// 現在の強調状態
+let isTabletSpotlightActive = false;
+
+// 強調状態を切り替える
+function setTabletSpotlight(enabled) {
+
+  isTabletSpotlightActive = enabled === true;
+
+  gameStage.classList.toggle(
+    "tablet-spotlight-active",
+    isTabletSpotlightActive
+  );
+
+}
+
+
+
+
   // =========================================================
   // プレイヤーデータ
   // =========================================================
@@ -550,6 +577,12 @@ const DEFAULT_INVESTIGATION_FLAGS = {
 　cafeStampFound: false,
 　
 　observatoryStampFound: false,
+
+ 
+  // 中央広場時計台
+  clockTowerChecked: false,
+  clockBenchChecked: false,
+  clockSignChecked: false,
 
 };
 
@@ -1998,6 +2031,208 @@ scenario: prologueScenario
   }
 
 };
+
+
+
+// =========================================================
+// ゲームデータの整合性チェック
+// =========================================================
+
+function checkGameData() {
+
+  const errors = [];
+  const warnings = [];
+
+  // -------------------------------------------------------
+  // ① シナリオから参照するデータをチェック
+  // -------------------------------------------------------
+
+  Object.entries(sceneInfo).forEach(([sceneId, scene]) => {
+
+    scene.scenario.forEach(data => {
+
+      if (
+        data.type === "investigation" &&
+        !investigationData[data.investigationId]
+      ) {
+        errors.push(
+          `調査データがありません: ${data.investigationId}`
+        );
+      }
+
+      if (
+        data.type === "unlockEbook" &&
+        !EBOOK_DATA[data.bookId]
+      ) {
+        errors.push(
+          `電子書籍がありません: ${data.bookId}`
+        );
+      }
+
+      if (
+        data.type === "unlockCharacter" &&
+        !CHARACTER_PROFILE_DATA[data.characterId]
+      ) {
+        errors.push(
+          `人物データがありません: ${data.characterId}`
+        );
+      }
+
+    });
+
+  });
+
+  // -------------------------------------------------------
+  // ② 調査データをチェック
+  // -------------------------------------------------------
+
+  Object.entries(investigationData).forEach(
+    ([investigationId, investigation]) => {
+
+      if (
+        investigation.completionFlag &&
+        !(investigation.completionFlag in DEFAULT_INVESTIGATION_FLAGS)
+      ) {
+        errors.push(
+          `未登録の調査終了フラグ: ${investigationId}`
+        );
+      }
+
+      if (
+        !investigation.targets ||
+        typeof investigation.targets !== "object"
+      ) {
+        errors.push(
+          `調査対象の設定がありません: ${investigationId}`
+        );
+        return;
+      }
+
+      Object.entries(investigation.targets).forEach(
+        ([targetId, target]) => {
+
+          if (
+            !target.flag ||
+            !(target.flag in DEFAULT_INVESTIGATION_FLAGS)
+          ) {
+            errors.push(
+              `未登録の調査フラグ: ${investigationId} / ${targetId}`
+            );
+          }
+
+          if (
+            !Array.isArray(target.result)
+          ) {
+            errors.push(
+              `調査結果の会話データが不正です: ${investigationId} / ${targetId}`
+            );
+          }
+
+        }
+      );
+
+      // 会話相手のデータも確認
+      if (investigation.talks) {
+
+        Object.entries(investigation.talks).forEach(
+          ([talkId, talk]) => {
+
+            if (!Array.isArray(talk.result)) {
+              errors.push(
+                `人物との会話データが不正です: ${investigationId} / ${talkId}`
+              );
+            }
+
+          }
+        );
+
+      }
+
+    }
+  );
+
+  // -------------------------------------------------------
+  // ③ 電子書籍データをチェック
+  // -------------------------------------------------------
+
+  Object.entries(EBOOK_DATA).forEach(([bookId, book]) => {
+
+    if (!Array.isArray(book.pages)) {
+      errors.push(
+        `電子書籍のページ設定が不正です: ${bookId}`
+      );
+      return;
+    }
+
+    book.pages.forEach((page, index) => {
+
+      const pageNumber = index + 1;
+
+      if (typeof page === "string") {
+        return;
+      }
+
+      if (!page || typeof page !== "object") {
+        errors.push(
+          `不正なページデータ: ${bookId} / ${pageNumber}ページ`
+        );
+        return;
+      }
+
+      // 取得前・取得後で内容が変わるページ
+      if (page.flag) {
+
+        if (!(page.flag in DEFAULT_INVESTIGATION_FLAGS)) {
+          errors.push(
+            `電子書籍の未登録フラグ: ${bookId} / ${page.flag}`
+          );
+        }
+
+        if (
+          typeof page.before !== "string" ||
+          typeof page.after !== "string"
+        ) {
+          errors.push(
+            `beforeまたはafterがありません: ${bookId} / ${pageNumber}ページ`
+          );
+        }
+
+      } else if (typeof page.text !== "string") {
+
+        errors.push(
+          `電子書籍の本文がありません: ${bookId} / ${pageNumber}ページ`
+        );
+
+      }
+
+    });
+
+  });
+
+  // -------------------------------------------------------
+  // ④ 結果をConsoleへ表示
+  // -------------------------------------------------------
+
+  if (errors.length === 0 && warnings.length === 0) {
+
+    console.log(
+      "✅ ゲームデータ整合性チェック：問題なし"
+    );
+
+  } else {
+
+    errors.forEach(message => {
+      console.error("❌ " + message);
+    });
+
+    warnings.forEach(message => {
+      console.warn("⚠️ " + message);
+    });
+
+  }
+
+}
+
 
 
 // =========================================================
@@ -5614,6 +5849,23 @@ if (data.type === "unlockEbook") {
 
 
 
+// =========================================================
+// タブレット・スポットライト演出
+// =========================================================
+
+if (data.type === "tabletSpotlight") {
+
+  setTabletSpotlight(data.enabled);
+
+  currentStep++;
+
+  updateDialogue();
+
+  return;
+}
+
+
+
 // -------------------------------------------------------
 // 人物情報の個別アンロック
 // -------------------------------------------------------
@@ -6009,6 +6261,8 @@ function nextDialogue() {
 
 
 resetInvestigationAndTabletState();
+
+setTabletSpotlight(false);
 
 resetEbookUnlocked();
 
@@ -7551,6 +7805,8 @@ isInvestigationMode: isInvestigationMode,
 
 currentInvestigationId: currentInvestigationId,
 
+isTabletSpotlightActive: isTabletSpotlightActive,
+
 
 // -------------------------------------------------------
 // 調査状態
@@ -8180,6 +8436,10 @@ gameContainer.classList.remove(
   'fade-out'
 );
 
+setTabletSpotlight(
+  saveData.isTabletSpotlightActive === true
+);
+
 }
 
 
@@ -8280,14 +8540,19 @@ menuToggleBtn
 // 通常会話：TABLETボタン
 // =========================================================
 
+
 document
   .getElementById("tablet-toggle-btn")
   .addEventListener("click", () => {
+
+    // スポットライトを解除
+    setTabletSpotlight(false);
 
     // 通常会話からタブレットを開く
     openDialogueTablet();
 
   });
+
 
 
     // -------------------------------------------------------
@@ -8869,7 +9134,9 @@ if (investigationResultBox) {
 
     resizeGameScreen();
 
-checkScenarioIds();
+　　checkScenarioIds();
+
+　　checkGameData();
 
     initUIEvents();
 
