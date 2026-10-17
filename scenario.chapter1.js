@@ -582,7 +582,7 @@
     {   
       id: "c1_bg003",
       type: "backgroundFade",
- 　　 image:"classroom2_morning.jpg"
+ 　　 image:"classroom2_morning.png"
     },
 
     {   
@@ -2351,13 +2351,206 @@
     {   
       id: "c1_bg008",
       type: "backgroundFade",
- 　　 image:" shrine_morning.jpg"
+ 　　 image:"shrine_morning.jpg"
     },
 
     {
        id:"c1_inv003",
        type:"investigation",
        investigationId:"stampRallyClock"
+    },
+
+    {   
+      id: "c1_295",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "わざわざ時計台に来たんだし、記念に写真でも撮っておこうかな？"
+    },
+
+    {   
+      id: "c1_296",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "えっと、スマホは......"
+    },
+
+    {   
+      id: "c1_296",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "あれ、無い！？"
+    },
+
+    {   
+      id: "c1_297",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "（学校に置いてきちゃったのかな。\nあー、せっかくいい天気なのに！）"
+    },
+
+    {   
+      id: "c1_298",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "そうだタブレット、あんた何とかできないの？\nわざわざ持ち歩いてあげてるんだからこんな時くらい役に立ちなさいよ！"
+    },
+
+    {   
+      id: "c1_299",
+      type: "dialogue",
+      name: "タブレット",
+      text: "かしこまりました。\nカメラ及び画像フォルダを開放します。"
+    },
+
+    {   
+      id: "c1_300",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "......えっ、ほんとに出来るの？"
+    },
+
+    {   
+      id: "c1_301",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "（嫌味のつもりで言ったんだけど......このハイテクタブレットが！）"
+    },
+
+    {   
+      id: "c1_302",
+      type: "dialogue",
+      name: "タブレット",
+      text: "お褒めに預かり光栄です。"
+    },
+
+    {   
+      id: "c1_303",
+      type: "dialogue",
+      name: "タブレット",
+      text: "それでは、撮影を開始します。"
+    },
+
+    {   
+      id: "c1_304",
+      type: "dialogue",
+      name: "タブレット",
+      text: "３、２......"
+    },
+
+    {   
+      id: "c1_305",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "ちょっ、なんでタイマー！？"
+    },
+
+    {   
+      id: "c1_306",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "えっとえっと、とりあえずいい感じに空が映るように――"
+    },
+
+    {   
+      id: "c1_307",
+      type: "dialogue",
+      name: "タブレット",
+      text: "――１。"
+    },
+
+    {   
+      id: "c1_308",
+      type: "dialogue",
+      name: "タブレット",
+      text: "カシャッ。"
+    },
+
+    {   
+      id: "c1_309",
+      type: "dialogue",
+      name: "タブレット",
+      text: "撮影完了。写真をお確かめください。"
+    },
+
+　　{
+  　　id: "c1_unlock_images",
+ 　 　type: "unlockTabletApp",
+  　　appId: "images"
+　　},
+
+　　{
+  　　id: "c1_unlock_image001",
+  　　type: "unlockImage",
+ 　　 imageId: "clock_photo"
+　　},
+
+　　{
+  　　id: "c1_tablet_spotlight004",
+  　　type: "tabletSpotlight",
+ 　　 enabled: true
+　　},
+
+    {   
+      id: "c1_310",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "いきなりだったし、上手く撮れてるかな......"
+    },
+
+    {   
+      id: "c1_311",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "あっ、意外といい感じ！"
+    },
+
+    {   
+      id: "c1_312",
+      type: "dialogue",
+      name: "タブレット",
+      text: "本端末におけるカメラ機能は最高レベルの解像度を誇るため、ごく当たり前の結果と言えます。"
+    },
+
+    {   
+      id: "c1_313",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "何よ、急にアピールしてきて。"
+    },
+
+    {   
+      id: "c1_314",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "そうだ、それとタイマー設定を解除しておかないと。\nもしまた写真を撮る時に不便だもんね。"
+    },
+
+    {   
+      id: "c1_315",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "ここをこうしてっと......よし、完璧！"
+    },
+
+    {   
+      id: "c1_316",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "写真も撮れたし、そろそろ次のスタンプを取りに行こうかな。次は......"
+    },
+
+    {   
+      id: "c1_317",
+      type: "dialogue",
+      name: "タブレット",
+      text: "「和菓子屋あさか」です。"
+    },
+
+    {   
+      id: "c1_318",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "そうそう！それじゃあさっそく、レッツゴー！"
     }
 
   ];
