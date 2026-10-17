@@ -9617,6 +9617,13 @@ document.addEventListener(
       return;
     }
 
+    // スポットライト演出中はEnterキーで進めない
+    if (isTabletSpotlightActive) {
+      e.preventDefault();
+      return;
+    }
+
+
 
 // -------------------------------------------------------
 // 持ち物ウィンドウ表示中
