@@ -407,3 +407,487 @@
   outline: 2px solid var(--deco-accent);
   outline-offset: 3px;
 }
+
+
+
+/* =========================================================
+   Floriography - Minimal Deco / 補完スタイル
+   theme-minimal-deco.css の末尾に追加してください。
+   既存の配置・機能・スポットライトの重なり順を維持します。
+   ========================================================= */
+
+/* 共通：背景色と文字色の仕上げ */
+#title-text {
+  color: var(--deco-text);
+  text-shadow: 0 2px 18px rgba(0, 0, 0, .28);
+}
+.btn, .name-confirm-btn, .choice-btn {
+  color: var(--deco-text);
+  background: var(--deco-panel);
+  border: 1px solid var(--deco-line);
+  border-radius: var(--deco-radius);
+  box-shadow: none;
+}
+.btn:hover, .name-confirm-btn:hover, .choice-btn:hover {
+  color: #fff;
+  background: var(--deco-panel-light);
+  border-color: var(--deco-gold);
+}
+.input-prompt, .name-confirm-player-name, .config-label {
+  color: var(--deco-gold);
+}
+.name-input {
+  color: var(--deco-text);
+  background: var(--deco-panel);
+  border: 1px solid var(--deco-line);
+  border-radius: var(--deco-radius);
+}
+.name-input:focus {
+  border-color: var(--deco-accent);
+  box-shadow: 0 0 0 2px rgba(142,187,200,.16);
+}
+.name-confirm-box {
+  color: var(--deco-text);
+  background: var(--deco-bg);
+  border: 1px solid var(--deco-line);
+  border-radius: var(--deco-radius);
+  box-shadow: 0 12px 36px rgba(0,0,0,.32);
+}
+.name-confirm-text, .message-text { color: var(--deco-text); }
+.config-slider { accent-color: var(--deco-accent); }
+
+/* 会話・調査の名前欄：旧CSSの黒と強い金色を抑える */
+.character-name, .investigation-result-name {
+  color: var(--deco-gold);
+  background: var(--deco-panel);
+  border: 1px solid var(--deco-line);
+  border-radius: var(--deco-radius);
+}
+.auto-btn, .skip-btn {
+  color: var(--deco-muted);
+  background: var(--deco-panel);
+  border: 1px solid var(--deco-line-soft);
+}
+.auto-btn:hover, .skip-btn:hover, .close-btn:hover,
+.next-mark:hover {
+  color: var(--deco-gold);
+  background: var(--deco-panel-light);
+  border-color: var(--deco-line);
+}
+.auto-btn.active-auto {
+  color: var(--deco-bg);
+  background: var(--deco-gold);
+  border-color: var(--deco-gold);
+}
+
+/* 調査：未対応だった案内パネル・戻るボタンを統一 */
+.investigation-tablet-panel {
+  color: var(--deco-text);
+  background: var(--deco-panel);
+  border: 1px solid var(--deco-line);
+  border-radius: var(--deco-radius);
+}
+.investigation-tablet-title { color: var(--deco-gold); }
+.investigation-tablet-text { color: var(--deco-muted); }
+.investigation-tablet-back-btn {
+  color: var(--deco-text);
+  background: var(--deco-panel-light);
+  border: 1px solid var(--deco-line-soft);
+  border-radius: var(--deco-radius);
+}
+.investigation-tablet-back-btn:hover {
+  color: #fff;
+  background: #2a4155;
+  border-color: var(--deco-gold);
+}
+.investigation-finish-btn:hover {
+  color: #fff;
+  background: #2a4155;
+  border-color: var(--deco-gold);
+}
+.investigation-point:hover {
+  color: var(--deco-text);
+  background: #2a4155;
+  border-color: var(--deco-gold);
+  transform: scale(1.025);
+}
+.investigation-point.checked {
+  color: var(--deco-muted);
+  background: rgba(16,29,43,.72);
+  border-color: rgba(172,187,197,.28);
+}
+
+/* タブレット：旧CSSの詳細セレクタより強く指定 */
+.tablet-home-panel {
+  /* 旧CSSのカメラ・筐体構造は維持し、外装を落ち着かせる */
+  border: 5px solid #283847;
+  border-radius: 12px;
+  background: var(--deco-bg);
+  box-shadow: 0 16px 48px rgba(0,0,0,.45),
+              inset 0 0 0 1px rgba(215,191,161,.16);
+}
+.tablet-home-panel .tablet-function-btn {
+  color: var(--deco-text);
+  background: var(--deco-panel-light);
+  border: 1px solid var(--deco-line-soft);
+  border-radius: var(--deco-radius);
+  box-shadow: none;
+}
+.tablet-home-panel .tablet-function-btn:not(:disabled):hover {
+  color: #fff;
+  background: #2a4155;
+  border-color: var(--deco-gold);
+  transform: none;
+}
+.tablet-home-panel .tablet-function-btn.locked,
+.tablet-home-panel .tablet-function-btn:disabled {
+  color: #768794;
+  background: rgba(20,31,43,.8);
+  border-color: rgba(172,187,197,.14);
+  opacity: .65;
+}
+.tablet-app-locked-label { color: #768794; }
+.tablet-close-btn {
+  color: var(--deco-muted);
+  background: var(--deco-panel-light);
+  border: 1px solid var(--deco-line-soft);
+  border-radius: var(--deco-radius);
+}
+.tablet-close-btn:hover {
+  color: #fff;
+  background: #2a4155;
+  border-color: var(--deco-gold);
+}
+.tablet-loading-spinner::before {
+  border-top-color: var(--deco-gold);
+  border-right-color: rgba(215,191,161,.45);
+}
+
+/* 持ち物 */
+.inventory-panel {
+  background: var(--deco-bg);
+  border: 1px solid var(--deco-line);
+  border-radius: var(--deco-radius);
+}
+.inventory-header, .inventory-detail-name { color: var(--deco-gold); }
+.inventory-close-btn { color: var(--deco-muted); }
+.inventory-close-btn:hover { color: var(--deco-gold); }
+.inventory-item-btn {
+  color: var(--deco-text);
+  background: var(--deco-panel-light);
+  border: 1px solid var(--deco-line-soft);
+  border-radius: var(--deco-radius);
+}
+.inventory-item-btn:hover {
+  color: #fff;
+  background: #2a4155;
+  border-color: var(--deco-gold);
+}
+.inventory-detail-description { color: var(--deco-text); }
+.inventory-back-btn {
+  color: var(--deco-text);
+  background: var(--deco-panel-light);
+  border: 1px solid var(--deco-line-soft);
+  border-radius: var(--deco-radius);
+}
+.inventory-back-btn:hover { border-color: var(--deco-gold); }
+
+/* 人物情報・電子書籍：一覧と操作ボタン */
+.character-profile-btn, .ebook-list-btn {
+  color: var(--deco-text);
+  background: var(--deco-panel-light);
+  border: 1px solid var(--deco-line-soft);
+  border-radius: var(--deco-radius);
+}
+.character-profile-btn:hover, .ebook-list-btn:hover {
+  color: #fff;
+  background: #2a4155;
+  border-color: var(--deco-gold);
+}
+.character-detail-name { color: var(--deco-gold); }
+.character-detail-relation { color: var(--deco-muted); }
+.character-detail-description {
+  color: var(--deco-text);
+  background: rgba(0,0,0,.16);
+  border-radius: var(--deco-radius);
+}
+.character-back-btn, .ebook-back-btn, .ebook-page-btn {
+  color: var(--deco-text);
+  background: var(--deco-panel-light);
+  border: 1px solid var(--deco-line-soft);
+  border-radius: var(--deco-radius);
+}
+.character-back-btn:hover, .ebook-back-btn:hover,
+.ebook-page-btn:hover:not(:disabled) {
+  color: #fff;
+  background: #2a4155;
+  border-color: var(--deco-gold);
+}
+.ebook-page-btn:disabled { opacity: .35; }
+/* 読書面の明るい紙色と解析リンクの青は、可読性のため維持 */
+.ebook-page { border-color: #c8bdab; }
+.ebook-analysis-panel {
+  background: #172b3b;
+  border: 1px solid var(--deco-accent);
+  border-radius: var(--deco-radius);
+  box-shadow: 0 10px 32px rgba(0,0,0,.34);
+}
+.ebook-analysis-header { color: var(--deco-accent); }
+.ebook-analysis-close { color: var(--deco-muted); }
+.ebook-analysis-title { color: var(--deco-text); }
+.ebook-analysis-description { color: var(--deco-text); }
+
+/* メニュー・モーダルの細部 */
+.sidebar-title, .slot-modal-header, .log-modal-header {
+  border-bottom-color: var(--deco-line-soft);
+}
+.sidebar-btn:hover, .sidebar-close-btn:hover {
+  color: #fff;
+  background: #2a4155;
+  border-color: var(--deco-gold);
+}
+.slot-item {
+  color: var(--deco-text);
+  background: var(--deco-panel-light);
+  border: 1px solid var(--deco-line-soft);
+  border-radius: var(--deco-radius);
+}
+.slot-item:hover {
+  background: #2a4155;
+  border-color: var(--deco-gold);
+}
+.slot-number, .log-speaker { color: var(--deco-gold); }
+.slot-detail, .log-text { color: var(--deco-text); }
+.log-container::-webkit-scrollbar-thumb { background: var(--deco-line); }
+.message-ok-btn {
+  color: var(--deco-text);
+  background: var(--deco-panel-light);
+  border: 1px solid var(--deco-line);
+  border-radius: var(--deco-radius);
+}
+.message-ok-btn:hover {
+  color: #fff;
+  background: #2a4155;
+  border-color: var(--deco-gold);
+}
+
+/* キーボード操作の視認性 */
+.btn:focus-visible, .choice-btn:focus-visible,
+.investigation-tablet-back-btn:focus-visible,
+.tablet-close-btn:focus-visible, .ebook-page-btn:focus-visible,
+.ebook-back-btn:focus-visible, .character-back-btn:focus-visible,
+.inventory-item-btn:focus-visible, .inventory-back-btn:focus-visible,
+.message-ok-btn:focus-visible {
+  outline: 2px solid var(--deco-accent);
+  outline-offset: 3px;
+}
+
+
+
+
+/* =========================================================
+   IMAGE FOLDER
+   画像フォルダ
+   ========================================================= */
+
+/* ギャラリー・拡大画面共通 */
+.tablet-home-panel .tablet-function-menu.image-gallery-view,
+.tablet-home-panel .tablet-function-menu.image-detail-view {
+  display: flex;
+  flex-direction: column;
+
+  width: 88%;
+  max-height: 350px;
+
+  gap: 12px;
+  padding: 4px 8px;
+
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* 2×2画像一覧 */
+.image-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 12px;
+  width: 100%;
+}
+
+/* サムネイル */
+.image-gallery-item {
+  display: flex;
+  flex-direction: column;
+
+  gap: 6px;
+  padding: 7px;
+
+  min-width: 0;
+
+  background: var(--deco-panel-light);
+  border: 1px solid var(--deco-line-soft);
+  border-radius: var(--deco-radius);
+
+  color: var(--deco-text);
+  font-family: 'Shippori Mincho', serif;
+
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.image-gallery-item:hover {
+  background: #2a4155;
+  border-color: var(--deco-gold);
+}
+
+/* 一覧内の画像 */
+.image-gallery-item img {
+  width: 100%;
+  height: 105px;
+
+  display: block;
+  object-fit: cover;
+
+  border-radius: 2px;
+}
+
+/* 画像名 */
+.image-gallery-label {
+  font-size: 14px;
+  text-align: center;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ページ移動 */
+.image-gallery-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  gap: 22px;
+  color: var(--deco-muted);
+}
+
+.image-gallery-controls button,
+.image-gallery-back {
+  padding: 8px 16px;
+
+  background: var(--deco-panel-light);
+  color: var(--deco-text);
+
+  border: 1px solid var(--deco-line-soft);
+  border-radius: var(--deco-radius);
+
+  font-family: 'Shippori Mincho', serif;
+  font-size: 14px;
+
+  cursor: pointer;
+}
+
+.image-gallery-controls button:hover:not(:disabled),
+.image-gallery-back:hover {
+  border-color: var(--deco-gold);
+  background: #2a4155;
+}
+
+.image-gallery-controls button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* 画像未取得時 */
+.image-gallery-empty {
+  grid-column: 1 / -1;
+  padding: 70px 10px;
+
+  color: var(--deco-muted);
+  text-align: center;
+}
+
+/* 拡大表示 */
+.image-detail-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 0;
+  height: 260px;
+
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--deco-line-soft);
+  border-radius: var(--deco-radius);
+
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.image-detail-picture {
+  display: block;
+
+  max-width: 100%;
+  max-height: 100%;
+
+  width: auto;
+  height: auto;
+
+  object-fit: contain;
+}
+
+
+
+
+/* =========================================================
+   画像フォルダ：NEWマーク・説明文
+   ========================================================= */
+
+/* NEWマークの配置基準 */
+.image-gallery-item {
+  position: relative;
+}
+
+/* 画像ごとのNEW */
+.image-gallery-new {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+
+  padding: 3px 7px;
+
+  background: #b97979;
+  color: #ffffff;
+
+  border-radius: 4px;
+
+  font-family: sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* 拡大画像の説明文 */
+.image-detail-description {
+  width: 100%;
+  padding: 9px 12px;
+
+  box-sizing: border-box;
+
+  background: rgba(33, 52, 72, 0.6);
+  border: 1px solid var(--deco-line-soft);
+  border-radius: var(--deco-radius);
+
+  color: var(--deco-text);
+
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}

@@ -12,6 +12,8 @@
 
 <link rel="stylesheet" href="style.css">
 
+<link rel="stylesheet" href="theme-minimal-deco.css">
+
 </head>
 
 <body>
@@ -279,6 +281,7 @@
 <script src="data/inventory-data.js"></script>
 <script src="data/character-data.js"></script>
 <script src="data/ebook-data.js"></script>
+<script src="data/image-data.js"></script>
 
 <script>
 
@@ -1531,6 +1534,91 @@ function resetEbookUnlocked() {
     ebookUnlocked,
     DEFAULT_EBOOK_UNLOCKED
   );
+
+}
+
+
+
+// =========================================================
+// 画像フォルダ：画像ごとの既読状態
+// =========================================================
+
+const imageViewed = {};
+
+function resetImageViewed() {
+
+  Object.keys(imageViewed).forEach(imageId => {
+    delete imageViewed[imageId];
+  });
+
+}
+
+// 画像を閲覧済みにする
+function markImageAsViewed(imageId) {
+
+  if (imageUnlocked[imageId] !== true) return;
+
+  imageViewed[imageId] = true;
+
+}
+
+// 画像が未読か判定
+function isImageNew(imageId) {
+
+  return (
+    imageUnlocked[imageId] === true &&
+    imageViewed[imageId] !== true
+  );
+
+}
+
+
+
+// =========================================================
+// 画像フォルダ：取得状態の管理
+// =========================================================
+
+// すべての画像は未取得から開始
+const imageUnlocked = {};
+
+Object.keys(IMAGE_DATA).forEach(imageId => {
+  imageUnlocked[imageId] = false;
+});
+
+// 画像を取得する
+function unlockImage(imageId) {
+
+  if (!Object.prototype.hasOwnProperty.call(
+    IMAGE_DATA, imageId
+  )) {
+    console.warn("未登録の画像IDです:", imageId);
+    return;
+  }
+
+  // 取得済みなら何もしない
+  if (imageUnlocked[imageId] === true) {
+    return;
+  }
+
+  imageUnlocked[imageId] = true;
+
+  // 初めて画像を取得した際はアプリも解放
+  unlockTabletApp("images");
+
+  // NEW通知
+  addTabletNewNotification("images");
+}
+
+// 取得状態を初期化
+function resetImageUnlocked() {
+
+  Object.keys(imageUnlocked).forEach(imageId => {
+    delete imageUnlocked[imageId];
+  });
+
+  Object.keys(IMAGE_DATA).forEach(imageId => {
+    imageUnlocked[imageId] = false;
+  });
 
 }
 
@@ -4149,6 +4237,20 @@ if (appId === "ebooks") {
 }
 
 
+// -------------------------------------------------------
+// 画像フォルダ
+// -------------------------------------------------------
+
+if (appId === "images") {
+
+  clearTabletNewNotification("images");
+
+  showImageGallery(0);
+
+  return;
+}
+
+
   // -------------------------------------------------------
   // その他
   // -------------------------------------------------------
@@ -4157,6 +4259,225 @@ if (appId === "ebooks") {
     "この機能は現在準備中です。"
   );
 }
+
+
+
+// =========================================================
+// 画像フォルダ：一覧表示
+// =========================================================
+
+function showImageGallery(pageIndex = 0) {
+
+  const tablet =
+    document.querySelector(".tablet-home-panel");
+
+  if (!tablet) return;
+
+  const title = tablet.querySelector(".tablet-home-title");
+  const subtitle = tablet.querySelector(".tablet-home-text");
+  const menu = tablet.querySelector(".tablet-function-menu");
+
+  if (!title || !subtitle || !menu) return;
+
+  title.textContent = "IMAGE FOLDER";
+  subtitle.textContent = "保存された画像を選択してください";
+
+  menu.innerHTML = "";
+  menu.classList.remove("character-view", "ebook-view");
+  menu.classList.add("image-gallery-view");
+
+  // 取得済みの画像だけを取り出す
+  const images = Object.entries(IMAGE_DATA)
+    .filter(([imageId]) => imageUnlocked[imageId] === true);
+
+  const pageSize = 4;
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(images.length / pageSize)
+  );
+
+  pageIndex = Math.max(
+    0,
+    Math.min(pageIndex, totalPages - 1)
+  );
+
+  const currentImages = images.slice(
+    pageIndex * pageSize,
+    (pageIndex + 1) * pageSize
+  );
+
+  // 画像を並べる領域
+  const grid = document.createElement("div");
+  grid.className = "image-gallery-grid";
+
+  currentImages.forEach(([imageId, data]) => {
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "image-gallery-item";
+
+    const img = document.createElement("img");
+    img.src = `images/gallery/${data.file}`;
+    img.alt = data.title;
+    img.loading = "lazy";
+
+    const label = document.createElement("span");
+    label.className = "image-gallery-label";
+    label.textContent = data.title;
+
+    button.append(img, label);
+
+    // 未閲覧の画像にNEWマークを付ける
+    if (isImageNew(imageId)) {
+
+     const newMark = document.createElement("span");
+ 
+     newMark.className = "image-gallery-new";
+     newMark.textContent = "NEW";
+
+    button.appendChild(newMark);
+
+    }
+
+    button.addEventListener("click", () => {
+      showImageDetail(imageId, pageIndex);
+    });
+
+    grid.appendChild(button);
+
+  });
+
+  if (images.length === 0) {
+
+    const empty = document.createElement("div");
+    empty.className = "image-gallery-empty";
+    empty.textContent = "まだ画像が登録されていません。";
+
+    grid.appendChild(empty);
+
+  }
+
+  menu.appendChild(grid);
+
+  // ページ切り替え
+  const controls = document.createElement("div");
+  controls.className = "image-gallery-controls";
+
+  const prev = document.createElement("button");
+  prev.type = "button";
+  prev.textContent = "← 前へ";
+  prev.disabled = pageIndex === 0;
+
+  const pageLabel = document.createElement("span");
+  pageLabel.textContent = `${pageIndex + 1} / ${totalPages}`;
+
+  const next = document.createElement("button");
+  next.type = "button";
+  next.textContent = "次へ →";
+  next.disabled = pageIndex >= totalPages - 1;
+
+  prev.addEventListener("click", () => {
+    showImageGallery(pageIndex - 1);
+  });
+
+  next.addEventListener("click", () => {
+    showImageGallery(pageIndex + 1);
+  });
+
+  controls.append(prev, pageLabel, next);
+  menu.appendChild(controls);
+
+  // タブレットホームへ戻る
+  const back = document.createElement("button");
+
+  back.type = "button";
+  back.className = "image-gallery-back";
+  back.textContent = "← タブレットホームへ";
+
+  back.addEventListener("click", () => {
+    showTabletFunctionMenu();
+  });
+
+  menu.appendChild(back);
+}
+
+
+
+
+// =========================================================
+// 画像フォルダ：拡大表示
+// =========================================================
+
+function showImageDetail(imageId, returnPage = 0) {
+
+  if (imageUnlocked[imageId] !== true) return;
+
+  const data = IMAGE_DATA[imageId];
+  if (!data) return;
+
+  // 画像を既読にする
+markImageAsViewed(imageId);
+
+  const tablet =
+    document.querySelector(".tablet-home-panel");
+
+  if (!tablet) return;
+
+  const title = tablet.querySelector(".tablet-home-title");
+  const subtitle = tablet.querySelector(".tablet-home-text");
+  const menu = tablet.querySelector(".tablet-function-menu");
+
+  if (!title || !subtitle || !menu) return;
+
+  title.textContent = "IMAGE VIEWER";
+  subtitle.textContent = data.title;
+
+  menu.innerHTML = "";
+  menu.classList.remove(
+    "character-view",
+    "ebook-view",
+    "image-gallery-view"
+  );
+  menu.classList.add("image-detail-view");
+
+  const viewer = document.createElement("div");
+  viewer.className = "image-detail-container";
+
+  const img = document.createElement("img");
+  img.className = "image-detail-picture";
+  img.src = `images/gallery/${data.file}`;
+  img.alt = data.title;
+
+  viewer.appendChild(img);
+  menu.appendChild(viewer);
+
+// 画像の説明文
+if (data.description) {
+
+  const description = document.createElement("div");
+
+  description.className = "image-detail-description";
+  description.textContent = data.description;
+
+  menu.appendChild(description);
+
+}
+
+  const back = document.createElement("button");
+
+  back.type = "button";
+  back.className = "image-gallery-back";
+  back.textContent = "← 画像一覧へ戻る";
+
+  back.addEventListener("click", () => {
+    showImageGallery(returnPage);
+  });
+
+  menu.appendChild(back);
+}
+
+
  
 
 // =========================================================
@@ -6079,6 +6400,23 @@ if (data.type === "unlockEbook") {
 
 
 
+// -------------------------------------------------------
+// 画像フォルダ：画像取得
+// -------------------------------------------------------
+
+if (data.type === "unlockImage") {
+
+  unlockImage(data.imageId);
+
+  currentStep++;
+
+  updateDialogue();
+
+  return;
+}
+
+
+
 // =========================================================
 // タブレット・スポットライト演出
 // =========================================================
@@ -6497,6 +6835,10 @@ resetTabletNewNotifications();
 setTabletSpotlight(false);
 
 resetEbookUnlocked();
+
+resetImageUnlocked();
+
+resetImageViewed();
 
 resetInventory();
 
@@ -8067,6 +8409,14 @@ ebookUnlocked: {
 },
 
 
+imageUnlocked: {
+  ...imageUnlocked
+},
+
+imageViewed: {
+  ...imageViewed
+},
+
 // -------------------------------------------------------
 // 人物情報の個別解放状態
 // -------------------------------------------------------
@@ -8258,6 +8608,10 @@ resetInvestigationAndTabletState();
 
 resetEbookUnlocked();
 
+resetImageUnlocked();
+
+resetImageViewed();
+
 // NEW通知を初期化・復元
 tabletNewNotifications.clear();
 
@@ -8378,6 +8732,45 @@ if (
 
     }
   );
+
+}
+
+
+// -------------------------------------------------------
+// 画像フォルダ：取得状態を復元
+// -------------------------------------------------------
+
+if (
+  saveData.imageUnlocked &&
+  typeof saveData.imageUnlocked === "object"
+) {
+
+  Object.keys(IMAGE_DATA).forEach(imageId => {
+
+    imageUnlocked[imageId] =
+      saveData.imageUnlocked[imageId] === true;
+
+  });
+
+}
+
+
+// 画像ごとの既読状態を復元
+if (
+  saveData.imageViewed &&
+  typeof saveData.imageViewed === "object"
+) {
+
+  Object.keys(IMAGE_DATA).forEach(imageId => {
+
+    if (
+      imageUnlocked[imageId] === true &&
+      saveData.imageViewed[imageId] === true
+    ) {
+      imageViewed[imageId] = true;
+    }
+
+  });
 
 }
 
