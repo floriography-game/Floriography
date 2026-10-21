@@ -1303,6 +1303,14 @@
       text: "（まあ、こうなっちゃったら仕方ないよね。\nとりあえず人物情報を確認してみようかな？"
     },
 
+
+{
+  id: "167_1",
+  type: "unlockTabletApp",
+  appId: "characters"
+},
+
+
 {
   id: "c1_tablet_spotlight001",
   type: "tabletSpotlight",
@@ -2649,5 +2657,5 @@
       name: "{NAME}",
       text: "（そんなあ……久しぶりに食べられると思ったのに。）"
     }
-    
+
   ];

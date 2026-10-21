@@ -282,6 +282,7 @@
 <script src="data/character-data.js"></script>
 <script src="data/ebook-data.js"></script>
 <script src="data/image-data.js"></script>
+<script src="data/location-data.js"></script>
 
 <script>
 
@@ -337,6 +338,14 @@ function resizeGameScreen() {
 
 
 // =========================================================
+// タブレット本体の解放状態
+// =========================================================
+
+let isTabletUnlocked = false;
+
+
+
+// =========================================================
 // TABLETボタンの表示状態を更新
 // =========================================================
 
@@ -351,30 +360,31 @@ function updateTabletButtonVisibility() {
     return;
   }
 
-  // 第一章のタブレット受け取り位置を取得
-  const unlockIndex =
-    chapter1Scenario.findIndex(
-      data => data.id === "c1_167"
-    );
+const hasTablet = isTabletUnlocked;
 
-  // 第一章でタブレット受け取り後なら表示
-  // 今後の章でも表示する
-  const hasTablet =
-    currentScene === "chapter1"
-      ? unlockIndex !== -1 &&
-        currentStep >= unlockIndex
-      : currentScene !== "prologue";
 
-  // 通常会話画面でのみ表示
-  const isDialogueScreen =
-    document.getElementById(
-      "game-screen"
-    ) !== null;
+// 通常会話画面かどうか
+const isDialogueScreen =
+  document.getElementById("game-screen") !== null;
 
-  buttonContainer.classList.toggle(
-    "active",
-    hasTablet && isDialogueScreen
-  );
+// 調査画面かどうか
+const isInvestigationScreen =
+  document.getElementById("investigation-screen") !== null &&
+  isInvestigationMode;
+
+
+// タブレット入手後のみ表示する
+// 通常会話中・調査中の両方に対応
+const shouldShowTablet =
+  hasTablet &&
+  (isDialogueScreen || isInvestigationScreen);
+
+// 表示・非表示を実際のボタンに反映
+buttonContainer.classList.toggle(
+  "active",
+  shouldShowTablet
+);
+
 }
 
 
@@ -482,6 +492,12 @@ let isTabletSpotlightActive = false;
 function setTabletSpotlight(enabled) {
 
   isTabletSpotlightActive = enabled === true;
+
+  // スポットライト開始時はAUTO・SKIPを停止
+  if (isTabletSpotlightActive) {
+    stopAutoMode();
+    stopSkipMode();
+  }
 
   gameStage.classList.toggle(
     "tablet-spotlight-active",
@@ -1381,7 +1397,7 @@ const investigationFlags = {
 };
 
 // =========================================================
-// タブレットアプリ
+// タブレット：アプリ一覧
 // =========================================================
 
 const tabletApps = [
@@ -1398,39 +1414,18 @@ const tabletApps = [
 
   {
     id: "characters",
-    label: "キャラクター情報"
+    label: "人物情報"
   },
 
-{
-  id: "ebooks",
-  label: "電子書籍"
-},
-
   {
-    id: "timeline",
-    label: "タイムライン"
+    id: "ebooks",
+    label: "電子書籍"
   },
 
   {
     id: "messages",
-    label: "メッセージアプリ"
-  },
-
-  {
-    id: "synthesizer",
-    label: "検証・シンセサイザー"
-  },
-
-  {
-    id: "keypad",
-    label: "コード入力"
-  },
-
-  {
-    id: "investigation",
-    label: "調査"
+    label: "メッセージ"
   }
-
 
 ];
 
@@ -1638,6 +1633,15 @@ function unlockTabletApp(appId) {
   const wasLocked = tabletAppUnlocked[appId] !== true;
 
   tabletAppUnlocked[appId] = true;
+
+
+// 人物情報アプリを初めて解放した時に
+// タブレット本体も利用可能にする
+if (appId === "characters") {
+  isTabletUnlocked = true;
+  updateTabletButtonVisibility();
+}
+
 
   if (wasLocked) {
     addTabletNewNotification(appId);
@@ -3374,6 +3378,12 @@ function renderDialogueScreen() {
         e.stopPropagation();
 
 
+// スポットライト中はAUTOを開始しない
+if (isTabletSpotlightActive) {
+  return;
+}
+
+
         if (!isSkipMode) {
 
           // 現在の行が未読ならSKIP不可
@@ -3483,6 +3493,183 @@ function renderDialogueScreen() {
 
 
 
+
+// =========================================================
+// 移動先の解放状態
+// =========================================================
+
+const locationUnlocked = {};
+
+// 新しいゲーム用の初期化
+function resetLocationUnlocked() {
+
+  Object.keys(locationUnlocked).forEach(id => {
+    delete locationUnlocked[id];
+  });
+
+  Object.keys(LOCATION_DATA).forEach(id => {
+    locationUnlocked[id] = false;
+  });
+
+}
+
+// 移動先を解放
+function unlockLocation(locationId) {
+
+  if (!LOCATION_DATA[locationId]) {
+    console.warn("未登録の移動先:", locationId);
+    return;
+  }
+
+  locationUnlocked[locationId] = true;
+
+}
+
+// 移動可能か判定
+function isLocationUnlocked(locationId) {
+
+  const destination = LOCATION_DATA[locationId];
+
+  if (!destination) return false;
+
+  // 解放されていなければ移動不可
+  if (locationUnlocked[locationId] !== true) {
+    return false;
+  }
+
+  // 現在地に対応する場所を調べる
+  const currentLocation = Object.values(LOCATION_DATA)
+    .find(location =>
+      location.investigationId === currentInvestigationId
+    );
+
+  // 学校など、移動エリアに属さない場所からは移動不可
+  if (!currentLocation) return false;
+
+  // 同じエリア内のみ移動可能
+  return destination.area === currentLocation.area;
+
+}
+
+
+// =========================================================
+// 調査モード：移動先一覧
+// =========================================================
+
+function showInvestigationMoveMenu() {
+
+  const screen =
+    document.getElementById("investigation-screen");
+
+  if (!screen) return;
+
+  // この画面を開く前に調査ホームは再生成できるため、
+  // 一時的に中身を入れ替える
+  screen.innerHTML = "";
+
+  const panel = document.createElement("div");
+
+  panel.className = "investigation-move-panel";
+
+  const title = document.createElement("div");
+
+  title.className = "investigation-move-title";
+  title.textContent = "移動先を選択してください";
+
+  panel.appendChild(title);
+
+  const locations = Object.entries(LOCATION_DATA)
+    .filter(([locationId]) =>
+      isLocationUnlocked(locationId)
+    );
+
+  locations.forEach(([locationId, location]) => {
+
+    const button = document.createElement("button");
+
+    button.type = "button";
+    button.className = "investigation-move-destination";
+
+    const isCurrent =
+      currentInvestigationId === location.investigationId;
+
+    button.textContent = isCurrent
+      ? `${location.name}（現在地）`
+      : location.name;
+
+    button.disabled = isCurrent;
+
+    button.addEventListener("click", () => {
+      moveToInvestigationLocation(locationId);
+    });
+
+    panel.appendChild(button);
+
+  });
+
+  const back = document.createElement("button");
+
+  back.type = "button";
+  back.className = "investigation-move-back";
+  back.textContent = "← 戻る";
+
+  back.addEventListener("click", () => {
+    renderInvestigationScreen(currentInvestigationId);
+  });
+
+  panel.appendChild(back);
+
+  screen.appendChild(panel);
+
+}
+
+
+// =========================================================
+// 指定した場所へ移動する
+// =========================================================
+
+function moveToInvestigationLocation(locationId) {
+
+  const location = LOCATION_DATA[locationId];
+
+  if (!location) return;
+
+  if (!isLocationUnlocked(locationId)) return;
+
+  if (!investigationData[location.investigationId]) {
+    console.warn(
+      "移動先の調査データがありません:",
+      location.investigationId
+    );
+    return;
+  }
+
+  // 現在地と同じなら何もしない
+  if (currentInvestigationId === location.investigationId) {
+    return;
+  }
+
+  // 背景を変更
+  changeBackground(location.background);
+
+  // 場所ごとのBGMに切り替える
+  sceneBgm = location.bgm ?? null;
+
+  if (sceneBgm) {
+    playBgm(sceneBgm);
+  } else {
+    stopBgm();
+  }
+
+  // メインシナリオのcurrentStepは変更しない
+  // 選択した場所の調査画面だけを表示する
+  renderInvestigationScreen(location.investigationId);
+
+}
+
+
+
+
 // =========================================================
 // 調査画面
 // =========================================================
@@ -3534,13 +3721,13 @@ setInvestigationReturnView("home");
           会話
         </button>
 
-        <button
-          type="button"
-          id="investigation-tablet-btn"
-          class="investigation-menu-btn"
-        >
-          タブレット
-        </button>
+ <button
+  type="button"
+  id="investigation-search-btn"
+  class="investigation-menu-btn"
+>
+  調査
+</button>
 
         <button
           type="button"
@@ -3550,20 +3737,25 @@ setInvestigationReturnView("home");
           持ち物
         </button>
 
-        <button
-          type="button"
-          id="investigation-move-btn"
-          class="investigation-menu-btn"
-          disabled
-        >
-          移動
-        </button>
+<button
+  type="button"
+  id="investigation-move-btn"
+  class="investigation-menu-btn"
+  ${Object.values(LOCATION_DATA).some(
+    location => location.investigationId === investigationId
+  ) ? "" : "disabled"}
+>
+  移動
+</button>
 
       </div>
 
 
 ${
-  canFinishInvestigation()
+
+canFinishInvestigation() &&
+currentInvestigationId ===
+  getCurrentScenario()[currentStep]?.investigationId
 
     ? `
       <button
@@ -3626,23 +3818,21 @@ document
   });
 
 
-  // -------------------------------------------------------
-  // タブレット
-  // -------------------------------------------------------
-
+// -------------------------------------------------------
+// 調査ボタン
+// -------------------------------------------------------
 
 document
-  .getElementById(
-    'investigation-tablet-btn'
-  )
-  .addEventListener(
-    'click',
-    () => {
+  .getElementById("investigation-search-btn")
+  .addEventListener("click", () => {
 
-      openTabletWithLoading();
+    // タブレットを経由せず、直接調査地点を表示
+    showInvestigationTargets();
 
-    }
-  );
+  });
+
+
+
 
 
 // -------------------------------------------------------
@@ -3660,6 +3850,23 @@ document
     showInventory();
 
   });
+
+
+// -------------------------------------------------------
+// 移動ボタン
+// -------------------------------------------------------
+
+document
+  .getElementById("investigation-move-btn")
+  .addEventListener("click", () => {
+
+    showInvestigationMoveMenu();
+
+  });
+
+
+updateTabletButtonVisibility();
+
 
 } // renderInvestigationScreen() の終了
 
@@ -3829,10 +4036,6 @@ function openDialogueTablet() {
   // 会話画面を一時的に非表示
   gameScreen.style.display = "none";
 
-  // TABLETボタンも一時的に隠す
-  document
-    .getElementById("tablet-trigger-container")
-    ?.classList.remove("active");
 
   // タブレット表示用の画面を作成
   const screen =
@@ -4095,6 +4298,25 @@ if (
 
     }
   );
+
+
+
+// =========================================================
+// タブレット：空き枠を追加
+// =========================================================
+
+const emptySlots = Math.max(0, 6 - tabletApps.length);
+
+for (let i = 0; i < emptySlots; i++) {
+
+  const empty = document.createElement("div");
+
+  empty.className = "tablet-empty-slot";
+  empty.setAttribute("aria-hidden", "true");
+
+  appMenu.appendChild(empty);
+
+}
 
 
 
@@ -5502,6 +5724,27 @@ function showInvestigationTargets() {
 clearInvestigationView();
 
 
+// -------------------------------------------------------
+// 調査地点選択中は下部メニューを非表示にする
+// -------------------------------------------------------
+
+// 会話・調査・持ち物・移動ボタンを隠す
+const baseMenu =
+  screen.querySelector(".investigation-menu");
+
+if (baseMenu) {
+  baseMenu.style.display = "none";
+}
+
+// 調査終了ボタンも隠す
+const finishButton =
+  screen.querySelector(".investigation-finish-btn");
+
+if (finishButton) {
+  finishButton.style.display = "none";
+}
+
+
 
   const investigation =
     investigationData[
@@ -5564,17 +5807,12 @@ panel.innerHTML = `
 // -------------------------------------------------------
 
 document
-  .getElementById(
-    'investigation-back-btn'
-  )
-  .addEventListener(
-    'click',
-    () => {
+  .getElementById("investigation-back-btn")
+  .addEventListener("click", () => {
 
-      showTabletFunctionMenu();
+    renderInvestigationScreen(currentInvestigationId);
 
-    }
-  );
+  });
 
 
   // -------------------------------------------------------
@@ -5990,6 +6228,19 @@ function showInvestigationResultEntry(
 
 // 調査画面内の一時的なUIを削除
 clearInvestigationView();
+
+// 調査地点選択中は基本メニューと終了ボタンを隠す
+const baseMenu = screen.querySelector(".investigation-menu");
+if (baseMenu) {
+  baseMenu.style.display = "none";
+}
+
+const finishButton =
+  screen.querySelector(".investigation-finish-btn");
+
+if (finishButton) {
+  finishButton.style.display = "none";
+}
 
 // 調査結果の表示中は基本メニューを隠す
 screen.querySelector(".investigation-menu")?.remove();
@@ -6475,10 +6726,17 @@ if (data.type === "updateCharacterProfile") {
 // 調査
 // -------------------------------------------------------
 
-if (
-  data.type ===
-  "investigation"
-) {
+if (data.type === "investigation") {
+
+  // シナリオ上で実際に到着した場所を解放
+  const locationEntry = Object.entries(LOCATION_DATA)
+    .find(([id, location]) =>
+      location.investigationId === data.investigationId
+    );
+
+  if (locationEntry) {
+    unlockLocation(locationEntry[0]);
+  }
 
   renderInvestigationScreen(
     data.investigationId
@@ -6606,6 +6864,15 @@ charName.style.display =
   // =========================================================
 
 function nextDialogue() {
+
+
+// スポットライト演出中は会話を進めない
+if (isTabletSpotlightActive) {
+  stopAutoMode();
+  stopSkipMode();
+  return;
+}
+
 
   // =========================================================
   // 選択肢表示中は通常の会話送りを禁止
@@ -6829,6 +7096,10 @@ function nextDialogue() {
 
 
 resetInvestigationAndTabletState();
+
+isTabletUnlocked = false;
+
+resetLocationUnlocked();
 
 resetTabletNewNotifications();
 
@@ -8383,6 +8654,8 @@ isTabletSpotlightActive: isTabletSpotlightActive,
 
 tabletNewNotifications: Array.from(tabletNewNotifications),
 
+isTabletUnlocked: isTabletUnlocked,
+
 
 // -------------------------------------------------------
 // 調査状態
@@ -8415,6 +8688,10 @@ imageUnlocked: {
 
 imageViewed: {
   ...imageViewed
+},
+
+locationUnlocked: {
+  ...locationUnlocked
 },
 
 // -------------------------------------------------------
@@ -8606,6 +8883,8 @@ if (saveData.scene) {
 
 resetInvestigationAndTabletState();
 
+resetLocationUnlocked();
+
 resetEbookUnlocked();
 
 resetImageUnlocked();
@@ -8711,6 +8990,32 @@ if (
     tabletAppUnlocked,
     saveData.tabletAppUnlocked
   );
+}
+
+
+// タブレット本体の解放状態を復元
+isTabletUnlocked =
+  typeof saveData.isTabletUnlocked === "boolean"
+    ? saveData.isTabletUnlocked
+    : tabletAppUnlocked.characters === true;
+
+
+// -------------------------------------------------------
+// 移動先の解放状態を復元
+// -------------------------------------------------------
+
+if (
+  saveData.locationUnlocked &&
+  typeof saveData.locationUnlocked === "object"
+) {
+
+  Object.keys(LOCATION_DATA).forEach(locationId => {
+
+    locationUnlocked[locationId] =
+      saveData.locationUnlocked[locationId] === true;
+
+  });
+
 }
 
 
@@ -9057,10 +9362,15 @@ if (
   currentData.type === "investigation"
 ) {
 
-  // 調査シーンを復元
-  renderInvestigationScreen(
-    currentData.investigationId
-  );
+  // セーブ時の実際の現在地を優先
+  const savedLocationId =
+    saveData.isInvestigationMode === true &&
+    typeof saveData.currentInvestigationId === "string" &&
+    investigationData[saveData.currentInvestigationId]
+      ? saveData.currentInvestigationId
+      : currentData.investigationId;
+
+  renderInvestigationScreen(savedLocationId);
 
 } else {
 
@@ -9184,7 +9494,6 @@ menuToggleBtn
 // 通常会話：TABLETボタン
 // =========================================================
 
-
 document
   .getElementById("tablet-toggle-btn")
   .addEventListener("click", () => {
@@ -9192,11 +9501,20 @@ document
     // スポットライトを解除
     setTabletSpotlight(false);
 
-    // 通常会話からタブレットを開く
-    openDialogueTablet();
+    // 調査モード中の場合
+    if (isInvestigationMode) {
+
+      // 調査中のタブレット起動処理を使う
+      openTabletWithLoading();
+
+    } else {
+
+      // 通常会話中のタブレット起動処理
+      openDialogueTablet();
+
+    }
 
   });
-
 
 
     // -------------------------------------------------------
