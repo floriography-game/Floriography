@@ -1073,3 +1073,61 @@
 }
 
 
+
+
+/* =========================================================
+   電子書籍：文書ごとのNEW通知
+   ========================================================= */
+
+/* 赤い丸を配置するための基準 */
+.tablet-home-panel .ebook-list-btn.ebook-new-anchor {
+  position: relative;
+}
+
+/* 未読文書・更新文書の赤い丸 */
+.tablet-home-panel .ebook-new-dot {
+  position: absolute;
+
+  top: 8px;
+  right: 10px;
+
+  width: 9px;
+  height: 9px;
+
+  background: #b97979;
+  border-radius: 50%;
+
+  box-shadow: 0 0 5px rgba(185, 121, 121, 0.35);
+
+  pointer-events: none;
+}
+
+
+
+/* =========================================================
+   電子書籍：次のページに未読情報がある場合の赤い丸
+   ========================================================= */
+
+/* 赤い丸を配置する基準 */
+.tablet-home-panel .ebook-next-new-anchor {
+  position: relative;
+}
+
+/* 「次のページ」ボタン右上の赤い丸 */
+.tablet-home-panel .ebook-next-new-dot {
+  position: absolute;
+
+  top: 5px;
+  right: 7px;
+
+  width: 9px;
+  height: 9px;
+
+  background: #b97979;
+  border-radius: 50%;
+
+  box-shadow: 0 0 5px rgba(185, 121, 121, 0.35);
+
+  pointer-events: none;
+}
+

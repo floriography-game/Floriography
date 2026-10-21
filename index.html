@@ -1498,6 +1498,182 @@ const ebookUnlocked = {
   ...DEFAULT_EBOOK_UNLOCKED
 };
 
+
+
+
+// =========================================================
+// 電子書籍：既読履歴
+// =========================================================
+
+// 文書ID → ページ番号 → 閲覧済みの本文
+const ebookReadHistory = {};
+
+
+// =========================================================
+// 電子書籍：既読履歴を初期化
+// =========================================================
+
+function resetEbookReadHistory() {
+
+  Object.keys(ebookReadHistory).forEach(bookId => {
+    delete ebookReadHistory[bookId];
+  });
+
+}
+
+
+// 現在のフラグを反映したページ本文を取得する
+function getEbookPageText(bookId, pageIndex) {
+  const pageData = EBOOK_DATA[bookId]?.pages?.[pageIndex];
+
+  if (pageData === undefined) return "";
+
+  let rawText = "";
+
+  if (typeof pageData === "string") {
+    rawText = pageData;
+
+  } else if (typeof pageData?.flag === "string") {
+    rawText = investigationFlags[pageData.flag] === true
+      ? pageData.after ?? ""
+      : pageData.before ?? "";
+
+  } else {
+    rawText = pageData?.text ?? "";
+  }
+
+  return rawText.replace(
+    /\{\{stamp:([a-zA-Z0-9_]+)\}\}/g,
+    (match, flagName) =>
+      investigationFlags[flagName] === true
+        ? "取得済み"
+        : "未取得"
+  );
+}
+
+
+
+// =========================================================
+// 電子書籍：現在より先に未読ページがあるか
+// =========================================================
+
+function hasUnreadEbookPagesAhead(bookId, currentPageIndex) {
+
+  const book = EBOOK_DATA[bookId];
+
+  if (!book || !Array.isArray(book.pages)) {
+    return false;
+  }
+
+  // 現在のページより後ろを調べる
+  for (
+    let i = currentPageIndex + 1;
+    i < book.pages.length;
+    i++
+  ) {
+
+    if (!isEbookPageRead(bookId, i)) {
+      return true;
+    }
+
+  }
+
+  return false;
+}
+
+
+
+// このページの現在の内容を閲覧済みか判定する
+function isEbookPageRead(bookId, pageIndex) {
+  const text = getEbookPageText(bookId, pageIndex);
+
+  return (
+    ebookReadHistory[bookId]?.[pageIndex]?.includes(text) === true
+  );
+}
+
+// ページを閲覧済みにする
+function markEbookPageAsRead(bookId, pageIndex) {
+  if (ebookUnlocked[bookId] !== true) return;
+  if (!EBOOK_DATA[bookId]?.pages?.[pageIndex]) return;
+
+  const text = getEbookPageText(bookId, pageIndex);
+
+  if (!ebookReadHistory[bookId]) {
+    ebookReadHistory[bookId] = {};
+  }
+
+  if (!ebookReadHistory[bookId][pageIndex]) {
+    ebookReadHistory[bookId][pageIndex] = [];
+  }
+
+  if (ebookReadHistory[bookId][pageIndex].includes(text)) {
+    return;
+  }
+
+ebookReadHistory[bookId][pageIndex].push(text);
+
+}
+
+
+
+// =========================================================
+// 電子書籍：文書ごとの未読判定
+// =========================================================
+
+function isEbookNew(bookId) {
+
+  // 解放されていない文書は対象外
+  if (ebookUnlocked[bookId] !== true) {
+    return false;
+  }
+
+  const book = EBOOK_DATA[bookId];
+
+  if (!book || !Array.isArray(book.pages)) {
+    return false;
+  }
+
+  // 現在の内容が未読であるページが1つでもあればNEW
+  return book.pages.some((page, pageIndex) => {
+    return !isEbookPageRead(bookId, pageIndex);
+  });
+
+}
+
+
+
+// 現在解放済みの電子書籍に未読ページがあるか
+function hasUnreadEbookPages() {
+  return Object.keys(EBOOK_DATA).some(bookId => {
+    if (ebookUnlocked[bookId] !== true) return false;
+
+    const pages = EBOOK_DATA[bookId].pages ?? [];
+
+    return pages.some((page, index) =>
+      !isEbookPageRead(bookId, index)
+    );
+  });
+}
+
+// 電子書籍アプリのNEW表示を実際の未読状態と一致させる
+function syncEbookNewNotification() {
+  const shouldShowNew =
+    tabletAppUnlocked.ebooks === true &&
+    hasUnreadEbookPages();
+
+  if (shouldShowNew) {
+    tabletNewNotifications.add("ebooks");
+  } else {
+    tabletNewNotifications.delete("ebooks");
+  }
+
+  updateTabletNewBadge();
+  updateTabletAppNewBadges();
+}
+
+
+
 // =========================================================
 // 電子書籍：文書をアンロック
 // =========================================================
@@ -1513,9 +1689,9 @@ function unlockEbook(bookId) {
 
   ebookUnlocked[bookId] = true;
 
-  if (wasLocked) {
-    addTabletNewNotification("ebooks");
-  }
+if (wasLocked) {
+  syncEbookNewNotification();
+}
 
 }
 
@@ -1643,9 +1819,23 @@ if (appId === "characters") {
 }
 
 
-  if (wasLocked) {
+if (wasLocked) {
+
+  if (appId === "ebooks") {
+
+    syncEbookNewNotification();
+
+  } else if (appId === "characters") {
+
+    syncCharacterNewNotification();
+
+  } else {
+
     addTabletNewNotification(appId);
+
   }
+
+}
 
 }
 
@@ -1690,9 +1880,9 @@ function unlockCharacter(characterId) {
 
   characterUnlocked[characterId] = true;
 
-  if (wasLocked) {
-    addTabletNewNotification("characters");
-  }
+ if (wasLocked) {
+  syncCharacterNewNotification();
+}
 
 }
 
@@ -1765,6 +1955,8 @@ function updateCharacterProfile(characterId, stage) {
   characterProfileStage[characterId] =
     Math.max(currentStage, stage);
 
+syncCharacterNewNotification();
+
 }
 
 
@@ -1791,6 +1983,8 @@ function resetCharacterProfileStage() {
 const characterProfileReadStage = {};
 
 
+
+
 // =========================================================
 // 人物情報：NEW表示の判定
 // =========================================================
@@ -1812,7 +2006,40 @@ function isCharacterProfileNew(characterId) {
 
 
 // =========================================================
-// 人物情報：プロフィールを既読にする
+// 人物情報：アプリ全体の未読通知
+// =========================================================
+
+function syncCharacterNewNotification() {
+
+  const hasUnread = Object.keys(CHARACTER_PROFILE_DATA)
+    .some(characterId => {
+
+      return isCharacterProfileNew(characterId);
+
+    });
+
+  const shouldShowNew =
+    tabletAppUnlocked.characters === true &&
+    hasUnread;
+
+  if (shouldShowNew) {
+
+    tabletNewNotifications.add("characters");
+
+  } else {
+
+    tabletNewNotifications.delete("characters");
+
+  }
+
+  updateTabletNewBadge();
+  updateTabletAppNewBadges();
+
+}
+
+
+// =========================================================
+// 人物情報：既読登録
 // =========================================================
 
 function markCharacterProfileAsRead(characterId) {
@@ -1821,9 +2048,27 @@ function markCharacterProfileAsRead(characterId) {
     return;
   }
 
-  characterProfileReadStage[characterId] =
+  const currentStage =
     getCharacterProfileStage(characterId);
+
+  const previousReadStage =
+    characterProfileReadStage[characterId] ?? 0;
+
+  // 以前に読んだ段階を巻き戻さない
+  const newReadStage =
+    Math.max(previousReadStage, currentStage);
+if (newReadStage !== previousReadStage) {
+
+  characterProfileReadStage[characterId] = newReadStage;
+
 }
+
+
+  // アプリのNEW通知を更新
+  syncCharacterNewNotification();
+
+}
+
 
 
 // =========================================================
@@ -4435,8 +4680,8 @@ function openTabletApp(appId) {
 
 if (appId === "characters") {
 
-  // 人物情報のNEWを既読にする
-  clearTabletNewNotification("characters");
+  // 一覧を開くだけでは既読にしない
+  syncCharacterNewNotification();
 
   showCharacterList();
 
@@ -4450,8 +4695,9 @@ if (appId === "characters") {
 
 if (appId === "ebooks") {
 
-  // 電子書籍のNEWを既読にする
-  clearTabletNewNotification("ebooks");
+  // アプリを開くだけではNEWを消さない
+  // 実際の既読状態に合わせる
+  syncEbookNewNotification();
 
   showEbookList();
 
@@ -4752,6 +4998,25 @@ Object.entries(EBOOK_DATA)
 
       button.textContent = book.title;
 
+
+// -------------------------------------------------------
+// 未読・更新された文書には赤い丸を表示
+// -------------------------------------------------------
+
+if (isEbookNew(bookId)) {
+
+  button.classList.add("ebook-new-anchor");
+
+  const newDot = document.createElement("span");
+
+  newDot.className = "ebook-new-dot";
+  newDot.setAttribute("aria-hidden", "true");
+
+  button.appendChild(newDot);
+
+}
+
+
       button.addEventListener("click", () => {
         showEbookPage(bookId, 0);
       });
@@ -4930,6 +5195,18 @@ menu.appendChild(page);
 
 
 
+
+// =========================================================
+// 表示したページを既読として記録
+// =========================================================
+
+markEbookPageAsRead(bookId, pageIndex);
+
+// 未読状況に応じてNEW通知を更新
+syncEbookNewNotification();
+
+
+
   // -------------------------------------------------------
   // ページ操作ボタン
   // -------------------------------------------------------
@@ -4963,6 +5240,28 @@ menu.appendChild(page);
 
   nextButton.disabled =
     pageIndex === totalPages - 1;
+
+
+// -------------------------------------------------------
+// この先に未読ページがあれば「次へ」に赤い丸を表示
+// -------------------------------------------------------
+
+if (
+  !nextButton.disabled &&
+  hasUnreadEbookPagesAhead(bookId, pageIndex)
+) {
+
+  nextButton.classList.add("ebook-next-new-anchor");
+
+  const newDot = document.createElement("span");
+
+  newDot.className = "ebook-next-new-dot";
+  newDot.setAttribute("aria-hidden", "true");
+
+  nextButton.appendChild(newDot);
+
+}
+
 
   nextButton.addEventListener("click", () => {
     showEbookPage(bookId, pageIndex + 1);
@@ -6024,12 +6323,15 @@ if (
     "observatoryStampFound"
   ];
 
-  if (
-    wasUnchecked &&
-    stampFlags.includes(flag)
-  ) {
-    addTabletNewNotification("ebooks");
-  }
+
+if (
+  wasUnchecked &&
+  stampFlags.includes(flag)
+) {
+  // 更新された内容が未読の場合だけNEWを表示
+  syncEbookNewNotification();
+}
+
 
 }
 
@@ -7107,6 +7409,9 @@ setTabletSpotlight(false);
 
 resetEbookUnlocked();
 
+// 電子書籍の既読履歴を初期化
+resetEbookReadHistory();
+
 resetImageUnlocked();
 
 resetImageViewed();
@@ -7119,6 +7424,7 @@ resetCharacterUnlocked();
 
 resetCharacterProfileStage();
 
+// 人物情報の既読履歴を初期化
 resetCharacterProfileReadStage();
 
 
@@ -8600,7 +8906,7 @@ function closeSlotModal() {
 
 
       // セーブデータ形式
-      version: 8,
+      version: 9,
 
 
       scene:
@@ -8681,10 +8987,14 @@ ebookUnlocked: {
   ...ebookUnlocked
 },
 
+// 電子書籍の既読履歴を保存
+ebookReadHistory:
+  JSON.parse(JSON.stringify(ebookReadHistory)),
 
 imageUnlocked: {
   ...imageUnlocked
 },
+
 
 imageViewed: {
   ...imageViewed
@@ -8887,6 +9197,9 @@ resetLocationUnlocked();
 
 resetEbookUnlocked();
 
+// 電子書籍の既読履歴をいったん初期化
+resetEbookReadHistory();
+
 resetImageUnlocked();
 
 resetImageViewed();
@@ -8925,6 +9238,7 @@ resetCharacterProfileStage();
 
 
 resetCharacterProfileReadStage();
+
 
 
 // -------------------------------------------------------
@@ -9041,6 +9355,54 @@ if (
 }
 
 
+
+// =========================================================
+// 電子書籍：セーブ時点の既読履歴を復元
+// =========================================================
+
+if (
+  saveData.ebookReadHistory &&
+  typeof saveData.ebookReadHistory === "object" &&
+  !Array.isArray(saveData.ebookReadHistory)
+) {
+
+  Object.entries(saveData.ebookReadHistory)
+    .forEach(([bookId, pages]) => {
+
+      if (
+        !EBOOK_DATA[bookId] ||
+        !pages ||
+        typeof pages !== "object" ||
+        Array.isArray(pages)
+      ) {
+        return;
+      }
+
+      ebookReadHistory[bookId] = {};
+
+      Object.entries(pages)
+        .forEach(([pageIndex, contents]) => {
+
+          if (
+            !Number.isInteger(Number(pageIndex)) ||
+            Number(pageIndex) < 0 ||
+            Number(pageIndex) >= EBOOK_DATA[bookId].pages.length ||
+            !Array.isArray(contents)
+          ) {
+            return;
+          }
+
+          ebookReadHistory[bookId][pageIndex] =
+            contents.filter(text => typeof text === "string");
+
+        });
+
+    });
+
+}
+
+
+
 // -------------------------------------------------------
 // 画像フォルダ：取得状態を復元
 // -------------------------------------------------------
@@ -9129,34 +9491,38 @@ if (
 
 
 
+
 // =========================================================
-// 人物情報：閲覧済みプロフィール段階を復元
+// 人物情報：セーブ時点の既読履歴を復元
 // =========================================================
 
 if (
   saveData.characterProfileReadStage &&
-  typeof saveData.characterProfileReadStage === "object"
+  typeof saveData.characterProfileReadStage === "object" &&
+  !Array.isArray(saveData.characterProfileReadStage)
 ) {
 
   Object.entries(saveData.characterProfileReadStage)
-    .forEach(([characterId, stage]) => {
+    .forEach(([characterId, savedStage]) => {
 
       if (
         CHARACTER_PROFILE_DATA[characterId] &&
-        Number.isInteger(stage) &&
-        stage >= 0
+        Number.isInteger(savedStage) &&
+        savedStage >= 0
       ) {
 
         characterProfileReadStage[characterId] =
           Math.min(
-            stage,
+            savedStage,
             getCharacterProfileStage(characterId)
           );
 
       }
 
     });
+
 }
+
 
 
 
@@ -9394,8 +9760,17 @@ setTabletSpotlight(
   saveData.isTabletSpotlightActive === true
 );
 
-}
 
+// =========================================================
+// セーブ時点の既読履歴に基づいてNEW通知を再判定
+// =========================================================
+
+
+syncEbookNewNotification();
+
+syncCharacterNewNotification();
+
+}
 
   // =========================================================
   // UIイベント
