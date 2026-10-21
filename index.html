@@ -5848,7 +5848,8 @@ function returnToInvestigationView() {
 // 調査モード：画面切り替え時の共通処理
 // =========================================================
 
-function clearInvestigationView() {
+
+function clearInvestigationView(menuMode = "keep") {
 
   const screen =
     document.getElementById("investigation-screen");
@@ -5868,6 +5869,27 @@ function clearInvestigationView() {
   ).forEach(element => {
     element.remove();
   });
+
+  // 基本メニューと調査終了ボタン
+  const baseMenu =
+    screen.querySelector(".investigation-menu");
+
+  const finishButton =
+    screen.querySelector(".investigation-finish-btn");
+
+  if (menuMode === "hide") {
+
+    // 要素は残し、画面から隠す
+    if (baseMenu) baseMenu.style.display = "none";
+    if (finishButton) finishButton.style.display = "none";
+
+  } else if (menuMode === "remove") {
+
+    // 要素そのものを削除する
+    baseMenu?.remove();
+    finishButton?.remove();
+
+  }
 
   return screen;
 }
@@ -5892,14 +5914,11 @@ function showInvestigationTalks() {
 
   }
 
-const screen = clearInvestigationView();
+// 会話相手一覧に切り替えるため、
+// 一時的なUIと基本メニューを削除する
+const screen = clearInvestigationView("remove");
 
 if (!screen) return;
-
-// 会話相手の選択画面では基本メニューを隠す
-screen.querySelector(".investigation-menu")?.remove();
-
-screen.querySelector(".investigation-finish-btn")?.remove();
 
 
   const panel = document.createElement("div");
@@ -6019,29 +6038,15 @@ function showInvestigationTargets() {
   );
 
 
-
-clearInvestigationView();
-
-
 // -------------------------------------------------------
-// 調査地点選択中は下部メニューを非表示にする
+// 調査地点選択画面への切り替え準備
 // -------------------------------------------------------
 
-// 会話・調査・持ち物・移動ボタンを隠す
-const baseMenu =
-  screen.querySelector(".investigation-menu");
+// 一時的なUIを削除し、
+// 基本メニューと調査終了ボタンを非表示にする
+clearInvestigationView("hide");
 
-if (baseMenu) {
-  baseMenu.style.display = "none";
-}
 
-// 調査終了ボタンも隠す
-const finishButton =
-  screen.querySelector(".investigation-finish-btn");
-
-if (finishButton) {
-  finishButton.style.display = "none";
-}
 
 
 
@@ -6520,36 +6525,14 @@ function showInvestigationResultEntry(
   }
 
 
-  // 念のため前の調査用タイマーを停止
-  stopInvestigationTextTimer();
 
 
 // -------------------------------------------------------
-// 調査中の会話表示に不要なUIを削除
+// 調査結果画面への切り替え準備
 // -------------------------------------------------------
 
-// 調査画面内の一時的なUIを削除
-clearInvestigationView();
-
-// 調査地点選択中は基本メニューと終了ボタンを隠す
-const baseMenu = screen.querySelector(".investigation-menu");
-if (baseMenu) {
-  baseMenu.style.display = "none";
-}
-
-const finishButton =
-  screen.querySelector(".investigation-finish-btn");
-
-if (finishButton) {
-  finishButton.style.display = "none";
-}
-
-// 調査結果の表示中は基本メニューを隠す
-screen.querySelector(".investigation-menu")?.remove();
-
-// 調査終了ボタンも非表示にする
-screen.querySelector(".investigation-finish-btn")?.remove();
-
+// 一時的なUIと基本メニューを削除する
+clearInvestigationView("remove");
 
   const resultBox =
     document.createElement(
