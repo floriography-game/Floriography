@@ -2551,6 +2551,81 @@
       type: "dialogue",
       name: "{NAME}",
       text: "そうそう！それじゃあさっそく、レッツゴー！"
-    }
+    },
 
+   {   
+      id: "c1_bg009",
+      type: "backgroundFade",
+ 　　 image:"shrine_morning.jpg"
+    },
+
+    {
+       id:"c1_inv004",
+       type:"investigation",
+       investigationId:"stampRallyClock"
+    },
+
+    {   
+      id: "c1_319",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "とりあえず来てみたけど……"
+    },
+
+    {   
+      id: "c1_320",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "さっすが老舗の和菓子屋さん。どれも美味しそ〜！"
+    },
+
+　  {   
+      id: "c1_321",
+      type: "dialogue",
+      name: "タブレット",
+      text: "ユーザーの目的はスタンプラリーを制覇することです。\n和菓子の購入ではありません。"
+    },
+
+    {   
+      id: "c1_322",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "わざわざ言われなくてもわかってるって！\n……でも、一個くらいならいいと思わない？"
+    },
+
+    {   
+      id: "c1_323",
+      type: "dialogue",
+      name: "タブレット",
+      text: "…………"
+    },
+
+    {   
+      id: "c1_324",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "（この町の名物、あさか饅頭は……\nあった！）"
+    },
+
+    {   
+      id: "c1_325",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "（って、やばっ！あと一個しかないじゃん！）"
+    },
+
+    {   
+      id: "c1_326",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "すみませーん、このあさか饅頭を――"
+    },
+
+    {   
+      id: "c1_327",
+      type: "dialogue",
+      name: "？？？",
+      text: "かしわ餅あさか饅頭一つ、お願いします。"
+    },
+    
   ];
