@@ -2559,12 +2559,6 @@
  　　 image:"shrine_morning.jpg"
     },
 
-    {
-       id:"c1_inv004",
-       type:"investigation",
-       investigationId:"stampRallyClock"
-    },
-
     {   
       id: "c1_319",
       type: "dialogue",
@@ -2611,7 +2605,7 @@
       id: "c1_325",
       type: "dialogue",
       name: "{NAME}",
-      text: "（って、やばっ！あと一個しかないじゃん！）"
+      text: "（って、やばっ！あと１個しかないじゃん！）"
     },
 
     {   
@@ -2625,7 +2619,35 @@
       id: "c1_327",
       type: "dialogue",
       name: "？？？",
-      text: "かしわ餅あさか饅頭一つ、お願いします。"
+      text: "柏餅とみたらし４つずつ、それとあさか饅頭を１つお願いします。"
     },
+
+    {   
+      id: "c1_328",
+      type: "dialogue",
+      name: "店主",
+      text: "はいはい、いつもありがとうねえ。"
+    },
+
+    {   
+      id: "c1_329",
+      type: "dialogue",
+      name: "　　　",
+      text: "そう言った店主さんがひょいひょいと柏餅とみたらし団子、そしてあさか饅頭を包装していく。"
+    },
+
+    {   
+      id: "c1_330",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "え……ええっ？"
+    },
+
+    {   
+      id: "c1_331",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "（そんなあ……久しぶりに食べられると思ったのに。）"
+    }
     
   ];
