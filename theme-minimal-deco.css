@@ -891,3 +891,185 @@
   line-height: 1.6;
   white-space: pre-wrap;
 }
+
+
+
+
+/* =========================================================
+   調査モード：移動先選択
+   ========================================================= */
+
+.investigation-move-panel {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  width: 440px;
+  max-height: 75%;
+
+  box-sizing: border-box;
+  padding: 28px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  overflow-y: auto;
+
+  background: var(--deco-panel);
+  border: 1px solid var(--deco-line);
+  border-radius: var(--deco-radius);
+
+  z-index: 210;
+}
+
+.investigation-move-title {
+  text-align: center;
+  color: var(--deco-gold);
+
+  font-size: 19px;
+  letter-spacing: 0.08em;
+
+  margin-bottom: 12px;
+}
+
+.investigation-move-destination,
+.investigation-move-back {
+  padding: 12px 18px;
+
+  background: var(--deco-panel-light);
+  color: var(--deco-text);
+
+  border: 1px solid var(--deco-line-soft);
+  border-radius: var(--deco-radius);
+
+  font-family: 'Shippori Mincho', serif;
+  font-size: 16px;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.investigation-move-destination:hover:not(:disabled),
+.investigation-move-back:hover {
+  background: #2a4155;
+  border-color: var(--deco-gold);
+}
+
+.investigation-move-destination:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.investigation-move-back {
+  margin-top: 12px;
+  color: var(--deco-muted);
+}
+
+/* =========================================================
+   タブレット：3列×2行レイアウト
+   ========================================================= */
+
+/* アプリ一覧を3列に配置 */
+.tablet-home-panel
+.tablet-function-menu:not(.character-view):not(.ebook-view):not(.image-gallery-view):not(.image-detail-view) {
+
+  display: grid;
+
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  grid-template-rows: repeat(2, 86px);
+
+  gap: 16px;
+
+  align-content: center;
+
+}
+
+/* アプリボタンの大きさ */
+.tablet-home-panel
+.tablet-function-menu:not(.character-view):not(.ebook-view):not(.image-gallery-view):not(.image-detail-view)
+.tablet-function-btn {
+
+  height: 86px;
+
+  min-width: 0;
+
+}
+
+
+
+/* タブレットの空き枠 */
+
+.tablet-empty-slot {
+  height: 86px;
+  min-width: 0;
+
+  background: transparent;
+  border: 1px solid transparent;
+
+  pointer-events: none;
+}
+
+
+
+
+/* =========================================================
+   電子書籍：スクロール領域とボタン配置の修正
+   ========================================================= */
+
+/* 文書一覧・本文画面の共通スクロール領域 */
+.tablet-home-panel .tablet-function-menu.ebook-view {
+  display: flex;
+  flex-direction: column;
+
+  width: 88%;
+  height: 280px;
+  max-height: 280px;
+  min-height: 0;
+
+  gap: 12px;
+  padding: 4px 8px 16px;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  box-sizing: border-box;
+  align-items: stretch;
+}
+
+/* 文書名のボタン */
+.tablet-home-panel .ebook-view .ebook-list-btn {
+  display: block;
+
+  width: 100%;
+  min-height: 64px;
+  flex: 0 0 64px;
+
+  margin: 0;
+  box-sizing: border-box;
+}
+
+/* 文書一覧・本文画面の戻るボタン */
+.tablet-home-panel .ebook-view .ebook-back-btn {
+  display: block;
+
+  width: 100%;
+  min-height: 64px;
+  flex: 0 0 64px;
+
+  margin: 0;
+  box-sizing: border-box;
+}
+
+/* 本文とページ送りボタンの縮小を防ぐ */
+.tablet-home-panel .ebook-view .ebook-page,
+.tablet-home-panel .ebook-view .ebook-controls {
+  flex-shrink: 0;
+}
+
+
