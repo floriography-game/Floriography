@@ -2489,7 +2489,7 @@
 　　{
   　　id: "c1_unlock_image001",
   　　type: "unlockImage",
- 　　 imageId: "clock_photo"
+ 　　 imageId: "testPhoto"
 　　},
 
 　　{

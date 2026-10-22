@@ -283,6 +283,7 @@
 <script src="data/ebook-data.js"></script>
 <script src="data/image-data.js"></script>
 <script src="data/location-data.js"></script>
+<script src="data/information-data.js"></script>
 
 <script>
 
@@ -1727,9 +1728,14 @@ function resetImageViewed() {
 // 画像を閲覧済みにする
 function markImageAsViewed(imageId) {
 
+  // 未取得の画像は閲覧済みにできない
   if (imageUnlocked[imageId] !== true) return;
 
+  // 画像を既読として記録
   imageViewed[imageId] = true;
+
+  // 未閲覧画像の有無に応じてNEW通知を更新
+  syncImageNewNotification();
 
 }
 
@@ -1742,6 +1748,41 @@ function isImageNew(imageId) {
   );
 
 }
+
+
+
+
+// =========================================================
+// 画像フォルダ：アプリ全体のNEW通知
+// =========================================================
+
+function syncImageNewNotification() {
+
+  // 取得済み・未閲覧の画像が存在するか
+  const hasUnread = Object.keys(IMAGE_DATA)
+    .some(imageId => isImageNew(imageId));
+
+  // アプリが解放され、未閲覧画像がある場合のみNEW
+  const shouldShowNew =
+    tabletAppUnlocked.images === true &&
+    hasUnread;
+
+  if (shouldShowNew) {
+
+    tabletNewNotifications.add("images");
+
+  } else {
+
+    tabletNewNotifications.delete("images");
+
+  }
+
+  // TABLETボタンとアプリ一覧の表示を更新
+  updateTabletNewBadge();
+  updateTabletAppNewBadges();
+
+}
+
 
 
 
@@ -1773,11 +1814,11 @@ function unlockImage(imageId) {
 
   imageUnlocked[imageId] = true;
 
-  // 初めて画像を取得した際はアプリも解放
-  unlockTabletApp("images");
+// 初めて画像を取得した際はアプリも解放
+unlockTabletApp("images");
 
-  // NEW通知
-  addTabletNewNotification("images");
+// 実際の未閲覧状態に応じてNEW通知を更新
+syncImageNewNotification();
 }
 
 // 取得状態を初期化
@@ -1829,6 +1870,10 @@ if (wasLocked) {
 
     syncCharacterNewNotification();
 
+  } else if (appId === "images") {
+
+    syncImageNewNotification();
+
   } else {
 
     addTabletNewNotification(appId);
@@ -1838,6 +1883,154 @@ if (wasLocked) {
 }
 
 }
+
+
+
+
+
+// =========================================================
+// 情報記録：取得・更新状態の管理
+// =========================================================
+
+// 情報を取得済みかどうか
+const informationUnlocked = {};
+
+// 各情報の現在の更新段階
+const informationStage = {};
+
+// =========================================================
+// 情報記録：初期化
+// =========================================================
+
+function resetInformationState() {
+
+  Object.keys(informationUnlocked).forEach(id => {
+    delete informationUnlocked[id];
+  });
+
+  Object.keys(informationStage).forEach(id => {
+    delete informationStage[id];
+  });
+
+  Object.keys(INFORMATION_DATA).forEach(id => {
+    informationUnlocked[id] = false;
+  });
+
+}
+
+// 起動時の初期状態を設定
+resetInformationState();
+
+
+// =========================================================
+// 情報記録：情報の取得
+// =========================================================
+
+function unlockInformation(infoId) {
+
+  if (!Object.prototype.hasOwnProperty.call(
+    INFORMATION_DATA,
+    infoId
+  )) {
+    console.warn("未登録の情報IDです:", infoId);
+    return;
+  }
+
+  // すでに取得済みなら何もしない
+  if (informationUnlocked[infoId] === true) {
+    return;
+  }
+
+  informationUnlocked[infoId] = true;
+  informationStage[infoId] = 1;
+
+  // 情報記録アプリも解放する
+  unlockTabletApp("information");
+
+}
+
+
+// =========================================================
+// 情報記録：現在の更新段階を取得
+// =========================================================
+
+function getInformationStage(infoId) {
+
+  if (informationUnlocked[infoId] !== true) {
+    return 0;
+  }
+
+  return informationStage[infoId] ?? 1;
+
+}
+
+
+// =========================================================
+// 情報記録：情報の更新
+// =========================================================
+
+function updateInformation(infoId, stage) {
+
+  if (!INFORMATION_DATA[infoId]) {
+    console.warn("未登録の情報IDです:", infoId);
+    return;
+  }
+
+  if (!Number.isInteger(stage) || stage < 1) {
+    console.warn("不正な更新段階です:", stage);
+    return;
+  }
+
+  // 未取得の場合は、先に情報を取得する
+  if (informationUnlocked[infoId] !== true) {
+    unlockInformation(infoId);
+  }
+
+  const currentStage = getInformationStage(infoId);
+
+  // 更新段階は前に戻さない
+  informationStage[infoId] = Math.max(
+    currentStage,
+    stage
+  );
+
+}
+
+
+// =========================================================
+// 情報記録：現在までの本文を取得
+// =========================================================
+
+function getInformationText(infoId) {
+
+  if (informationUnlocked[infoId] !== true) {
+    return "";
+  }
+
+  const info = INFORMATION_DATA[infoId];
+
+  if (!info) return "";
+
+  const stage = getInformationStage(infoId);
+
+  const paragraphs = [info.text ?? ""];
+
+  // 現在の段階までの追記を順番に追加
+  for (let i = 2; i <= stage; i++) {
+
+    const additionalText = info.updates?.[i];
+
+    if (typeof additionalText === "string") {
+      paragraphs.push(additionalText);
+    }
+
+  }
+
+  return paragraphs.filter(Boolean).join("\n\n");
+
+}
+
+
 
 
 
@@ -4711,7 +4904,8 @@ if (appId === "ebooks") {
 
 if (appId === "images") {
 
-  clearTabletNewNotification("images");
+  // 一覧を開くだけでは既読にしない
+  syncImageNewNotification();
 
   showImageGallery(0);
 
@@ -5728,72 +5922,169 @@ markCharacterProfileAsRead(characterId);
 
 
 
+
 // =========================================================
-// タブレット：取得情報
+// 情報記録：情報一覧画面
 // =========================================================
 
 function showInvestigationInformation() {
 
-  let informationText =
-    "【取得情報】\n";
+  const tablet =
+    document.querySelector(".tablet-home-panel");
 
-  // 以下続く
+  if (!tablet) return;
 
-// =========================================================
-// タブレット：取得情報
-// =========================================================
+  const title =
+    tablet.querySelector(".tablet-home-title");
 
+  const subtitle =
+    tablet.querySelector(".tablet-home-text");
 
-  if (
-    investigationFlags.deskChecked
-  ) {
+  const menu =
+    tablet.querySelector(".tablet-function-menu");
 
-    informationText +=
-      "\n・自分の机：学生手帳は見つからなかった";
-  }
+  if (!title || !subtitle || !menu) return;
 
+  // タイトルと説明
+  title.textContent = "INFORMATION ARCHIVE";
+  subtitle.textContent = "取得した情報を選択してください";
 
-  if (
-    investigationFlags.teacherDeskChecked
-  ) {
+  // 一覧表示の準備
+  menu.innerHTML = "";
 
-    informationText +=
-      "\n・教卓：学生手帳は見つからなかった";
-  }
-
-
-  if (
-    investigationFlags.backChecked
-  ) {
-
-    informationText +=
-      "\n・教室後方：学生手帳は見つからなかった";
-  }
-
-
-  if (
-    investigationFlags.studentBookFound
-  ) {
-
-    informationText +=
-      "\n・学生手帳：発見済み";
-  }
-
-
-  if (
-    informationText ===
-    "【取得情報】\n"
-  ) {
-
-    informationText +=
-      "\nまだ情報はありません。";
-  }
-
-
-  showMessage(
-    informationText
+  // 既存の電子書籍用レイアウトを利用
+  menu.classList.remove(
+    "character-view",
+    "image-gallery-view",
+    "image-detail-view"
   );
+  menu.classList.add("ebook-view");
+
+  // 取得済みの情報だけを抽出
+  const informations = Object.entries(INFORMATION_DATA)
+    .filter(([infoId]) =>
+      informationUnlocked[infoId] === true
+    );
+
+  // 情報がない場合
+  if (informations.length === 0) {
+
+    const emptyMessage = document.createElement("div");
+    emptyMessage.className = "ebook-empty-message";
+    emptyMessage.textContent =
+      "まだ情報は登録されていません。";
+
+    menu.appendChild(emptyMessage);
+
+  } else {
+
+    // 取得済みの情報を一覧表示
+    informations.forEach(([infoId, info]) => {
+
+      const button = document.createElement("button");
+
+      button.type = "button";
+      button.className = "ebook-list-btn";
+      button.textContent = info.title;
+
+      button.addEventListener("click", () => {
+        showInformationDetail(infoId);
+      });
+
+      menu.appendChild(button);
+
+    });
+
+  }
+
+  // タブレットホームへ戻る
+  const backButton = document.createElement("button");
+
+  backButton.type = "button";
+  backButton.className = "ebook-back-btn";
+  backButton.textContent = "← タブレットホームへ";
+
+  backButton.addEventListener("click", () => {
+    showTabletFunctionMenu();
+  });
+
+  menu.appendChild(backButton);
+
 }
+
+
+// =========================================================
+// 情報記録：詳細画面
+// =========================================================
+
+function showInformationDetail(infoId) {
+
+  // 未取得の情報は開けない
+  if (informationUnlocked[infoId] !== true) {
+    return;
+  }
+
+  const info = INFORMATION_DATA[infoId];
+
+  if (!info) return;
+
+  const tablet =
+    document.querySelector(".tablet-home-panel");
+
+  if (!tablet) return;
+
+  const title =
+    tablet.querySelector(".tablet-home-title");
+
+  const subtitle =
+    tablet.querySelector(".tablet-home-text");
+
+  const menu =
+    tablet.querySelector(".tablet-function-menu");
+
+  if (!title || !subtitle || !menu) return;
+
+  // タイトル
+  title.textContent = "INFORMATION ARCHIVE";
+  subtitle.textContent = info.title;
+
+  // 詳細画面の準備
+  menu.innerHTML = "";
+
+  menu.classList.remove(
+    "character-view",
+    "image-gallery-view",
+    "image-detail-view"
+  );
+  menu.classList.add("ebook-view");
+
+  // 情報本文
+  const content = document.createElement("div");
+
+  content.className = "ebook-page";
+
+  // 現在の更新段階までの全文を表示
+  content.textContent =
+    replaceNameTags(getInformationText(infoId));
+
+  menu.appendChild(content);
+
+  // 情報一覧へ戻る
+  const backButton = document.createElement("button");
+
+  backButton.type = "button";
+  backButton.className = "ebook-back-btn";
+  backButton.textContent = "← 情報一覧へ戻る";
+
+  backButton.addEventListener("click", () => {
+    showInvestigationInformation();
+  });
+
+  menu.appendChild(backButton);
+
+}
+
+
 
 
 
@@ -7381,6 +7672,9 @@ if (isTabletSpotlightActive) {
 
 
 resetInvestigationAndTabletState();
+
+// 情報記録の取得・更新状態を初期化
+resetInformationState();
 
 isTabletUnlocked = false;
 
@@ -9752,6 +10046,8 @@ setTabletSpotlight(
 syncEbookNewNotification();
 
 syncCharacterNewNotification();
+
+syncImageNewNotification();
 
 }
 
