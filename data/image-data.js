@@ -4,6 +4,16 @@
 
 const IMAGE_DATA = {
 
+
+
+testPhoto: {
+  title: "テスト用の写真",
+  file: "test_photo.png",
+  description: "画像フォルダの動作を確認するための写真です。"
+},
+
+
+
   parkPhoto: {
     title: "浅華中央公園",
     file: "park_photo.jpg"
