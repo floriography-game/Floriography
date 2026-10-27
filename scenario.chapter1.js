@@ -2656,6 +2656,194 @@
       type: "dialogue",
       name: "{NAME}",
       text: "（そんなあ……久しぶりに食べられると思ったのに。）"
-    }
+    },
 
+    {   
+      id: "c1_332",
+      type: "dialogue",
+      name: "店主",
+      text: "あぁ、そこのお嬢さんの注文は？"
+    },
+
+    {   
+      id: "c1_333",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "えーっと……わ、私は、その……"
+    },
+
+   {   
+      id: "c1_334",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "（ここまで来ておいて何も買わないっていうのも勿体ないし……）"
+    },
+    
+   {   
+      id: "c1_335",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "じゃあ、みたらし団子を一つ。"
+    },
+    
+   {   
+      id: "c1_336",
+      type: "dialogue",
+      name: "店主",
+      text: "みたらし団子一つ、あいよ！\n220円ね。"
+    },
+        
+   {   
+      id: "c1_337",
+      type: "dialogue",
+      name: "　　",
+      text: "みたらし団子を受け取る代わりに220円を差し出す。\nまいどあり、という店主さんの明るい声に思わず笑顔になった。"
+    },
+        
+   {   
+      id: "c1_338",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "……でもさあ、笑顔でお腹は膨れないじゃん……"
+    },
+
+   {   
+      id: "c1_bg010",
+      type: "backgroundFade",
+ 　　 image:"park_morning.jpg"
+    },
+
+   {   
+      id: "c1_339",
+      type: "dialogue",
+      name: "　　　",
+      text: "はあ、と大きくため息をついてみたらし団子を頬張る。\nみたらし団子も美味しいけど、やっぱり。"
+    },
+    
+   {   
+      id: "c1_340",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "あさか饅頭、食べたかったなあ〜！"
+    },
+
+   {   
+      id: "c1_341",
+      type: "dialogue",
+      name: "タブレット",
+      text: "ユーザーは食い意地が張り過ぎかと。"
+    },
+
+   {   
+      id: "c1_342",
+      type: "dialogue",
+      name: "タブレット",
+      text: "そもそも、現在みたらし団子を摂取している事自体が健康に対し悪影響を与えています。\n推定、あさか饅頭はみたらし団子のおよそ1.3倍の糖分を含みます。そのためユーザーがあさか饅頭を食べられなかったことは不幸中の幸いだったと……"
+    },
+    
+   {   
+      id: "c1_343",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "うるさいなあ！"
+    },
+  
+   {   
+      id: "c1_344",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "いいじゃん、私はあさか饅頭は手に入らなかったけどみたらし団子を美味しく食べてるってことで！！"
+    },
+  
+   {   
+      id: "c1_345",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "乙女にカロリーの話をするなんてデリカシーなさすぎ！"
+    },
+    
+   {   
+      id: "c1_346",
+      type: "dialogue",
+      name: "タブレット",
+      text: "訂正。先ほど私が説明したことはみたらし団子に含まれる糖分の話であり、カロリーの話では……"
+    },
+        
+   {   
+      id: "c1_347",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "だ、か、ら！そういうところがデリカシーないって――"
+    },
+
+   {   
+      id: "c1_348",
+      type: "dialogue",
+      name: "？？？",
+      text: "あー……すまない、少しいいか？"
+    },
+    
+   {   
+      id: "c1_349",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "ほんっとあんたって人の心が分からな……\nん？"
+    },
+        
+   {   
+      id: "c1_350",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "えっ、あ、私ですか！？"
+    },
+    
+   {   
+      id: "c1_351",
+      type: "dialogue",
+      name: "　　　",
+      text: "頭上から降ってきた声に慌てて振り返る。\nそこには先ほど、私の目の前であさか饅頭をかっさらっていった男が立っていた。"
+    },
+        
+   {   
+      id: "c1_352",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "えーっと……なんのご用でしょうか？"
+    },
+
+   {   
+      id: "c1_353",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "（こいつ、さっき最後のあさか饅頭を買ってった奴……！）"
+    },
+    
+   {   
+      id: "c1_354",
+      type: "dialogue",
+      name: "　　　",
+      text: "べー、と心の中でこっそり舌を出しながら笑みを浮かべる。\n明らかに口角が上がりきっていないのが自分でも分かった。"
+    },
+    
+   {   
+      id: "c1_355",
+      type: "dialogue",
+      name: "？？？",
+      text: "いや……その、もしかして君もこれを買いたかったのかと思って。"
+    },
+    
+　　{   
+      id: "c1_356",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "（そ、それは……あさか饅頭！）"
+    },
+        
+   {   
+      id: "c1_357",
+      type: "dialogue",
+      name: "{NAME}",
+      text: "そうですそうです、めっちゃ食べたいです！！"
+    }
+    
   ];
